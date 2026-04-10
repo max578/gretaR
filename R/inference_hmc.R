@@ -5,6 +5,7 @@
 hmc_sampler <- function(model, n_samples = 1000L, warmup = 500L,
                         chains = 4L, step_size = NULL,
                         n_leapfrog = 25L, target_accept = 0.65,
+                        compiled_fn = NULL,
                         init_values = NULL, verbose = TRUE) {
 
   n_params <- model$total_dim
@@ -20,6 +21,16 @@ hmc_sampler <- function(model, n_samples = 1000L, warmup = 500L,
     cli_alert_info("Running HMC with {chains} chain{?s}, {warmup} warmup + {n_samples} samples")
     cli_alert_info("Parameters: {n_params}")
   }
+
+  # Set up compiled gradient function if available
+  if (!is.null(compiled_fn)) {
+    .gretaR_env$active_grad_fn <- function(theta_vec) {
+      fast_grad(compiled_fn, theta_vec, model$dtype)
+    }
+  } else {
+    .gretaR_env$active_grad_fn <- NULL
+  }
+  on.exit(.gretaR_env$active_grad_fn <- NULL, add = TRUE)
 
   for (chain in seq_len(chains)) {
     if (verbose) cli_alert_info("Chain {chain}/{chains}")

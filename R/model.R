@@ -214,11 +214,13 @@ grad_log_prob <- function(model, theta_free) {
   theta_free <- theta_free$detach()$requires_grad_(TRUE)
 
   lp <- log_prob(model, theta_free)
-  lp$backward()
+
+  # Use autograd_grad instead of backward() — avoids grad accumulation overhead
+  grads <- autograd_grad(lp, theta_free)
 
   list(
     lp = lp$item(),
-    grad = theta_free$grad$clone()
+    grad = grads[[1]]
   )
 }
 

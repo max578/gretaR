@@ -50,8 +50,14 @@ mcmc <- function(model, n_samples = 1000L, warmup = 1000L, chains = 4L,
     target_accept <- if (sampler == "nuts") 0.8 else 0.65
   }
 
-  # Reset DAG computation state to avoid stale values
-  # (nodes keep their structure but values will be recomputed)
+  # Compile the log-prob function for faster gradient evaluation
+  compiled_fn <- tryCatch(
+    compile_model(model, use_jit = TRUE),
+    error = function(e) NULL
+  )
+  if (!is.null(compiled_fn) && verbose) {
+    cli_alert_info("Compiled log-prob for fast evaluation")
+  }
 
   if (verbose) {
     cli_alert_info("Sampler: {toupper(sampler)}")
@@ -67,7 +73,8 @@ mcmc <- function(model, n_samples = 1000L, warmup = 1000L, chains = 4L,
       max_treedepth = max_treedepth,
       target_accept = target_accept,
       init_values = init_values,
-      verbose = verbose
+      verbose = verbose,
+      compiled_fn = compiled_fn
     )
   } else {
     hmc_sampler(
@@ -79,7 +86,8 @@ mcmc <- function(model, n_samples = 1000L, warmup = 1000L, chains = 4L,
       n_leapfrog = n_leapfrog,
       target_accept = target_accept,
       init_values = init_values,
-      verbose = verbose
+      verbose = verbose,
+      compiled_fn = compiled_fn
     )
   }
 

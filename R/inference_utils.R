@@ -116,11 +116,20 @@ find_initial_values <- function(model, n_params, n_steps = 200,
 }
 
 #' Compute log_prob and gradient at a numeric vector position
+#'
+#' Uses the active gradient function stored in `.gretaR_env$active_grad_fn`
+#' if available (set by the sampler when a compiled function is provided),
+#' otherwise falls back to the standard `grad_log_prob()`.
 #' @noRd
 eval_grad <- function(model, theta_vec) {
+  # Fast path: use compiled gradient function if active
+  if (!is.null(.gretaR_env$active_grad_fn)) {
+    return(.gretaR_env$active_grad_fn(theta_vec))
+  }
+  # Standard path
   theta_t <- torch_tensor(theta_vec, dtype = model$dtype)
   glp <- grad_log_prob(model, theta_t)
-  grad_vec <- as.numeric(glp$grad$detach()$cpu())
+  grad_vec <- as.numeric(glp$grad)
   if (any(is.nan(grad_vec))) grad_vec[is.nan(grad_vec)] <- 0
   list(lp = glp$lp, grad = grad_vec)
 }

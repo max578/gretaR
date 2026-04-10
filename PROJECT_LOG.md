@@ -8,9 +8,9 @@
 
 **Key assumptions:** R torch autograd is stable and sufficient. Distribution log_prob can be implemented directly as torch ops. Single torch backend (no TF fallback). R6 first, S7 migration later.
 
-**Status:** Phase 2b complete. 15 distributions, hierarchical models, sparse matrices, MAP, Laplace, ADVI (mean-field + full-rank), formula interface (gretaR_glm), 3 vignettes, 129 passing tests. GitHub: max578/gretaR with CI. R CMD check: 0 errors, 0 warnings.
+**Status:** Phase 2 complete. 18 distributions, hierarchical models, sparse matrices, MAP/Laplace/ADVI, formula interface, 4 vignettes (getting-started, hierarchical, GLMs, migration guide), 136 passing tests, 10-model validation suite vs Stan/greta. README, pkgdown config, CRAN comments prepared. R CMD check: 0 errors, 0 warnings.
 
-**Open issues:** (1) Validate hierarchical model MCMC recovery (in progress). (2) Profile NUTS on >10 param models. (3) Test on Windows/Linux CI. (4) Benchmarking vs Stan. (5) Phase 3: advanced formula, GP/ODE extensions, JOSS paper.
+**Open issues:** (1) Benchmark 10 (hierarchical) still running — awaiting final timing. (2) Windows/Linux CI untested. (3) Phase 3: advanced formula, GP/ODE, JOSS paper.
 
 ---
 
