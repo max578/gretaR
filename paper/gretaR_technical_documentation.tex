@@ -1,0 +1,1046 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\documentclass[
+  11pt,
+]{article}
+\usepackage{xcolor}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{5}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{longtable,booktabs,array}
+\newcounter{none} % for unnumbered tables
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
+% Set default figure placement to htbp
+\def\fps@figure{htbp}
+\makeatother
+% definitions for citeproc citations
+\NewDocumentCommand\citeproctext{}{}
+\NewDocumentCommand\citeproc{mm}{%
+  \begingroup\def\citeproctext{#2}\cite{#1}\endgroup}
+\makeatletter
+ % allow citations to break across lines
+ \let\@cite@ofmt\@firstofone
+ % avoid brackets around text for \cite:
+ \def\@biblabel#1{}
+ \def\@cite#1#2{{#1\if@tempswa , #2\fi}}
+\makeatother
+\newlength{\cslhangindent}
+\setlength{\cslhangindent}{1.5em}
+\newlength{\csllabelwidth}
+\setlength{\csllabelwidth}{3em}
+\newenvironment{CSLReferences}[2] % #1 hanging-indent, #2 entry-spacing
+ {\begin{list}{}{%
+  \setlength{\itemindent}{0pt}
+  \setlength{\leftmargin}{0pt}
+  \setlength{\parsep}{0pt}
+  % turn on hanging indent if param 1 is 1
+  \ifodd #1
+   \setlength{\leftmargin}{\cslhangindent}
+   \setlength{\itemindent}{-1\cslhangindent}
+  \fi
+  % set entry spacing
+  \setlength{\itemsep}{#2\baselineskip}}}
+ {\end{list}}
+\usepackage{calc}
+\newcommand{\CSLBlock}[1]{\hfill\break\parbox[t]{\linewidth}{\strut\ignorespaces#1\strut}}
+\newcommand{\CSLLeftMargin}[1]{\parbox[t]{\csllabelwidth}{\strut#1\strut}}
+\newcommand{\CSLRightInline}[1]{\parbox[t]{\linewidth - \csllabelwidth}{\strut#1\strut}}
+\newcommand{\CSLIndent}[1]{\hspace{\cslhangindent}#1}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{float}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\floatplacement{figure}{H}
+\floatplacement{table}{H}
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={gretaR: A Torch-Based Probabilistic Programming Framework for Bayesian Statistical Modelling in R},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{gretaR: A Torch-Based Probabilistic Programming Framework for
+Bayesian Statistical Modelling in R}
+\usepackage{etoolbox}
+\makeatletter
+\providecommand{\subtitle}[1]{% add subtitle to \maketitle
+  \apptocmd{\@title}{\par {\large #1 \par}}{}{}
+}
+\makeatother
+\subtitle{Technical Documentation and Reference}
+\author{true}
+\date{11 April 2026}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+gretaR is an R package for Bayesian statistical modelling that provides
+an R-native domain-specific language (DSL) for defining probabilistic
+models, compiled to differentiable computation graphs for inference via
+Hamiltonian Monte Carlo, the No-U-Turn Sampler, variational inference,
+and maximum a posteriori estimation. The package offers a dual-backend
+architecture: a native torch backend for GPU-capable custom models and
+an automatically generated Stan backend for production-speed inference
+on standard models. This document provides comprehensive technical
+documentation of the package architecture, algorithms, and
+implementation.
+\end{abstract}
+
+{
+\setcounter{tocdepth}{3}
+\tableofcontents
+}
+\section{Introduction}\label{introduction}
+
+gretaR is a probabilistic programming package for R that enables
+Bayesian statistical modelling using native R syntax. Models are defined
+interactively by manipulating \texttt{gretaR\_array} objects --- data
+wrappers, random variables, and deterministic transformations --- which
+lazily construct a directed acyclic graph (DAG). This graph is then
+compiled into a differentiable log-joint density function for
+gradient-based inference.
+
+The package addresses three limitations of existing tools:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{greta} (Golding 2019) provides an elegant R-native DSL but
+  requires Python, TensorFlow, and reticulate --- a fragile dependency
+  chain.
+\item
+  \textbf{Stan/brms} (Carpenter et al. 2017; Bürkner 2017) requires
+  learning a separate modelling language and managing a C++ toolchain.
+\item
+  \textbf{NIMBLE} (Valpine et al. 2017) uses BUGS-like syntax that
+  differs from standard R.
+\end{enumerate}
+
+gretaR resolves these by providing pure R syntax with a torch backend
+(no Python), optional Stan backend (no new language), and five inference
+methods in a single package.
+
+\subsection{Scope of this Document}\label{scope-of-this-document}
+
+This document covers every major component of gretaR v0.1.0:
+
+\begin{itemize}
+\tightlist
+\item
+  The directed acyclic graph (DAG) and lazy evaluation system (Section
+  2)
+\item
+  The 18 probability distributions and parameter transforms (Section 3)
+\item
+  Five inference engines: NUTS, HMC, ADVI, MAP, Laplace (Section 4)
+\item
+  Performance optimisations (Section 5)
+\item
+  The Stan code generation backend (Section 6)
+\item
+  The formula interface and random effects (Section 7)
+\item
+  Custom distributions and mixture models (Section 8)
+\item
+  Sparse matrix support (Section 9)
+\item
+  The unified output structure (Section 10)
+\item
+  Validation results (Section 11)
+\end{itemize}
+
+\section{Core Architecture: The Directed Acyclic
+Graph}\label{core-architecture-the-directed-acyclic-graph}
+
+\subsection{Lazy Evaluation and Node
+Types}\label{lazy-evaluation-and-node-types}
+
+gretaR uses lazy evaluation: operations on \texttt{gretaR\_array}
+objects do not compute values immediately. Instead, they construct a DAG
+of interconnected nodes. Each node is an R6 object
+(\texttt{GretaRArray}) with fields:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{\texttt{node\_type}}: one of \texttt{"data"},
+  \texttt{"variable"}, or \texttt{"operation"}
+\item
+  \textbf{\texttt{value}}: a torch tensor (fixed for data; managed by
+  the sampler for variables)
+\item
+  \textbf{\texttt{parents}}: character vector of parent node identifiers
+\item
+  \textbf{\texttt{operation}}: a closure that computes this node's value
+  from its parents
+\item
+  \textbf{\texttt{distribution}}: a prior distribution (for variable
+  nodes)
+\item
+  \textbf{\texttt{constraint}}: bounds on the parameter space
+\item
+  \textbf{\texttt{transform}}: a bijector mapping between constrained
+  and unconstrained spaces
+\end{itemize}
+
+\subsection{Model Compilation}\label{model-compilation}
+
+The \texttt{model()} function compiles the DAG into a differentiable
+log-joint density function:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Identify free variables}: traverse the DAG to find all
+  variable nodes
+\item
+  \textbf{Exclude likelihood templates}: variable nodes used on the
+  right-hand side of \texttt{distribution(y)\ \textless{}-} are not free
+  parameters
+\item
+  \textbf{Build parameter layout}: compute offsets for packing/unpacking
+  a flat parameter vector
+  \(\boldsymbol\theta_{\text{free}} \in \mathbb{R}^d\)
+\item
+  \textbf{Construct \texttt{log\_prob()}}: a function
+  \(f: \mathbb{R}^d \to \mathbb{R}\) that computes:
+\end{enumerate}
+
+\[\log p(\boldsymbol\theta, \mathbf{y}) = \underbrace{\sum_{k=1}^{K} \log p(\theta_k \mid \text{prior}_k)}_{\text{priors}} + \underbrace{\sum_{k=1}^{K} \log \left| \frac{\partial T_k^{-1}}{\partial \theta_k^{\text{free}}} \right|}_{\text{Jacobian}} + \underbrace{\sum_{i=1}^{N} \log p(y_i \mid \boldsymbol\theta)}_{\text{likelihood}}\]
+
+where \(T_k\) is the bijector for parameter \(k\).
+
+\subsection{Gradient Computation}\label{gradient-computation}
+
+Gradients are computed via torch's automatic differentiation:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{grad\_log\_prob }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(model, theta\_free) \{}
+\NormalTok{  theta\_free}\SpecialCharTok{$}\FunctionTok{requires\_grad\_}\NormalTok{(}\ConstantTok{TRUE}\NormalTok{)}
+\NormalTok{  lp }\OtherTok{\textless{}{-}} \FunctionTok{log\_prob}\NormalTok{(model, theta\_free)}
+\NormalTok{  grads }\OtherTok{\textless{}{-}} \FunctionTok{autograd\_grad}\NormalTok{(lp, theta\_free)}
+  \FunctionTok{list}\NormalTok{(}\AttributeTok{lp =}\NormalTok{ lp}\SpecialCharTok{$}\FunctionTok{item}\NormalTok{(), }\AttributeTok{grad =}\NormalTok{ grads[[}\DecValTok{1}\NormalTok{]])}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+The use of \texttt{autograd\_grad()} (rather than \texttt{backward()})
+avoids gradient accumulation overhead and eliminates the need for
+gradient zeroing between evaluations.
+
+\section{Probability Distributions}\label{probability-distributions}
+
+gretaR implements 18 probability distributions, each as an R6 class
+inheriting from \texttt{GretaRDistribution}. Every distribution
+provides:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{log\_prob(x)}: differentiable log-density evaluated at \(x\)
+  (returns a scalar torch tensor)
+\item
+  \texttt{sample(n)}: draw \(n\) samples (for prior predictive checks)
+\item
+  \texttt{constraint}: parameter space bounds (used to select the
+  appropriate bijector)
+\end{itemize}
+
+\subsection{Continuous Distributions}\label{continuous-distributions}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.4000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.1875}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.1625}}@{}}
+\caption{Continuous distributions. *Simplex, correlation, and PD
+transforms are deferred to a future release.}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Distribution
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Constructor
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Support
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Transform
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Distribution
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Constructor
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Support
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Transform
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Normal & \texttt{normal()} & \(\mathbb{R}\) & Identity \\
+Half-Normal & \texttt{half\_normal()} & \(\mathbb{R}^+\) & Log \\
+Half-Cauchy & \texttt{half\_cauchy()} & \(\mathbb{R}^+\) & Log \\
+Student-\(t\) & \texttt{student\_t()} & \(\mathbb{R}\) & Identity \\
+Cauchy & \texttt{cauchy()} & \(\mathbb{R}\) & Identity \\
+Exponential & \texttt{exponential()} & \(\mathbb{R}^+\) & Log \\
+Gamma & \texttt{gamma\_dist()} & \(\mathbb{R}^+\) & Log \\
+Beta & \texttt{beta\_dist()} & \([0,1]\) & Logit \\
+Log-Normal & \texttt{lognormal()} & \(\mathbb{R}^+\) & Log \\
+Uniform & \texttt{uniform()} & \([a,b]\) & Scaled logit \\
+Multivariate Normal & \texttt{multivariate\_normal()} & \(\mathbb{R}^k\)
+& Identity \\
+Dirichlet & \texttt{dirichlet()} & Simplex & Identity* \\
+LKJ Correlation & \texttt{lkj\_correlation()} & Corr. matrix &
+Identity* \\
+Wishart & \texttt{wishart()} & PD matrix & Identity* \\
+\end{longtable}
+
+\subsection{Discrete Distributions}\label{discrete-distributions}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.2571}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.4286}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3143}}@{}}
+\caption{Discrete distributions (used as likelihoods; not directly
+sampled via HMC).}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Distribution
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Constructor
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Support
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Distribution
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Constructor
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Support
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Bernoulli & \texttt{bernoulli()} & \(\{0,1\}\) \\
+Binomial & \texttt{binomial()} & \(\{0,\ldots,n\}\) \\
+Poisson & \texttt{poisson\_dist()} & \(\mathbb{Z}_{\geq 0}\) \\
+Negative Binomial & \texttt{negative\_binomial()} &
+\(\mathbb{Z}_{\geq 0}\) \\
+\end{longtable}
+
+\subsection{Parameter Transforms
+(Bijectors)}\label{parameter-transforms-bijectors}
+
+Six bijectors map between constrained parameter spaces and the
+unconstrained real line, as required by gradient-based samplers:
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Bijector
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Domain
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Forward \(T(x)\)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Inverse \(T^{-1}(y)\)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\(\log|J|\)
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Identity & \(\mathbb{R}\) & \(y = x\) & \(x = y\) & \(0\) \\
+Log & \(\mathbb{R}^+\) & \(y = \log x\) & \(x = e^y\) & \(\sum y_i\) \\
+Logit & \((0,1)\) & \(y = \log\frac{x}{1-x}\) & \(x = \sigma(y)\) &
+\(\sum[\log\sigma(y) + \log(1-\sigma(y))]\) \\
+Scaled logit & \((a,b)\) & Shifted logit & Shifted sigmoid & Includes
+range adjustment \\
+Softplus & \(\mathbb{R}^+\) & \(y = \log(e^x - 1)\) &
+\(x = \text{softplus}(y)\) & \(\sum\log\sigma(y)\) \\
+Lower bound & \((L, \infty)\) & \(y = \log(x - L)\) & \(x = e^y + L\) &
+\(\sum y_i\) \\
+\end{longtable}
+}
+
+The \texttt{select\_transform()} function automatically chooses the
+bijector based on the distribution's constraint specification.
+
+\section{Inference Engines}\label{inference-engines}
+
+\subsection{No-U-Turn Sampler (NUTS)}\label{no-u-turn-sampler-nuts}
+
+The primary inference method implements the NUTS algorithm (Hoffman and
+Gelman 2014) with the following components:
+
+\textbf{Leapfrog integrator.} Given position \(\boldsymbol\theta\) and
+momentum \(\mathbf{p}\), one step with step size \(\epsilon\) and mass
+matrix \(\mathbf{M}\):
+
+\begin{align}
+\mathbf{p} &\leftarrow \mathbf{p} + \frac{\epsilon}{2} \nabla_\theta \log p(\boldsymbol\theta, \mathbf{y}) \\
+\boldsymbol\theta &\leftarrow \boldsymbol\theta + \epsilon \mathbf{M}^{-1} \mathbf{p} \\
+\mathbf{p} &\leftarrow \mathbf{p} + \frac{\epsilon}{2} \nabla_\theta \log p(\boldsymbol\theta, \mathbf{y})
+\end{align}
+
+\textbf{Tree doubling.} The trajectory is extended by doubling in a
+randomly chosen direction. At each depth \(j\), \(2^j\) leapfrog steps
+are evaluated. Growth stops when a U-turn is detected:
+\(\Delta\boldsymbol\theta \cdot \mathbf{p}_{\text{left}} < 0\) or
+\(\Delta\boldsymbol\theta \cdot \mathbf{p}_{\text{right}} < 0\).
+
+\textbf{Windowed warmup.} Adaptation follows a three-phase strategy
+inspired by Stan (Carpenter et al. 2017):
+
+\begin{itemize}
+\tightlist
+\item
+  Phase 1 (0--15\%): step-size adaptation via dual averaging (Nesterov
+  2009)
+\item
+  Phase 2 (15--90\%): collect samples for diagonal mass matrix
+  estimation
+\item
+  Phase 3 (90--100\%): re-adapt step size with the learned mass matrix
+\end{itemize}
+
+This phased approach prevents the mass matrix update from invalidating
+the previously adapted step size.
+
+\textbf{Implementation note.} The leapfrog operates on plain R numeric
+vectors (not torch tensors) to avoid scoping issues with torch's
+\texttt{with\_no\_grad()} in R. Only the gradient evaluation touches
+torch.
+
+\subsection{Hamiltonian Monte Carlo
+(HMC)}\label{hamiltonian-monte-carlo-hmc}
+
+Static HMC with a fixed number of leapfrog steps per iteration. Uses
+identical warmup adaptation to NUTS. Recommended for debugging or when
+NUTS tree depth is a concern.
+
+\subsection{Automatic Differentiation Variational Inference
+(ADVI)}\label{automatic-differentiation-variational-inference-advi}
+
+Implements the ADVI framework of Kucukelbir et al. (2017) with two
+variational families:
+
+\textbf{Mean-field:}
+\(q(\boldsymbol\theta) = \mathcal{N}(\boldsymbol\mu, \text{diag}(\boldsymbol\sigma^2))\)
+
+\textbf{Full-rank:}
+\(q(\boldsymbol\theta) = \mathcal{N}(\boldsymbol\mu, \mathbf{L}\mathbf{L}^\top)\)
+
+The ELBO is optimised via the reparameterisation trick:
+
+\[\text{ELBO} = \mathbb{E}_{q}[\log p(\mathbf{y}, \boldsymbol\theta)] + \mathcal{H}[q]\]
+
+where
+\(\boldsymbol\theta = \boldsymbol\mu + \boldsymbol\sigma \odot \boldsymbol\epsilon\)
+and \(\boldsymbol\epsilon \sim \mathcal{N}(\mathbf{0}, \mathbf{I})\).
+
+Convergence is assessed by monitoring the relative change in the median
+ELBO over a rolling window.
+
+\subsection{MAP Estimation}\label{map-estimation}
+
+Maximum a posteriori estimation via the Adam optimiser (Kingma and Ba
+2015). The initial point is found by gradient ascent toward the
+posterior mode (200 steps with learning rate 0.1), providing robust
+initialisation even for multimodal posteriors.
+
+\subsection{Laplace Approximation}\label{laplace-approximation}
+
+Approximates the posterior as a multivariate normal centred at the MAP:
+
+\[p(\boldsymbol\theta \mid \mathbf{y}) \approx \mathcal{N}\left(\hat{\boldsymbol\theta}_{\text{MAP}}, \left[-\nabla^2 \log p(\hat{\boldsymbol\theta}_{\text{MAP}}, \mathbf{y})\right]^{-1}\right)\]
+
+The Hessian is computed via symmetric finite differences on the
+gradient. Eigenvalue clamping ensures positive definiteness. The log
+marginal likelihood is approximated as:
+
+\[\log p(\mathbf{y}) \approx \log p(\hat{\boldsymbol\theta}, \mathbf{y}) + \frac{d}{2}\log(2\pi) + \frac{1}{2}\log|\boldsymbol\Sigma|\]
+
+\section{Performance Optimisations}\label{performance-optimisations}
+
+Three optimisations reduce the torch backend's per-gradient-evaluation
+cost:
+
+\subsection{Compiled Log-Probability
+Function}\label{compiled-log-probability-function}
+
+At model compilation time, \texttt{compile\_log\_prob()} pre-extracts
+all parameter layout information (offsets, dimensions, transforms,
+distribution references) into a closure. This eliminates R6 method
+dispatch and list lookups during the hot path of gradient evaluation.
+
+\subsection{\texorpdfstring{\texttt{autograd\_grad()} vs
+\texttt{backward()}}{autograd\_grad() vs backward()}}\label{autograd_grad-vs-backward}
+
+The standard \texttt{backward()} accumulates gradients into the
+\texttt{\$grad} attribute, requiring subsequent \texttt{\$clone()} and
+\texttt{\$detach()\$cpu()} calls. Using \texttt{autograd\_grad()}
+returns gradients directly, reducing per-call overhead by approximately
+27\%.
+
+\subsection{JIT Tracing}\label{jit-tracing}
+
+The compiled log-probability function is optionally traced via
+\texttt{torch::jit\_trace()}, which fuses torch operations into an
+optimised graph. Tracing succeeds for models without data-dependent
+control flow; a safe fallback to the untraced compiled function is used
+otherwise.
+
+\textbf{Combined effect:} 3--4\(\times\) speedup over the initial
+implementation, reducing the torch--Stan gap from 50--64\(\times\) to
+7--16\(\times\) for small models.
+
+\subsubsection{Approaches Evaluated and
+Rejected}\label{approaches-evaluated-and-rejected}
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Approach
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Finding
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Decision
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+GPU/MPS acceleration & 5.6\(\times\) \emph{slower} for small tensors due
+to transfer latency & Rejected \\
+C++ leapfrog loop & R-level loop overhead is \$\textless\$1\% of total
+time & Rejected \\
+In-place tensor operations & Higher dispatch cost than allocation for
+small tensors & Rejected \\
+Batched chains (vectorised HMC) & NUTS trees vary per chain, wasting
+compute & Deferred \\
+\end{longtable}
+}
+
+\section{Stan Backend}\label{stan-backend}
+
+\subsection{Motivation}\label{motivation}
+
+The torch backend executes the DAG interpretively: each gradient
+evaluation traverses R-level data structures and dispatches torch
+operations individually. Stan compiles the entire model to optimised C++
+with static automatic differentiation, yielding 32--152\(\times\) faster
+sampling on hierarchical models.
+
+gretaR's Stan backend provides this speed advantage while preserving the
+R-native DSL:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Same model definition}
+\NormalTok{mu }\OtherTok{\textless{}{-}} \FunctionTok{normal}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{10}\NormalTok{)}
+\NormalTok{sigma }\OtherTok{\textless{}{-}} \FunctionTok{half\_cauchy}\NormalTok{(}\DecValTok{2}\NormalTok{)}
+\FunctionTok{distribution}\NormalTok{(y) }\OtherTok{\textless{}{-}} \FunctionTok{normal}\NormalTok{(mu, sigma)}
+\NormalTok{m }\OtherTok{\textless{}{-}} \FunctionTok{model}\NormalTok{(mu, sigma)}
+
+\CommentTok{\# Choose backend at inference time}
+\NormalTok{fit\_torch }\OtherTok{\textless{}{-}} \FunctionTok{mcmc}\NormalTok{(m, }\AttributeTok{backend =} \StringTok{"torch"}\NormalTok{)  }\CommentTok{\# native torch NUTS}
+\NormalTok{fit\_stan  }\OtherTok{\textless{}{-}} \FunctionTok{mcmc}\NormalTok{(m, }\AttributeTok{backend =} \StringTok{"stan"}\NormalTok{)   }\CommentTok{\# compiled Stan NUTS}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Code Generation}\label{code-generation}
+
+\texttt{compile\_to\_stan()} walks the compiled model's DAG and emits
+valid Stan code:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Data block}: declares observed data with dimensions inferred
+  from tensor shapes
+\item
+  \textbf{Parameters block}: declares free parameters with constraints
+  (e.g., \texttt{real\textless{}lower=0\textgreater{}})
+\item
+  \textbf{Model block}: emits prior statements and likelihood statements
+\end{enumerate}
+
+Each gretaR distribution maps to its Stan equivalent (e.g.,
+\texttt{half\_cauchy(scale)} \(\to\) \texttt{cauchy(0,\ scale)} with
+\texttt{\textless{}lower=0\textgreater{}} bound).
+
+\subsection{Benchmark Results}\label{benchmark-results}
+
+\begin{longtable}[]{@{}lrrl@{}}
+\caption{Wall-clock time (500 warmup + 500 samples, 2 chains). Parameter
+recovery matches to 3 significant figures across
+backends.}\tabularnewline
+\toprule\noalign{}
+Model & Torch (s) & Stan (s) & Speedup \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+Model & Torch (s) & Stan (s) & Speedup \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Intercept-only (2p) & 351.1 & 3.7 & 95x \\
+Linear regression (3p) & 2.9 & 3.4 & 1x \\
+Random intercept LMM (23p) & 466.5 & 4.6 & 101x \\
+Crossed random effects (42p) & 1154.5 & 7.6 & 152x \\
+Logistic GLMM (17p) & 423.1 & 8.6 & 49x \\
+Poisson GLMM (22p) & 441.8 & 5.9 & 75x \\
+Random slopes (35p) & 208.8 & 6.5 & 32x \\
+\end{longtable}
+
+\section{Formula Interface}\label{formula-interface}
+
+\subsection{Basic Usage}\label{basic-usage}
+
+\texttt{gretaR\_glm()} provides a high-level interface using standard R
+formula syntax:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{fit }\OtherTok{\textless{}{-}} \FunctionTok{gretaR\_glm}\NormalTok{(}
+\NormalTok{  Sepal.Length }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Sepal.Width }\SpecialCharTok{+}\NormalTok{ Petal.Length,}
+  \AttributeTok{data =}\NormalTok{ iris,}
+  \AttributeTok{family =} \StringTok{"gaussian"}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Internally, \texttt{model.matrix()} constructs the design matrix;
+default priors are assigned (\(\beta \sim \mathcal{N}(0, 5)\),
+\(\sigma \sim \text{Half-Cauchy}(2)\)); and the model is compiled and
+sampled via the standard gretaR pipeline.
+
+\subsection{Random Effects}\label{random-effects}
+
+lme4-style random effects are parsed via regex (no lme4 dependency
+required):
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{fit }\OtherTok{\textless{}{-}} \FunctionTok{gretaR\_glm}\NormalTok{(}
+\NormalTok{  y }\SpecialCharTok{\textasciitilde{}}\NormalTok{ x }\SpecialCharTok{+}\NormalTok{ (}\DecValTok{1} \SpecialCharTok{|}\NormalTok{ group),        }\CommentTok{\# random intercepts}
+  \AttributeTok{data =}\NormalTok{ dat,}
+  \AttributeTok{family =} \StringTok{"gaussian"}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Supported patterns:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{(1\ \textbar{}\ group)} --- random intercepts
+\item
+  \texttt{(x\ \textbar{}\ group)} --- correlated random intercepts and
+  slopes
+\item
+  \texttt{(0\ +\ x\ \textbar{}\ group)} --- random slopes only
+\item
+  Multiple terms:
+  \texttt{(1\ \textbar{}\ site)\ +\ (1\ \textbar{}\ year)}
+\end{itemize}
+
+All random effects use non-centred parameterisation by default:
+\(\alpha_j = \tau \cdot z_j\) where \(z_j \sim \mathcal{N}(0, 1)\) and
+\(\tau \sim \text{Half-Cauchy}(2)\). This avoids the funnel geometry
+that degrades HMC performance in centred parameterisations (Betancourt
+and Girolami 2015).
+
+\subsection{Formula Style Detection}\label{formula-style-detection}
+
+The parser auto-detects formula styles:
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}lll@{}}
+\toprule\noalign{}
+Pattern & Detected as & Action \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\texttt{y\ \textasciitilde{}\ x1\ +\ x2} & base R & Standard GLM via
+\texttt{model.matrix()} \\
+\texttt{y\ \textasciitilde{}\ x\ +\ (1\textbackslash{}\textbar{}group)}
+& lme4 & Mixed model with non-centred RE \\
+\texttt{y\ \textasciitilde{}\ s(x)} & mgcv & Error (not yet
+supported) \\
+\end{longtable}
+}
+
+\section{Custom Distributions and Mixture
+Models}\label{custom-distributions-and-mixture-models}
+
+\subsection{Custom Distributions}\label{custom-distributions}
+
+Users can define distributions with arbitrary torch-differentiable
+log-probability functions:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{x }\OtherTok{\textless{}{-}} \FunctionTok{custom\_distribution}\NormalTok{(}
+  \AttributeTok{log\_prob\_fn =} \ControlFlowTok{function}\NormalTok{(x) }\SpecialCharTok{{-}}\FunctionTok{torch\_sum}\NormalTok{(}\FunctionTok{torch\_abs}\NormalTok{(x)),}
+  \AttributeTok{constraint =} \FunctionTok{list}\NormalTok{(}\AttributeTok{lower =} \SpecialCharTok{{-}}\ConstantTok{Inf}\NormalTok{, }\AttributeTok{upper =} \ConstantTok{Inf}\NormalTok{),}
+  \AttributeTok{name =} \StringTok{"laplace"}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+The supplied function must accept a torch tensor and return a scalar
+torch tensor. It must be differentiable via torch autograd.
+
+\subsection{Mixture Models}\label{mixture-models}
+
+Finite mixture models are supported via the log-sum-exp trick:
+
+\[\log p(x \mid \boldsymbol\pi, \boldsymbol\Theta) = \log \sum_{k=1}^{K} \pi_k \, p_k(x \mid \theta_k) = \text{logsumexp}_k \left[\log \pi_k + \log p_k(x \mid \theta_k)\right]\]
+
+This marginalises over the discrete component indicator, enabling
+gradient-based inference:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{w }\OtherTok{\textless{}{-}} \FunctionTok{dirichlet}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{))}
+\NormalTok{mu1 }\OtherTok{\textless{}{-}} \FunctionTok{normal}\NormalTok{(}\SpecialCharTok{{-}}\DecValTok{2}\NormalTok{, }\DecValTok{1}\NormalTok{); mu2 }\OtherTok{\textless{}{-}} \FunctionTok{normal}\NormalTok{(}\DecValTok{2}\NormalTok{, }\DecValTok{1}\NormalTok{)}
+\NormalTok{sigma }\OtherTok{\textless{}{-}} \FunctionTok{half\_cauchy}\NormalTok{(}\DecValTok{1}\NormalTok{)}
+
+\NormalTok{mix }\OtherTok{\textless{}{-}} \FunctionTok{mixture}\NormalTok{(}
+  \AttributeTok{distributions =} \FunctionTok{list}\NormalTok{(}\FunctionTok{normal}\NormalTok{(mu1, sigma), }\FunctionTok{normal}\NormalTok{(mu2, sigma)),}
+  \AttributeTok{weights =}\NormalTok{ w}
+\NormalTok{)}
+\FunctionTok{distribution}\NormalTok{(y) }\OtherTok{\textless{}{-}}\NormalTok{ mix}
+\end{Highlighting}
+\end{Shaded}
+
+\section{Sparse Matrix Support}\label{sparse-matrix-support}
+
+Large, sparse design matrices (common in genomics, NLP, and spatial
+modelling) are handled via the Matrix package (Bates et al. 2024). The
+\texttt{as\_data()} function dispatches on \texttt{sparseMatrix}
+objects:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(Matrix)}
+\NormalTok{X\_sparse }\OtherTok{\textless{}{-}} \FunctionTok{sparseMatrix}\NormalTok{(}\AttributeTok{i =}\NormalTok{ ..., }\AttributeTok{j =}\NormalTok{ ..., }\AttributeTok{x =}\NormalTok{ ...)}
+\NormalTok{X }\OtherTok{\textless{}{-}} \FunctionTok{as\_data}\NormalTok{(X\_sparse)  }\CommentTok{\# stored as torch sparse COO tensor}
+\NormalTok{mu }\OtherTok{\textless{}{-}}\NormalTok{ X }\SpecialCharTok{\%*\%}\NormalTok{ beta         }\CommentTok{\# sparse{-}aware matrix multiplication}
+\end{Highlighting}
+\end{Shaded}
+
+The Matrix package is a recommended R package shipped with every R
+installation, imposing zero additional installation burden. Sparse
+\(\times\) dense matrix multiplication uses \texttt{torch\_mm()}, which
+handles the sparse layout natively.
+
+\section{Unified Output Structure}\label{unified-output-structure}
+
+All inference functions return a \texttt{gretaR\_fit} S3 object with
+consistent structure:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{fit}\SpecialCharTok{$}\NormalTok{draws        }\CommentTok{\# posterior::draws\_array (NULL for MAP/Laplace)}
+\NormalTok{fit}\SpecialCharTok{$}\NormalTok{model        }\CommentTok{\# compiled gretaR\_model}
+\NormalTok{fit}\SpecialCharTok{$}\NormalTok{summary      }\CommentTok{\# tibble: mean, sd, quantiles, R{-}hat, ESS}
+\NormalTok{fit}\SpecialCharTok{$}\NormalTok{convergence  }\CommentTok{\# list: n\_eff, rhat, max\_rhat, min\_ess, n\_divergences}
+\NormalTok{fit}\SpecialCharTok{$}\NormalTok{call\_info    }\CommentTok{\# original arguments for reproducibility}
+\NormalTok{fit}\SpecialCharTok{$}\NormalTok{run\_time     }\CommentTok{\# elapsed seconds}
+\NormalTok{fit}\SpecialCharTok{$}\NormalTok{method       }\CommentTok{\# "nuts", "hmc", "vi", "map", "laplace", "stan"}
+\NormalTok{fit}\SpecialCharTok{$}\NormalTok{par          }\CommentTok{\# point estimates (all methods)}
+\end{Highlighting}
+\end{Shaded}
+
+S3 methods provide a consistent interface:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{print(fit)} --- concise summary with convergence diagnostics
+\item
+  \texttt{summary(fit)} --- full posterior table via
+  \texttt{posterior::summarise\_draws()}
+\item
+  \texttt{coef(fit)} --- named vector of posterior means or MAP
+  estimates
+\item
+  \texttt{plot(fit,\ type)} --- diagnostic plots via bayesplot
+  (\texttt{"trace"}, \texttt{"density"}, \texttt{"pairs"},
+  \texttt{"rhat"}, \texttt{"neff"})
+\end{itemize}
+
+\section{Validation}\label{validation}
+
+gretaR was validated against CmdStan (Carpenter et al. 2017) on 10
+benchmark models. Parameter estimates agree to 2--3 significant figures
+across all benchmarks. The validation suite is included in
+\texttt{inst/validation/} and covers:
+
+\begin{itemize}
+\tightlist
+\item
+  Normal mean estimation (known and unknown variance)
+\item
+  Linear and multiple regression
+\item
+  Logistic and Poisson regression
+\item
+  Gamma GLM and robust regression (Student-\(t\) errors)
+\item
+  Beta regression
+\item
+  Hierarchical random intercepts (non-centred parameterisation)
+\end{itemize}
+
+\subsection{Correctness Criteria}\label{correctness-criteria}
+
+A model is considered validated when:
+
+\begin{itemize}
+\tightlist
+\item
+  \(\hat{R} < 1.05\) for all parameters
+\item
+  Bulk ESS \(> 400\) for all parameters
+\item
+  Posterior means within MCMC uncertainty of Stan reference values
+\item
+  Zero post-warmup divergent transitions
+\end{itemize}
+
+\section{Potential for Further
+Development}\label{potential-for-further-development}
+
+\subsection{Near-Term (Phase 3)}\label{near-term-phase-3}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{mgcv smooth terms} (\texttt{s()}, \texttt{te()}) via basis
+  function expansion
+\item
+  \textbf{Simplex and correlation transforms} for Dirichlet and LKJ
+  sampling
+\item
+  \textbf{Wishart/inverse-Wishart sampling} via Bartlett decomposition
+\item
+  \textbf{Improved Stan code generator} with operation-type metadata on
+  DAG nodes
+\end{itemize}
+
+\subsection{Medium-Term}\label{medium-term}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Gaussian Process module} (\texttt{gretaR.gp}) as an extension
+  package
+\item
+  \textbf{ODE-based models} using torch ODE solvers
+\item
+  \textbf{Expectation propagation} for approximate inference
+\item
+  \textbf{S7 class system} migration (when mature)
+\end{itemize}
+
+\subsection{Long-Term}\label{long-term}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{GPU-accelerated inference} for large latent variable models
+\item
+  \textbf{Batched chain evaluation} for static HMC on GPU
+\item
+  \textbf{Community extension framework} with templates and
+  documentation
+\item
+  \textbf{CRAN submission} and JOSS publication
+\end{itemize}
+
+\section*{References}\label{references}
+\addcontentsline{toc}{section}{References}
+
+\protect\phantomsection\label{refs}
+\begin{CSLReferences}{1}{1}
+\bibitem[\citeproctext]{ref-matrix}
+Bates, Douglas, Martin Maechler, and Mikael Jagan. 2024. \emph{Matrix:
+Sparse and Dense Matrix Classes and Methods}.
+\url{https://CRAN.R-project.org/package=Matrix}.
+
+\bibitem[\citeproctext]{ref-betancourt2015}
+Betancourt, Michael, and Mark Girolami. 2015. {``Hamiltonian {M}onte
+{C}arlo for Hierarchical Models.''} \emph{Current Trends in Bayesian
+Methodology with Applications}, 79--101.
+
+\bibitem[\citeproctext]{ref-brms}
+Bürkner, Paul-Christian. 2017. {``{brms}: An {R} Package for {B}ayesian
+Multilevel Models Using {Stan}.''} \emph{Journal of Statistical
+Software} 80 (1): 1--28. \url{https://doi.org/10.18637/jss.v080.i01}.
+
+\bibitem[\citeproctext]{ref-stan}
+Carpenter, Bob, Andrew Gelman, Matthew D. Hoffman, et al. 2017. {``Stan:
+A Probabilistic Programming Language.''} \emph{Journal of Statistical
+Software} 76 (1): 1--32. \url{https://doi.org/10.18637/jss.v076.i01}.
+
+\bibitem[\citeproctext]{ref-greta}
+Golding, Nick. 2019. {``Greta: Simple and Scalable Statistical Modelling
+in {R}.''} \emph{Journal of Open Source Software} 4 (40): 1601.
+\url{https://doi.org/10.21105/joss.01601}.
+
+\bibitem[\citeproctext]{ref-nuts}
+Hoffman, Matthew D., and Andrew Gelman. 2014. {``The No-{U}-Turn
+Sampler: Adaptively Setting Path Lengths in {H}amiltonian {M}onte
+{C}arlo.''} \emph{Journal of Machine Learning Research} 15: 1593--623.
+
+\bibitem[\citeproctext]{ref-kingma2015adam}
+Kingma, Diederik P., and Jimmy Ba. 2015. {``Adam: A Method for
+Stochastic Optimization.''} \emph{arXiv Preprint arXiv:1412.6980}.
+
+\bibitem[\citeproctext]{ref-advi}
+Kucukelbir, Alp, Dustin Tran, Rajesh Ranganath, Andrew Gelman, and David
+M. Blei. 2017. {``Automatic Differentiation Variational Inference.''}
+\emph{Journal of Machine Learning Research} 18 (14): 1--45.
+
+\bibitem[\citeproctext]{ref-nesterov2009}
+Nesterov, Yurii. 2009. {``Primal-Dual Subgradient Methods for Convex
+Problems.''} \emph{Mathematical Programming} 120 (1): 221--59.
+\url{https://doi.org/10.1007/s10107-007-0149-x}.
+
+\bibitem[\citeproctext]{ref-nimble}
+Valpine, Perry de, Daniel Turek, Christopher J. Paciorek, Clifford
+Anderson-Bergman, Duncan Temple Lang, and Rastislav Bodik. 2017.
+{``Programming with Models: Writing Statistical Algorithms for General
+Model Structures with {NIMBLE}.''} \emph{Journal of Computational and
+Graphical Statistics} 26 (2): 403--13.
+\url{https://doi.org/10.1080/10618600.2016.1172487}.
+
+\end{CSLReferences}
+
+\end{document}
