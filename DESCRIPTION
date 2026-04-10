@@ -24,6 +24,7 @@ Imports:
 Suggests:
     Matrix,
     lme4,
+    cmdstanr,
     testthat (>= 3.0.0),
     knitr,
     rmarkdown,

@@ -45,11 +45,10 @@
 #' y <- as_data(rnorm(50, 3, 1.5))
 #' distribution(y) <- normal(mu, sigma)
 #' m <- model(mu, sigma)
-#' fit <- vi(m)
-#' fit$mean
-#' fit$sd
+#' fit <- variational(m)
+#' coef(fit)
 #' }
-vi <- function(model, n_samples = 1L, max_iter = 5000L,
+variational <- function(model, n_samples = 1L, max_iter = 5000L,
                learning_rate = 0.01, tolerance = 1e-4,
                method = c("meanfield", "fullrank"),
                init_from_map = TRUE, verbose = TRUE) {

@@ -12,6 +12,7 @@
 #'   (default 1e-6).
 #' @param init Optional initial values (numeric vector in unconstrained space).
 #' @param verbose Logical; print progress (default TRUE).
+#' @param backend Inference backend: \code{"torch"} (default) or \code{"stan"}.
 #'
 #' @return A `gretaR_fit` object (method = "map") with components:
 #'   \describe{

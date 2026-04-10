@@ -170,7 +170,7 @@ gretaR_glm <- function(formula, data, family = c("gaussian", "binomial", "poisso
   result <- if (sampler == "map") {
     opt(m, verbose = verbose, ...)
   } else if (sampler == "vi") {
-    vi(m, verbose = verbose, ...)
+    variational(m, verbose = verbose, ...)
   } else {
     mcmc(m, n_samples = n_samples, warmup = warmup, chains = chains,
          sampler = sampler, verbose = verbose, ...)
@@ -369,7 +369,7 @@ gretaR_glm <- function(formula, data, family = c("gaussian", "binomial", "poisso
   result <- if (sampler == "map") {
     opt(m, verbose = verbose, ...)
   } else if (sampler == "vi") {
-    vi(m, verbose = verbose, ...)
+    variational(m, verbose = verbose, ...)
   } else {
     mcmc(m, n_samples = n_samples, warmup = warmup, chains = chains,
          sampler = sampler, verbose = verbose, ...)
@@ -398,6 +398,7 @@ logistic_link <- function(eta) {
     parents = node$id,
     dim = node$dim_
   )
+  result_node$op_type <- "sigmoid"
   wrap_gretaR_array(result_node)
 }
 

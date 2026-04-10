@@ -379,6 +379,7 @@ distribution <- function(x) {
     parents = c(node$id, idx_node$id),
     dim = out_dim
   )
+  result_node$op_type <- "index_select"
 
   wrap_gretaR_array(result_node)
 }
@@ -489,6 +490,7 @@ Ops.gretaR_array <- function(e1, e2) {
     parents = c(node1$id, node2$id),
     dim = out_dim
   )
+  result_node$op_type <- paste0("binary_", op)
   wrap_gretaR_array(result_node)
 }
 
@@ -528,6 +530,7 @@ Math.gretaR_array <- function(x, ...) {
     parents = node$id,
     dim = node$dim_
   )
+  result_node$op_type <- paste0("math_", generic)
   wrap_gretaR_array(result_node)
 }
 
@@ -544,6 +547,7 @@ t.gretaR_array <- function(x) {
     parents = node$id,
     dim = rev(node$dim_)
   )
+  result_node$op_type <- "transpose"
   wrap_gretaR_array(result_node)
 }
 
@@ -565,6 +569,7 @@ gretaR_matmul <- function(x, y) {
     parents = c(node1$id, node2$id),
     dim = out_dim
   )
+  result_node$op_type <- "matmul"
   wrap_gretaR_array(result_node)
 }
 
@@ -590,6 +595,7 @@ sum.gretaR_array <- function(x, ..., na.rm = FALSE) {
     parents = node$id,
     dim = c(1L, 1L)
   )
+  result_node$op_type <- "sum"
   wrap_gretaR_array(result_node)
 }
 
@@ -603,6 +609,7 @@ mean.gretaR_array <- function(x, ...) {
     parents = node$id,
     dim = c(1L, 1L)
   )
+  result_node$op_type <- "mean"
   wrap_gretaR_array(result_node)
 }
 

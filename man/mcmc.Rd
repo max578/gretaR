@@ -30,6 +30,9 @@ mcmc(
 
 \item{sampler}{Sampler to use: \code{"nuts"} (default) or \code{"hmc"}.}
 
+\item{backend}{Inference backend: \code{"torch"} (default, native R + torch)
+or \code{"stan"} (generates Stan code, compiles and runs via cmdstanr).}
+
 \item{step_size}{Initial step size for the leapfrog integrator. If
 \code{NULL} (default), automatically tuned during warmup.}
 

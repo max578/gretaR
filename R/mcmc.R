@@ -11,6 +11,8 @@
 #' @param warmup Number of warmup (adaptation) iterations per chain (default 1000).
 #' @param chains Number of independent chains (default 4).
 #' @param sampler Sampler to use: \code{"nuts"} (default) or \code{"hmc"}.
+#' @param backend Inference backend: \code{"torch"} (default, native R + torch)
+#'   or \code{"stan"} (generates Stan code, compiles and runs via cmdstanr).
 #' @param step_size Initial step size for the leapfrog integrator. If
 #'   \code{NULL} (default), automatically tuned during warmup.
 #' @param max_treedepth Maximum tree depth for NUTS (default 10).

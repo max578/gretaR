@@ -27,6 +27,8 @@ opt(
 \item{init}{Optional initial values (numeric vector in unconstrained space).}
 
 \item{verbose}{Logical; print progress (default TRUE).}
+
+\item{backend}{Inference backend: \code{"torch"} (default) or \code{"stan"}.}
 }
 \value{
 A \code{gretaR_fit} object (method = "map") with components:

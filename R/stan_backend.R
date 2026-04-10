@@ -63,19 +63,57 @@ compile_to_stan <- function(model) {
   node_stan_names <- list()  # node_id → stan_name (lookup table, not on R6)
 
   # --- Identify data nodes and their Stan names ---
+  # Identify which data nodes are used as indices (parents of index_select ops)
+  index_data_ids <- character(0)
+  for (nid in names(model$dag_nodes)) {
+    node <- model$dag_nodes[[nid]]
+    if (node$node_type == "operation" && identical(node$op_type, "index_select")) {
+      # Second parent is the index
+      if (length(node$parents) >= 2) {
+        index_data_ids <- c(index_data_ids, node$parents[2])
+      }
+    }
+  }
+
+  # Identify data nodes used in discrete likelihoods
+  discrete_data_ids <- character(0)
+  for (data_id in names(model$likelihood_terms)) {
+    dist_arr <- model$likelihood_terms[[data_id]]
+    dist_nd <- if (inherits(dist_arr, "gretaR_array")) get_node(dist_arr) else dist_arr
+    if (!is.null(dist_nd) && !is.null(dist_nd$distribution)) {
+      dname <- dist_nd$distribution$name
+      if (dname %in% c("bernoulli", "binomial", "poisson", "negative_binomial")) {
+        discrete_data_ids <- c(discrete_data_ids, data_id)
+      }
+    }
+  }
+
   for (nid in names(model$dag_nodes)) {
     node <- model$dag_nodes[[nid]]
     if (node$node_type == "data") {
       stan_name <- paste0("data_", gsub("node_", "", nid))
       n_rows <- node$dim_[1]
       n_cols <- node$dim_[2]
+      vals <- as.numeric(node$value$cpu())
 
-      if (n_cols == 1) {
+      is_index <- nid %in% index_data_ids
+      is_discrete <- nid %in% discrete_data_ids
+
+      if (is_index) {
+        # Integer index array
+        data_block[[length(data_block) + 1]] <- sprintf("  array[%d] int %s;", n_rows, stan_name)
+        data_arrays[[stan_name]] <- as.integer(vals)
+      } else if (is_discrete) {
+        # Integer outcome array
+        data_block[[length(data_block) + 1]] <- sprintf("  array[%d] int %s;", n_rows, stan_name)
+        data_arrays[[stan_name]] <- as.integer(vals)
+      } else if (n_cols == 1) {
         data_block[[length(data_block) + 1]] <- sprintf("  vector[%d] %s;", n_rows, stan_name)
+        data_arrays[[stan_name]] <- vals
       } else {
         data_block[[length(data_block) + 1]] <- sprintf("  matrix[%d, %d] %s;", n_rows, n_cols, stan_name)
+        data_arrays[[stan_name]] <- vals
       }
-      data_arrays[[stan_name]] <- as.numeric(node$value$cpu())
       node_stan_names[[nid]] <- stan_name
     }
   }
@@ -303,45 +341,55 @@ node_to_stan_expr <- function(node, dag_nodes, param_names, node_stan_names = li
   }
 
   if (node$node_type == "operation") {
-    # Reconstruct the operation from parents
+    # Recursively resolve parent expressions
     parent_exprs <- vapply(node$parents, function(pid) {
       pnode <- dag_nodes[[pid]]
       if (is.null(pnode)) return(pid)
       node_to_stan_expr(pnode, dag_nodes, param_names, node_stan_names)
     }, character(1))
 
-    # Try to infer the operation from the function body
-    op_body <- if (!is.null(node$operation)) {
-      deparse(body(node$operation), width.cutoff = 200)
-    } else {
-      ""
-    }
+    ot <- node$op_type %||% "unknown"
 
-    op_str <- paste(op_body, collapse = " ")
-
+    # --- Binary operations ---
     if (length(parent_exprs) == 2) {
-      if (grepl("\\+", op_str) && !grepl("torch_", op_str)) {
-        return(sprintf("(%s + %s)", parent_exprs[1], parent_exprs[2]))
-      }
-      if (grepl("\\*", op_str) && !grepl("torch_", op_str)) {
-        return(sprintf("(%s .* %s)", parent_exprs[1], parent_exprs[2]))
-      }
-      if (grepl("torch_matmul|sparse_matmul", op_str)) {
-        return(sprintf("(%s * %s)", parent_exprs[1], parent_exprs[2]))
-      }
-      if (grepl("torch_index_select", op_str)) {
-        return(sprintf("%s[%s]", parent_exprs[1], parent_exprs[2]))
-      }
-      # Default binary
-      return(sprintf("(%s + %s)", parent_exprs[1], parent_exprs[2]))
+      a <- parent_exprs[1]; b <- parent_exprs[2]
+      stan_expr <- switch(ot,
+        "binary_+" = sprintf("(%s + %s)", a, b),
+        "binary_-" = sprintf("(%s - %s)", a, b),
+        "binary_*" = sprintf("(%s .* %s)", a, b),
+        "binary_/" = sprintf("(%s ./ %s)", a, b),
+        "binary_^" = sprintf("pow(%s, %s)", a, b),
+        "matmul"   = sprintf("(%s * %s)", a, b),
+        "index_select" = sprintf("%s[%s]", a, b),
+        # fallback: try deparse
+        sprintf("(%s + %s)", a, b)
+      )
+      return(stan_expr)
     }
 
+    # --- Unary operations ---
     if (length(parent_exprs) == 1) {
-      if (grepl("torch_exp", op_str)) return(sprintf("exp(%s)", parent_exprs[1]))
-      if (grepl("torch_log", op_str)) return(sprintf("log(%s)", parent_exprs[1]))
-      if (grepl("torch_sqrt", op_str)) return(sprintf("sqrt(%s)", parent_exprs[1]))
-      if (grepl("torch_sigmoid", op_str)) return(sprintf("inv_logit(%s)", parent_exprs[1]))
-      return(parent_exprs[1])
+      a <- parent_exprs[1]
+      stan_expr <- switch(ot,
+        "math_log"     = sprintf("log(%s)", a),
+        "math_exp"     = sprintf("exp(%s)", a),
+        "math_sqrt"    = sprintf("sqrt(%s)", a),
+        "math_abs"     = sprintf("fabs(%s)", a),
+        "math_cos"     = sprintf("cos(%s)", a),
+        "math_sin"     = sprintf("sin(%s)", a),
+        "math_tan"     = sprintf("tan(%s)", a),
+        "math_acos"    = sprintf("acos(%s)", a),
+        "math_asin"    = sprintf("asin(%s)", a),
+        "math_atan"    = sprintf("atan(%s)", a),
+        "math_lgamma"  = sprintf("lgamma(%s)", a),
+        "math_digamma" = sprintf("digamma(%s)", a),
+        "sigmoid"      = sprintf("inv_logit(%s)", a),
+        "transpose"    = sprintf("(%s)'", a),
+        "sum"          = sprintf("sum(%s)", a),
+        "mean"         = sprintf("mean(%s)", a),
+        a  # fallback: pass through
+      )
+      return(stan_expr)
     }
 
     return("0")

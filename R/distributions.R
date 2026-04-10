@@ -429,6 +429,9 @@ BinomialDistribution <- R6::R6Class(
 #' @description Create a binomially-distributed variable with the specified
 #'   number of trials and probability of success per trial.
 #'
+#'   Named \code{binomial_dist} to avoid masking \code{stats::binomial}
+#'   (the GLM family constructor).
+#'
 #' @param size Number of trials (positive integer or \code{gretaR_array}).
 #' @param prob Probability of success per trial (numeric or \code{gretaR_array}, 0 to 1).
 #' @param dim Integer vector of dimensions (default scalar).
@@ -436,9 +439,9 @@ BinomialDistribution <- R6::R6Class(
 #' @export
 #' @examples
 #' \dontrun{
-#' y <- binomial(size = 10, prob = 0.3)
+#' y <- binomial_dist(size = 10, prob = 0.3)
 #' }
-binomial <- function(size, prob, dim = NULL) {
+binomial_dist <- function(size, prob, dim = NULL) {
   dist <- BinomialDistribution$new(size = size, prob = prob, dim = dim)
   create_variable_node(distribution = dist, dim = dim, is_discrete = TRUE)
 }

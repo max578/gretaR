@@ -51,7 +51,7 @@ reference:
       - student_t
       - uniform
       - bernoulli
-      - binomial
+      - binomial_dist
       - poisson_dist
       - gamma_dist
       - beta_dist
@@ -70,7 +70,7 @@ reference:
       - mcmc
       - hmc
       - nuts
-      - vi
+      - variational
       - opt
       - laplace
 
