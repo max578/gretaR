@@ -12,3 +12,5 @@
 ^CLAUDE\.md$
 ^feasibility_assessment_v1\.md$
 ^cran-comments\.md$
+*.xlsx
+r_code_*.R
