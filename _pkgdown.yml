@@ -1,0 +1,95 @@
+url: https://max578.github.io/gretaR
+
+template:
+  bootstrap: 5
+
+navbar:
+  structure:
+    left:  [home, reference, articles, news]
+    right: [github]
+  components:
+    home:
+      icon: fa-home
+      href: index.html
+    reference:
+      text: Reference
+      href: reference/index.html
+    articles:
+      text: Articles
+      menu:
+        - text: Getting Started
+          href: articles/getting-started.html
+        - text: Hierarchical Models
+          href: articles/hierarchical-models.html
+        - text: GLM Models
+          href: articles/glm-models.html
+    news:
+      text: News
+      href: news/index.html
+    github:
+      icon: fa-github
+      href: https://github.com/max578/gretaR
+
+reference:
+  - title: Core DSL
+    desc: Define data, variables, and models using the gretaR array DSL.
+    contents:
+      - as_data
+      - variable
+      - distribution
+      - model
+      - joint_density
+
+  - title: Distributions
+    desc: Probability distributions for priors and likelihoods.
+    contents:
+      - normal
+      - half_normal
+      - half_cauchy
+      - student_t
+      - uniform
+      - bernoulli
+      - binomial
+      - poisson_dist
+      - gamma_dist
+      - beta_dist
+      - exponential
+      - multivariate_normal
+      - dirichlet
+      - negative_binomial
+      - lkj_correlation
+      - lognormal
+      - cauchy
+      - wishart
+
+  - title: Inference
+    desc: MCMC samplers, variational inference, and optimisation.
+    contents:
+      - mcmc
+      - hmc
+      - nuts
+      - vi
+      - opt
+      - laplace
+
+  - title: Formula Interface
+    desc: High-level formula-based model specification.
+    contents:
+      - gretaR_glm
+
+  - title: Utilities
+    desc: Helper functions for data handling and environment management.
+    contents:
+      - reset_gretaR_env
+
+articles:
+  - title: Getting Started
+    navbar: ~
+    contents:
+      - getting-started
+
+  - title: Model Types
+    navbar: ~
+    contents:
+      - hierarchical-models
+      - glm-models

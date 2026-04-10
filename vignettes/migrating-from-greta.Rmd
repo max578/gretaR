@@ -1,0 +1,331 @@
+---
+title: "Migrating from greta to gretaR"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Migrating from greta to gretaR}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = FALSE
+)
+```
+
+## Introduction
+
+**gretaR** is a ground-up reimplementation of the
+[greta](https://greta-stats.org/) probabilistic programming interface for R.
+It preserves the elegant, intuitive API that made greta popular while removing
+its most significant pain point — the Python/TensorFlow dependency — and adding
+modern inference capabilities.
+
+Three reasons to migrate:
+
+1. **No Python dependency.** gretaR uses
+   [torch for R](https://torch.mlverse.org/) as its computation backend.
+   Installation is a single `install.packages("gretaR")` call with no
+   `reticulate`, no conda environments, and no TensorFlow version conflicts.
+
+2. **Broader inference methods.** In addition to HMC/NUTS, gretaR ships MAP
+   optimisation (`opt()`), Laplace approximation (`laplace()`), and automatic
+   differentiation variational inference (`vi()`). These are useful for rapid
+   prototyping, model comparison, and large-data settings where full MCMC is
+   impractical.
+
+3. **Active, focused development.** gretaR is under active development with a
+   clear roadmap covering sparse matrix support, formula-based model
+   specification, and extended distribution families.
+
+## Side-by-side API comparison
+
+The table below maps the most common greta operations to their gretaR
+equivalents. Where the syntax is identical, migration requires no code changes
+at all.
+
+| Task | greta | gretaR | Notes |
+|:-----|:------|:-------|:------|
+| Data wrapping | `greta::as_data(x)` | `gretaR::as_data(x)` | Identical API |
+| Variable creation | `greta::variable(lower, upper, dim)` | `gretaR::variable(lower, upper, dim)` | Identical API |
+| Normal distribution | `greta::normal(mean, sd)` | `gretaR::normal(mean, sd)` | Identical API |
+| Half-Cauchy | `greta::cauchy(0, scale, truncation = c(0, Inf))` | `gretaR::half_cauchy(scale)` | Dedicated constructor in gretaR |
+| Student-t | `greta::student(df, mu, sigma)` | `gretaR::student_t(df, mu, sigma)` | Name differs slightly |
+| Gamma | `greta::gamma(shape, rate)` | `gretaR::gamma_dist(shape, rate)` | Renamed to avoid masking `base::gamma()` |
+| Beta | `greta::beta(shape1, shape2)` | `gretaR::beta_dist(alpha, beta)` | Renamed to avoid masking `base::beta()` |
+| Poisson | `greta::poisson(lambda)` | `gretaR::poisson_dist(rate)` | Renamed to avoid masking `stats::poisson()` |
+| Uniform | `greta::uniform(min, max)` | `gretaR::uniform(lower, upper)` | Parameter names differ |
+| Bernoulli | `greta::bernoulli(prob)` | `gretaR::bernoulli(prob)` | Identical API |
+| Binomial | `greta::binomial(size, prob)` | `gretaR::binomial(size, prob)` | Identical API |
+| Exponential | `greta::exponential(rate)` | `gretaR::exponential(rate)` | Identical API |
+| Multivariate normal | `greta::multivariate_normal(mean, Sigma)` | `gretaR::multivariate_normal(mean, covariance)` | Identical API |
+| Dirichlet | `greta::dirichlet(alpha)` | `gretaR::dirichlet(concentration)` | Parameter name differs |
+| LKJ correlation | `greta::lkj_correlation(eta, dimension)` | `gretaR::lkj_correlation(eta, dim)` | Parameter name differs |
+| Distribution assignment | `distribution(y) <- normal(mu, sigma)` | `distribution(y) <- normal(mu, sigma)` | Identical syntax |
+| Model creation | `greta::model(...)` | `gretaR::model(...)` | Identical API |
+| MCMC sampling | `greta::mcmc(model)` | `gretaR::mcmc(model)` | Arguments differ (see below) |
+
+### Distributions unique to gretaR
+
+gretaR provides several additional distribution constructors not available in
+greta:
+
+- `half_normal(sd)` — half-normal distribution on the positive reals
+- `half_cauchy(scale)` — first-class constructor (no truncation workaround)
+- `negative_binomial(size, prob)` — negative binomial for overdispersed counts
+- `lognormal(meanlog, sdlog)` — log-normal distribution
+- `cauchy(location, scale)` — full (two-sided) Cauchy distribution
+- `wishart(df, scale_matrix)` — Wishart distribution for covariance matrices
+
+## Key differences
+
+### 1. No Python dependency
+
+greta requires a working Python installation with TensorFlow and TensorFlow
+Probability. This is the single most common source of installation failures.
+gretaR replaces the entire Python stack with
+[torch for R](https://torch.mlverse.org/), which is a native R package with
+pre-built binaries for macOS, Linux, and Windows.
+
+```{r}
+# greta — requires Python + TensorFlow
+# install.packages("greta")
+# greta::install_greta_deps()  # can fail in many creative ways
+
+# gretaR — pure R + torch
+install.packages("gretaR")
+# That's it. No Python, no conda, no reticulate.
+```
+
+### 2. Torch backend (not TensorFlow)
+
+Under the hood, gretaR builds a computation graph using torch tensors. The
+automatic differentiation engine is torch's autograd, which provides exact
+gradients for HMC/NUTS without finite-difference approximations.
+
+For most users this is invisible — the user-facing API is the same. But if you
+wrote custom greta operations using `tensorflow` directly, those will need to
+be rewritten using `torch`.
+
+### 3. Additional inference methods
+
+greta provides only `mcmc()` (HMC/NUTS). gretaR adds three more:
+
+```{r}
+m <- model(mu, sigma)
+
+# MCMC (HMC or NUTS) — same as greta
+draws <- mcmc(m, n_samples = 1000, warmup = 1000, chains = 4)
+
+# Convenience wrappers
+draws <- nuts(m, n_samples = 1000)
+draws <- hmc(m, n_samples = 1000)
+
+# MAP optimisation — find the posterior mode
+fit <- opt(m)
+fit$par
+
+# Laplace approximation — Gaussian centred at MAP
+la <- laplace(m)
+la$mean
+la$sd
+
+# Variational inference (ADVI) — mean-field or full-rank Gaussian
+vi_fit <- vi(m, method = "meanfield")
+vi_fit$mean
+vi_fit$draws  # samples from the variational posterior
+```
+
+### 4. Formula interface
+
+gretaR includes `gretaR_glm()`, a high-level convenience function for fitting
+Bayesian generalised linear models using standard R formula syntax:
+
+```{r}
+# Bayesian linear regression in one call
+fit <- gretaR_glm(
+  Sepal.Length ~ Sepal.Width + Petal.Length,
+  data = iris,
+  family = "gaussian"
+)
+summary(fit$draws)
+
+# Logistic regression
+fit <- gretaR_glm(y ~ x1 + x2, data = dat, family = "binomial")
+
+# With custom priors
+fit <- gretaR_glm(
+  y ~ x,
+  data = dat,
+  family = "gaussian",
+  prior = list(beta = normal(0, 1), sigma = half_cauchy(1))
+)
+```
+
+There is no equivalent in greta — all models must be built from the DSL.
+
+### 5. Renamed distribution constructors
+
+greta uses names like `gamma()`, `beta()`, and `poisson()` that mask base R
+functions. gretaR avoids this by appending `_dist`:
+
+| greta | gretaR | Reason |
+|:------|:-------|:-------|
+| `gamma(shape, rate)` | `gamma_dist(shape, rate)` | Avoids masking `base::gamma()` |
+| `beta(shape1, shape2)` | `beta_dist(alpha, beta)` | Avoids masking `base::beta()` |
+| `poisson(lambda)` | `poisson_dist(rate)` | Avoids masking `stats::poisson()` |
+
+### 6. Sparse matrix support
+
+gretaR's `as_data()` accepts sparse matrices from the **Matrix** package
+directly. This is important for large, sparse design matrices common in
+ecology, genomics, and spatial models.
+
+```{r}
+library(Matrix)
+X_sparse <- sparseMatrix(i = c(1, 2, 3), j = c(1, 2, 3), x = 1.0, dims = c(3, 3))
+X <- as_data(X_sparse)
+```
+
+### 7. Posterior output format
+
+greta returns `coda::mcmc.list` objects from `mcmc()`. gretaR returns
+`posterior::draws_array` objects, which integrate directly with the modern
+**posterior** and **bayesplot** ecosystems.
+
+```{r}
+# greta
+draws <- greta::mcmc(m)
+class(draws)
+#> [1] "mcmc.list"
+coda::summary(draws)
+
+# gretaR
+draws <- gretaR::mcmc(m)
+class(draws)
+#> [1] "gretaR_draws" "draws_array" "draws" "array"
+posterior::summarise_draws(draws)
+bayesplot::mcmc_trace(draws)
+```
+
+If your downstream code expects `coda::mcmc.list`, convert with:
+
+```{r}
+coda_draws <- posterior::as_mcmc.list(draws)
+```
+
+### 8. MCMC argument differences
+
+The `mcmc()` signatures are similar but not identical:
+
+| Argument | greta | gretaR | Default |
+|:---------|:------|:-------|:--------|
+| Samples | `n_samples` | `n_samples` | 1000 |
+| Warmup | `warmup` | `warmup` | 1000 |
+| Chains | `chains` | `chains` | 4 |
+| Sampler | `sampler = hmc()` or `sampler = nuts()` | `sampler = "nuts"` or `"hmc"` | NUTS |
+| Verbose | `verbose` | `verbose` | TRUE |
+| Step size | Set inside `hmc()`/`nuts()` | `step_size` | Auto-tuned |
+| Tree depth | Set inside `nuts()` | `max_treedepth` | 10 |
+| Accept rate | Set inside sampler | `target_accept` | 0.8 (NUTS) |
+
+In greta, sampler configuration is done via sampler objects passed to `mcmc()`.
+In gretaR, all sampler options are direct arguments to `mcmc()`.
+
+## Worked example: Bayesian linear regression
+
+Below is a complete Bayesian linear regression in both greta and gretaR,
+side by side.
+
+### greta version
+
+```{r}
+library(greta)
+
+# Simulate data
+set.seed(42)
+n <- 100
+x_obs <- rnorm(n)
+y_obs <- 2 + 1.5 * x_obs + rnorm(n, sd = 0.8)
+
+# Wrap data
+x <- as_data(x_obs)
+y <- as_data(y_obs)
+
+# Priors
+alpha <- normal(0, 10)
+beta  <- normal(0, 10)
+sigma <- cauchy(0, 3, truncation = c(0, Inf))
+
+# Linear predictor and likelihood
+mu <- alpha + beta * x
+distribution(y) <- normal(mu, sigma)
+
+# Compile and sample
+m <- model(alpha, beta, sigma)
+draws <- mcmc(m, n_samples = 1000, warmup = 1000, chains = 4)
+
+# Summarise
+summary(draws)
+```
+
+### gretaR version
+
+```{r}
+library(gretaR)
+
+# Simulate data
+set.seed(42)
+n <- 100
+x_obs <- rnorm(n)
+y_obs <- 2 + 1.5 * x_obs + rnorm(n, sd = 0.8)
+
+# Wrap data
+x <- as_data(x_obs)
+y <- as_data(y_obs)
+
+# Priors
+alpha <- normal(0, 10)
+beta  <- normal(0, 10)
+sigma <- half_cauchy(3)     # <-- dedicated half-Cauchy constructor
+
+# Linear predictor and likelihood
+mu <- alpha + beta * x
+distribution(y) <- normal(mu, sigma)
+
+# Compile and sample
+m <- model(alpha, beta, sigma)
+draws <- mcmc(m, n_samples = 1000, warmup = 1000, chains = 4)
+
+# Summarise — uses posterior package
+posterior::summarise_draws(draws)
+
+# Or use the formula interface for the same model in one call:
+fit <- gretaR_glm(y_obs ~ x_obs,
+                  data = data.frame(y_obs, x_obs),
+                  family = "gaussian")
+```
+
+### What changed?
+
+Only two lines differ:
+
+1. `library(greta)` becomes `library(gretaR)`.
+2. `cauchy(0, 3, truncation = c(0, Inf))` becomes `half_cauchy(3)`.
+
+Everything else — `as_data()`, `normal()`, `variable()`, `distribution<-()`,
+`model()`, `mcmc()` — works identically.
+
+## Quick migration checklist
+
+- [ ] Replace `library(greta)` with `library(gretaR)`
+- [ ] Replace `gamma(...)` with `gamma_dist(...)`
+- [ ] Replace `beta(...)` with `beta_dist(...)`
+- [ ] Replace `poisson(...)` with `poisson_dist(...)`
+- [ ] Replace truncated Cauchy/normal priors with `half_cauchy()` / `half_normal()`
+- [ ] Replace `coda::` summary/plotting calls with `posterior::` / `bayesplot::` equivalents
+- [ ] If using `greta::opt()` or `greta::calculate()`: check gretaR equivalents (`opt()`, `laplace()`, `vi()`)
+- [ ] Remove `greta::install_greta_deps()` and any Python/conda setup from your workflow
+- [ ] If using custom TensorFlow operations: rewrite using torch

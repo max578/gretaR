@@ -935,3 +935,180 @@ lkj_correlation <- function(eta = 1, dim = 2L) {
   dist <- LKJDistribution$new(eta = eta, dim_mat = as.integer(dim))
   create_variable_node(distribution = dist, dim = c(dim, dim))
 }
+
+# =============================================================================
+# Log-Normal distribution
+# =============================================================================
+
+LogNormalDistribution <- R6::R6Class(
+  "LogNormalDistribution",
+  inherit = GretaRDistribution,
+
+  public = list(
+    initialize = function(meanlog, sdlog, dim = NULL) {
+      super$initialize(
+        name = "lognormal",
+        parameters = list(meanlog = meanlog, sdlog = sdlog),
+        constraint = list(lower = 0, upper = Inf),
+        dim = dim
+      )
+    },
+
+    log_prob = function(x) {
+      mu <- resolve_param(self$parameters$meanlog)
+      sigma <- resolve_param(self$parameters$sdlog)
+      x <- torch_clamp(x, min = 1e-30)
+      z <- (torch_log(x) - mu) / sigma
+      torch_sum(-torch_log(x) - torch_log(sigma) - 0.9189385 - 0.5 * z * z)
+    },
+
+    sample = function(n = 1L) {
+      mu <- resolve_param(self$parameters$meanlog)
+      sigma <- resolve_param(self$parameters$sdlog)
+      torch_exp(mu + sigma * torch_randn(c(n, 1L)))
+    }
+  )
+)
+
+#' @title Log-Normal Distribution
+#'
+#' @description A variable whose logarithm is normally distributed.
+#'
+#' @param meanlog Mean of the log-scale distribution.
+#' @param sdlog Standard deviation on the log scale (positive).
+#' @param dim Dimensions.
+#' @return A `gretaR_array` with support on the positive reals.
+#' @export
+#' @examples
+#' \dontrun{
+#' x <- lognormal(0, 1)
+#' }
+lognormal <- function(meanlog = 0, sdlog = 1, dim = NULL) {
+  dist <- LogNormalDistribution$new(meanlog = meanlog, sdlog = sdlog, dim = dim)
+  create_variable_node(distribution = dist, dim = dim)
+}
+
+# =============================================================================
+# Cauchy distribution
+# =============================================================================
+
+CauchyDistribution <- R6::R6Class(
+  "CauchyDistribution",
+  inherit = GretaRDistribution,
+
+  public = list(
+    initialize = function(location, scale, dim = NULL) {
+      super$initialize(
+        name = "cauchy",
+        parameters = list(location = location, scale = scale),
+        constraint = list(lower = -Inf, upper = Inf),
+        dim = dim
+      )
+    },
+
+    log_prob = function(x) {
+      loc <- resolve_param(self$parameters$location)
+      sc <- resolve_param(self$parameters$scale)
+      z <- (x - loc) / sc
+      torch_sum(-log(pi) - torch_log(sc) - torch_log(1 + z * z))
+    },
+
+    sample = function(n = 1L) {
+      loc <- resolve_param(self$parameters$location)
+      sc <- resolve_param(self$parameters$scale)
+      loc + sc * torch_tan((torch_rand(c(n, 1L)) - 0.5) * pi)
+    }
+  )
+)
+
+#' @title Cauchy Distribution
+#'
+#' @description The Cauchy distribution (Student-t with 1 degree of freedom).
+#'   Heavy-tailed; useful as a weakly informative prior.
+#'
+#' @param location Location parameter.
+#' @param scale Scale parameter (positive).
+#' @param dim Dimensions.
+#' @return A `gretaR_array`.
+#' @export
+#' @examples
+#' \dontrun{
+#' x <- cauchy(0, 1)
+#' }
+cauchy <- function(location = 0, scale = 1, dim = NULL) {
+  dist <- CauchyDistribution$new(location = location, scale = scale, dim = dim)
+  create_variable_node(distribution = dist, dim = dim)
+}
+
+# =============================================================================
+# Wishart distribution
+# =============================================================================
+
+WishartDistribution <- R6::R6Class(
+  "WishartDistribution",
+  inherit = GretaRDistribution,
+
+  public = list(
+    initialize = function(df, scale_matrix) {
+      p <- if (is.matrix(scale_matrix)) nrow(scale_matrix)
+           else if (is.numeric(scale_matrix)) as.integer(sqrt(length(scale_matrix)))
+           else NULL
+      super$initialize(
+        name = "wishart",
+        parameters = list(df = df, scale_matrix = scale_matrix),
+        constraint = list(lower = 0, upper = Inf, type = "positive_definite"),
+        dim = if (!is.null(p)) c(p, p) else NULL
+      )
+    },
+
+    log_prob = function(x) {
+      nu <- resolve_param(self$parameters$df)
+      V <- resolve_param(self$parameters$scale_matrix)
+      p <- V$shape[1]
+
+      # log p(X|nu, V) = (nu-p-1)/2 * log|X| - 0.5*tr(V^{-1} X)
+      #                  - nu*p/2*log(2) - nu/2*log|V| - log Gamma_p(nu/2)
+      log_det_X <- torch_slogdet(x)[[2]]
+      log_det_V <- torch_slogdet(V)[[2]]
+      V_inv <- torch_inverse(V)
+      trace_term <- torch_trace(torch_mm(V_inv, x))
+
+      # Multivariate log-gamma: sum_{i=1}^{p} lgamma((nu+1-i)/2)
+      log_gamma_p <- torch_zeros(1, dtype = x$dtype)
+      for (i in seq_len(as.integer(p))) {
+        log_gamma_p <- log_gamma_p + torch_lgamma((nu + 1 - i) / 2)
+      }
+      log_gamma_p <- log_gamma_p + p * (p - 1) / 4 * log(pi)
+
+      (nu - p - 1) / 2 * log_det_X - 0.5 * trace_term -
+        nu * p / 2 * log(2) - nu / 2 * log_det_V - log_gamma_p
+    },
+
+    sample = function(n = 1L) {
+      cli_alert_warning("Wishart sampling uses Bartlett decomposition (stub).")
+      p <- self$dim[1]
+      torch_eye(p)$unsqueeze(1)$expand(c(n, p, p))
+    }
+  )
+)
+
+#' @title Wishart Distribution
+#'
+#' @description The Wishart distribution over positive-definite matrices.
+#'   Used as a prior for covariance or precision matrices.
+#'
+#' @param df Degrees of freedom (must be >= dimension of scale matrix).
+#' @param scale_matrix Scale matrix (positive definite, p x p).
+#' @return A `gretaR_array` representing a positive-definite matrix.
+#' @note Full sampling via Bartlett decomposition is deferred to Phase 3.
+#' @export
+#' @examples
+#' \dontrun{
+#' Sigma <- wishart(df = 5, scale_matrix = diag(3))
+#' }
+wishart <- function(df, scale_matrix) {
+  dist <- WishartDistribution$new(df = df, scale_matrix = scale_matrix)
+  p <- if (is.matrix(scale_matrix)) nrow(scale_matrix) else NULL
+  dim <- if (!is.null(p)) c(p, p) else NULL
+  create_variable_node(distribution = dist, dim = dim)
+}

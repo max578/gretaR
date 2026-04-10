@@ -8,9 +8,9 @@
 
 **Key assumptions:** R torch autograd is stable and sufficient. Distribution log_prob can be implemented directly as torch ops. Single torch backend (no TF fallback). R6 first, S7 migration later.
 
-**Status:** Phase 2a complete. 15 distributions (12 P0 + Dirichlet, NegBin, LKJ). Hierarchical model support via `[.gretaR_array`. Sparse matrix support (Matrix → torch sparse COO). Complete roxygen2 docs. NA guard. GitHub repo (max578/gretaR, private) with CI. R CMD check: 0 errors, 0 warnings, 2 NOTEs.
+**Status:** Phase 2b complete. 15 distributions, hierarchical models, sparse matrices, MAP, Laplace, ADVI (mean-field + full-rank), formula interface (gretaR_glm), 3 vignettes, 129 passing tests. GitHub: max578/gretaR with CI. R CMD check: 0 errors, 0 warnings.
 
-**Open issues:** (1) Generate roxygen2 man pages for all exported functions. (2) Profile NUTS performance for larger models. (3) Test on Windows/Linux. (4) Step-size adaptation could be more robust — current windowed approach works but step sizes are sometimes small.
+**Open issues:** (1) Validate hierarchical model MCMC recovery (in progress). (2) Profile NUTS on >10 param models. (3) Test on Windows/Linux CI. (4) Benchmarking vs Stan. (5) Phase 3: advanced formula, GP/ODE extensions, JOSS paper.
 
 ---
 
