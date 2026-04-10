@@ -36,14 +36,20 @@ test_that("gretaR_glm fits a Gaussian model with MAP", {
   expect_true(!is.null(fit$result$par))
 })
 
-test_that("gretaR_glm rejects lme4-style formulas gracefully", {
+test_that("gretaR_glm handles lme4-style random intercepts", {
   skip_if_not_installed("torch")
-  dat <- data.frame(y = 1, x = 1, group = 1)
-  expect_error(
-    gretaR_glm(y ~ x + (1 | group), data = dat, sampler = "map",
-               verbose = FALSE),
-    "not yet supported"
+  skip_on_cran()
+
+  set.seed(42)
+  dat <- data.frame(
+    y = rnorm(30), x = rnorm(30),
+    group = factor(rep(1:3, each = 10))
   )
+  fit <- gretaR_glm(y ~ x + (1 | group), data = dat, sampler = "map",
+                     verbose = FALSE)
+  expect_s3_class(fit, "gretaR_glm_fit")
+  expect_true(!is.null(fit$random_effects))
+  expect_equal(fit$random_effects[[1]]$type, "intercept")
 })
 
 test_that("print.gretaR_glm_fit works", {

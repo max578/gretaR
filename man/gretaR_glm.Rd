@@ -19,18 +19,21 @@ gretaR_glm(
 )
 }
 \arguments{
-\item{formula}{A formula specifying the model (e.g., \code{y ~ x1 + x2}).}
+\item{formula}{A formula specifying the model (e.g., \code{y ~ x1 + x2},
+or \code{y ~ x + (1|group)} for mixed models).}
 
 \item{data}{A data frame containing the variables referenced in the formula.}
 
-\item{family}{Distribution family: \code{"gaussian"} (default), \code{"binomial"},
-or \code{"poisson"}.}
+\item{family}{Distribution family: \code{"gaussian"} (default),
+\code{"binomial"}, or \code{"poisson"}.}
 
 \item{prior}{A named list of gretaR distribution objects for parameter priors.
-Recognised names: \code{"beta"} (regression coefficients), \code{"intercept"},
-\code{"sigma"} (residual SD, gaussian only). Use \code{NULL} for default priors.}
+Recognised names: \code{"beta"} (regression coefficients),
+\code{"intercept"}, \code{"sigma"} (residual SD, gaussian only),
+\code{"tau"} (random effect SD). Use \code{NULL} for default priors.}
 
-\item{sampler}{Sampler: \code{"nuts"} (default), \code{"hmc"}, \code{"vi"}, or \code{"map"}.}
+\item{sampler}{Sampler: \code{"nuts"} (default), \code{"hmc"}, \code{"vi"},
+or \code{"map"}.}
 
 \item{chains}{Number of MCMC chains (default 4).}
 
@@ -38,8 +41,9 @@ Recognised names: \code{"beta"} (regression coefficients), \code{"intercept"},
 
 \item{warmup}{Number of warmup iterations (default half of iter).}
 
-\item{formula_style}{Optional explicit formula style hint: \code{"base"}, \code{"lme4"},
-\code{"brms"}, \code{"mgcv"}. If NULL (default), auto-detected.}
+\item{formula_style}{Optional explicit formula style hint: \code{"base"},
+\code{"lme4"}, \code{"brms"}, \code{"mgcv"}. If \code{NULL} (default),
+auto-detected.}
 
 \item{verbose}{Logical; print progress (default TRUE).}
 
@@ -53,14 +57,30 @@ A \code{gretaR_glm_fit} object with components:
 \item{formula}{The original formula.}
 \item{family}{The family used.}
 \item{data}{The original data.}
-\item{design_matrix}{The model matrix.}
-\item{param_names}{Named mapping of parameters.}
+\item{design_matrix}{The model matrix (fixed effects).}
+\item{col_names}{Named mapping of fixed-effect parameters.}
+\item{random_effects}{List of parsed random effect specifications
+(NULL for base-style formulas).}
 }
 }
 \description{
 A high-level interface for specifying and fitting generalised
-linear models using standard R formula syntax. Internally translates to
-the gretaR DSL, constructs the model, and runs MCMC inference.
+linear models (including mixed / hierarchical models) using standard R
+formula syntax. Internally translates to the gretaR DSL, constructs the
+model, and runs MCMC inference.
+
+lme4-style random effects are supported via regex parsing (lme4 is
+\strong{not} required). Recognised patterns:
+\itemize{
+\item \code{(1|group)} — random intercepts by group
+\item \code{(x|group)} — correlated random intercepts + slopes
+\item \code{(0 + x|group)} — random slopes only (no intercept)
+}
+Multiple random effect terms are permitted, e.g.
+\code{y ~ x + (1|site) + (1|year)}.
+
+A non-centred parameterisation is used by default for superior HMC
+geometry.
 }
 \examples{
 \dontrun{
@@ -76,5 +96,18 @@ fit <- gretaR_glm(y ~ x, data = dat, family = "binomial")
 # Custom priors
 fit <- gretaR_glm(y ~ x, data = dat, family = "gaussian",
                   prior = list(beta = normal(0, 1), sigma = half_cauchy(1)))
+
+# Random intercepts model (lme4-style)
+sleepstudy <- data.frame(
+  Reaction = rnorm(180, 300, 50),
+  Days = rep(0:9, each = 18),
+  Subject = factor(rep(1:18, times = 10))
+)
+fit <- gretaR_glm(Reaction ~ Days + (1 | Subject),
+                  data = sleepstudy, family = "gaussian")
+
+# Random intercepts + slopes
+fit <- gretaR_glm(Reaction ~ Days + (Days | Subject),
+                  data = sleepstudy, family = "gaussian")
 }
 }

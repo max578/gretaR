@@ -23,6 +23,7 @@ Imports:
     methods
 Suggests:
     Matrix,
+    lme4,
     testthat (>= 3.0.0),
     knitr,
     rmarkdown,

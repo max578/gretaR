@@ -37,6 +37,8 @@ reference:
       - as_data
       - variable
       - distribution
+      - "`distribution<-`"
+      - "`[.gretaR_array`"
       - model
       - joint_density
 
@@ -72,10 +74,18 @@ reference:
       - opt
       - laplace
 
+  - title: Custom & Mixture
+    desc: User-defined distributions and mixture models.
+    contents:
+      - custom_distribution
+      - mixture
+
   - title: Formula Interface
     desc: High-level formula-based model specification.
     contents:
       - gretaR_glm
+      - parse_re_bars
+      - remove_re_bars
 
   - title: Utilities
     desc: Helper functions for data handling and environment management.
@@ -93,3 +103,8 @@ articles:
     contents:
       - hierarchical-models
       - glm-models
+
+  - title: Migration
+    navbar: ~
+    contents:
+      - migrating-from-greta
