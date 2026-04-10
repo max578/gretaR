@@ -13,12 +13,12 @@
 #' @param init Optional initial values (numeric vector in unconstrained space).
 #' @param verbose Logical; print progress (default TRUE).
 #'
-#' @return A list with components:
+#' @return A `gretaR_fit` object (method = "map") with components:
 #'   \describe{
 #'     \item{par}{Named numeric vector of MAP estimates (constrained space).}
 #'     \item{par_unconstrained}{Numeric vector of MAP in unconstrained space.}
-#'     \item{value}{Log-joint density at the MAP.}
-#'     \item{convergence}{Logical; did the optimiser converge?}
+#'     \item{log_prob}{Log-joint density at the MAP.}
+#'     \item{convergence}{List with convergence info.}
 #'     \item{iterations}{Number of iterations used.}
 #'   }
 #'
@@ -108,12 +108,25 @@ opt <- function(model, max_iter = 2000L, learning_rate = 0.01,
   param_names <- make_param_names(model)
   names(constrained_vec) <- param_names
 
-  list(
-    par = constrained_vec,
-    par_unconstrained = best_theta,
-    value = best_lp,
-    convergence = converged,
-    iterations = min(iter, max_iter)
+  new_gretaR_fit(
+    draws = NULL,
+    model = model,
+    summary = NULL,
+    convergence = list(
+      n_eff = NULL, rhat = NULL, max_rhat = NA_real_,
+      min_ess = NA_real_, n_divergences = 0L,
+      converged = converged
+    ),
+    call_info = list(max_iter = max_iter, learning_rate = learning_rate,
+                     tolerance = tolerance),
+    run_time = NULL,
+    method = "map",
+    extra = list(
+      par = constrained_vec,
+      par_unconstrained = best_theta,
+      log_prob = best_lp,
+      iterations = min(iter, max_iter)
+    )
   )
 }
 
@@ -187,15 +200,24 @@ laplace <- function(model, map_fit = NULL, ...) {
   # Log marginal likelihood approximation (Laplace)
   # log p(y) ≈ log p(y, theta_MAP) + (d/2)*log(2*pi) + 0.5*log|Sigma|
   log_det_cov <- determinant(cov_mat, logarithm = TRUE)$modulus[1]
-  log_evidence <- map_fit$value + 0.5 * n_params * log(2 * pi) + 0.5 * log_det_cov
+  log_evidence <- map_fit$log_prob + 0.5 * n_params * log(2 * pi) + 0.5 * log_det_cov
 
-  list(
-    mean = map_fit$par,
-    mean_unconstrained = theta_map,
-    covariance = cov_mat,
-    sd = sd_vec,
-    log_evidence = log_evidence,
-    map = map_fit
+  new_gretaR_fit(
+    draws = NULL,
+    model = model,
+    summary = NULL,
+    convergence = NULL,
+    call_info = list(method = "laplace"),
+    run_time = NULL,
+    method = "laplace",
+    extra = list(
+      par = map_fit$par,
+      par_unconstrained = theta_map,
+      covariance = cov_mat,
+      sd = sd_vec,
+      log_evidence = log_evidence,
+      map = map_fit
+    )
   )
 }
 

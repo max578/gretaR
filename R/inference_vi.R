@@ -187,20 +187,29 @@ vi <- function(model, n_samples = 1L, max_iter = 5000L,
   draws <- generate_vi_draws(model, mu_final, cov_mat, param_names,
                              n_draws = 1000L, n_chains = 4L)
 
-  result <- list(
-    mean = constrained_vec,
-    mean_unconstrained = mu_final,
-    sd = sigma_final,
-    covariance = cov_mat,
-    elbo = elbo_history,
-    draws = draws,
-    converged = converged,
-    method = method,
-    iterations = min(iter, max_iter)
-  )
+  summ <- tryCatch(posterior::summarise_draws(draws), error = function(e) NULL)
+  convergence <- build_convergence(draws)
 
-  class(result) <- "gretaR_vi"
-  result
+  new_gretaR_fit(
+    draws = draws,
+    model = model,
+    summary = summ,
+    convergence = convergence,
+    call_info = list(method = method, max_iter = max_iter,
+                     learning_rate = learning_rate),
+    run_time = NULL,
+    method = "vi",
+    extra = list(
+      par = constrained_vec,
+      par_unconstrained = mu_final,
+      sd = sigma_final,
+      covariance = cov_mat,
+      elbo = elbo_history,
+      vi_method = method,
+      converged = converged,
+      iterations = min(iter, max_iter)
+    )
+  )
 }
 
 #' Build a lower-triangular matrix from a flat vector
@@ -260,20 +269,7 @@ generate_vi_draws <- function(model, mu_vec, cov_mat, param_names,
   posterior::as_draws_array(samples)
 }
 
-#' @export
-print.gretaR_vi <- function(x, ...) {
-  cat(sprintf("gretaR variational inference (%s)\n", x$method))
-  cat(sprintf("  Parameters: %d, Iterations: %d, Converged: %s\n",
-              length(x$mean), x$iterations, x$converged))
-  cat(sprintf("  Final ELBO: %.2f\n", tail(x$elbo, 1)))
-  cat("\nVariational posterior means:\n")
-  print(round(x$mean, 4))
-  cat("\nVariational posterior SDs (unconstrained):\n")
-  print(round(x$sd, 4))
-  invisible(x)
-}
+# Legacy print/summary removed — handled by gretaR_fit S3 methods
 
-#' @export
-summary.gretaR_vi <- function(object, ...) {
-  posterior::summarise_draws(object$draws, ...)
-}
+# Legacy print.gretaR_vi and summary.gretaR_vi removed.
+# All output is now handled by gretaR_fit S3 methods in fit.R.

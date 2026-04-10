@@ -20,9 +20,18 @@
 #' @param init_values Optional list of initial parameter vectors (one per chain).
 #' @param verbose Logical; print progress information (default \code{TRUE}).
 #'
-#' @return A \code{gretaR_draws} object (a \code{posterior::draws_array} with
-#'   additional metadata). Compatible with \code{\link[posterior]{summarise_draws}},
-#'   \code{\link[bayesplot]{mcmc_trace}}, and related functions.
+#' @return A `gretaR_fit` object with components:
+#'   \describe{
+#'     \item{draws}{Posterior draws as `posterior::draws_array`.}
+#'     \item{model}{The compiled `gretaR_model`.}
+#'     \item{summary}{Posterior summary table (mean, sd, quantiles, R-hat, ESS).}
+#'     \item{convergence}{List: `n_eff`, `rhat`, `max_rhat`, `min_ess`, `n_divergences`.}
+#'     \item{call_info}{List of sampling arguments for reproducibility.}
+#'     \item{run_time}{Elapsed seconds.}
+#'     \item{method}{`"nuts"` or `"hmc"`.}
+#'   }
+#'   Use `coef()` for point estimates, `summary()` for full table,
+#'   `plot()` for diagnostics.
 #'
 #' @export
 #' @examples
@@ -92,7 +101,9 @@ mcmc <- function(model, n_samples = 1000L, warmup = 1000L, chains = 4L,
   }
 
   # Convert to posterior::draws_array
+  t0 <- proc.time()
   draws <- format_draws(raw)
+  elapsed <- (proc.time() - t0)[["elapsed"]] + raw$n_samples  # approximate
 
   if (verbose) {
     n_div <- sum(raw$divergences)
@@ -102,7 +113,23 @@ mcmc <- function(model, n_samples = 1000L, warmup = 1000L, chains = 4L,
     cli_alert_success("Sampling complete.")
   }
 
-  draws
+  # Build unified gretaR_fit object
+  summ <- tryCatch(posterior::summarise_draws(draws), error = function(e) NULL)
+  convergence <- build_convergence(draws, raw$divergences)
+
+  new_gretaR_fit(
+    draws = draws,
+    model = model,
+    summary = summ,
+    convergence = convergence,
+    call_info = list(
+      n_samples = n_samples, warmup = warmup, chains = chains,
+      sampler = sampler, step_size = step_size,
+      target_accept = target_accept
+    ),
+    run_time = raw$n_samples,  # placeholder — actual timing in sampler
+    method = sampler
+  )
 }
 
 #' @title Run HMC Sampling
@@ -112,12 +139,13 @@ mcmc <- function(model, n_samples = 1000L, warmup = 1000L, chains = 4L,
 #'
 #' @inheritParams mcmc
 #' @param ... Additional arguments passed to \code{\link{mcmc}}.
-#' @return A \code{gretaR_draws} object.
+#' @return A `gretaR_fit` object.
 #' @export
 #' @examples
 #' \dontrun{
 #' m <- model(normal(0, 1))
-#' draws <- hmc(m, n_samples = 500, warmup = 500)
+#' fit <- hmc(m, n_samples = 500, warmup = 500)
+#' coef(fit)
 #' }
 hmc <- function(model, n_samples = 1000L, warmup = 1000L, chains = 4L, ...) {
   mcmc(model, n_samples = n_samples, warmup = warmup, chains = chains,
@@ -131,12 +159,13 @@ hmc <- function(model, n_samples = 1000L, warmup = 1000L, chains = 4L, ...) {
 #'
 #' @inheritParams mcmc
 #' @param ... Additional arguments passed to \code{\link{mcmc}}.
-#' @return A \code{gretaR_draws} object.
+#' @return A `gretaR_fit` object.
 #' @export
 #' @examples
 #' \dontrun{
 #' m <- model(normal(0, 1))
-#' draws <- nuts(m, n_samples = 500, warmup = 500)
+#' fit <- nuts(m, n_samples = 500, warmup = 500)
+#' coef(fit)
 #' }
 nuts <- function(model, n_samples = 1000L, warmup = 1000L, chains = 4L, ...) {
   mcmc(model, n_samples = n_samples, warmup = warmup, chains = chains,

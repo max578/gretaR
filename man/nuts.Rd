@@ -18,7 +18,7 @@ nuts(model, n_samples = 1000L, warmup = 1000L, chains = 4L, ...)
 \item{...}{Additional arguments passed to \code{\link{mcmc}}.}
 }
 \value{
-A \code{gretaR_draws} object.
+A \code{gretaR_fit} object.
 }
 \description{
 Convenience wrapper around \code{\link{mcmc}} that selects the
@@ -27,6 +27,7 @@ No-U-Turn Sampler (NUTS).
 \examples{
 \dontrun{
 m <- model(normal(0, 1))
-draws <- nuts(m, n_samples = 500, warmup = 500)
+fit <- nuts(m, n_samples = 500, warmup = 500)
+coef(fit)
 }
 }

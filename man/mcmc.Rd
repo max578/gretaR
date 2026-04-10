@@ -44,9 +44,18 @@ NUTS, 0.65 for HMC).}
 \item{verbose}{Logical; print progress information (default \code{TRUE}).}
 }
 \value{
-A \code{gretaR_draws} object (a \code{posterior::draws_array} with
-additional metadata). Compatible with \code{\link[posterior]{summarise_draws}},
-\code{\link[bayesplot]{mcmc_trace}}, and related functions.
+A \code{gretaR_fit} object with components:
+\describe{
+\item{draws}{Posterior draws as \code{posterior::draws_array}.}
+\item{model}{The compiled \code{gretaR_model}.}
+\item{summary}{Posterior summary table (mean, sd, quantiles, R-hat, ESS).}
+\item{convergence}{List: \code{n_eff}, \code{rhat}, \code{max_rhat}, \code{min_ess}, \code{n_divergences}.}
+\item{call_info}{List of sampling arguments for reproducibility.}
+\item{run_time}{Elapsed seconds.}
+\item{method}{\code{"nuts"} or \code{"hmc"}.}
+}
+Use \code{coef()} for point estimates, \code{summary()} for full table,
+\code{plot()} for diagnostics.
 }
 \description{
 Run Hamiltonian Monte Carlo or the No-U-Turn Sampler on a

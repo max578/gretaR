@@ -176,26 +176,16 @@ gretaR_glm <- function(formula, data, family = c("gaussian", "binomial", "poisso
          sampler = sampler, verbose = verbose, ...)
   }
 
-  # --- Build output ---
-  draws <- if (sampler == "map") NULL
-           else if (sampler == "vi") result$draws
-           else result
+  # result is already a gretaR_fit — enrich with formula-specific info
+  result$formula <- formula
+  result$family <- family
+  result$data <- data
+  result$design_matrix <- X
+  result$col_names <- col_names
+  result$random_effects <- NULL
 
-  fit <- list(
-    draws = draws,
-    model = m,
-    result = result,
-    formula = formula,
-    family = family,
-    data = data,
-    design_matrix = X,
-    col_names = col_names,
-    sampler = sampler,
-    random_effects = NULL
-  )
-
-  class(fit) <- "gretaR_glm_fit"
-  fit
+  class(result) <- c("gretaR_glm_fit", "gretaR_fit")
+  result
 }
 
 
@@ -385,26 +375,16 @@ gretaR_glm <- function(formula, data, family = c("gaussian", "binomial", "poisso
          sampler = sampler, verbose = verbose, ...)
   }
 
-  # --- Build output ---
-  draws <- if (sampler == "map") NULL
-           else if (sampler == "vi") result$draws
-           else result
+  # result is already a gretaR_fit — enrich with formula-specific info
+  result$formula <- formula
+  result$family <- family
+  result$data <- data
+  result$design_matrix <- X_fixed
+  result$col_names <- col_names
+  result$random_effects <- re_info
 
-  fit <- list(
-    draws = draws,
-    model = m,
-    result = result,
-    formula = formula,
-    family = family,
-    data = data,
-    design_matrix = X_fixed,
-    col_names = col_names,
-    sampler = sampler,
-    random_effects = re_info
-  )
-
-  class(fit) <- "gretaR_glm_fit"
-  fit
+  class(result) <- c("gretaR_glm_fit", "gretaR_fit")
+  result
 }
 
 #' Logistic (sigmoid) link for gretaR_arrays

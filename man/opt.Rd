@@ -28,12 +28,12 @@ opt(
 \item{verbose}{Logical; print progress (default TRUE).}
 }
 \value{
-A list with components:
+A \code{gretaR_fit} object (method = "map") with components:
 \describe{
 \item{par}{Named numeric vector of MAP estimates (constrained space).}
 \item{par_unconstrained}{Numeric vector of MAP in unconstrained space.}
-\item{value}{Log-joint density at the MAP.}
-\item{convergence}{Logical; did the optimiser converge?}
+\item{log_prob}{Log-joint density at the MAP.}
+\item{convergence}{List with convergence info.}
 \item{iterations}{Number of iterations used.}
 }
 }
