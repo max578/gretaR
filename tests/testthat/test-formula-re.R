@@ -155,14 +155,16 @@ test_that("gretaR_glm rejects missing grouping variable", {
   )
 })
 
-test_that("mgcv-style formulas still error", {
+test_that("mgcv-style formulas are handled", {
   skip_if_not_installed("torch")
+  skip_if_not_installed("mgcv")
+  skip_on_cran()
 
-  dat <- data.frame(y = 1:5, x = rnorm(5))
-  expect_error(
-    gretaR_glm(y ~ s(x), data = dat, sampler = "map", verbose = FALSE),
-    "not yet supported"
-  )
+  set.seed(42)
+  dat <- data.frame(y = rnorm(50), x = rnorm(50))
+  fit <- gretaR_glm(y ~ s(x, k = 6), data = dat, sampler = "map",
+                     verbose = FALSE)
+  expect_s3_class(fit, "gretaR_fit")
 })
 
 # =============================================================================

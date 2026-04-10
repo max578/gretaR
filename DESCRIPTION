@@ -24,6 +24,8 @@ Imports:
 Suggests:
     Matrix,
     lme4,
+    mgcv,
+    cmdstanr,
     testthat (>= 3.0.0),
     knitr,
     rmarkdown,
@@ -31,7 +33,7 @@ Suggests:
     ggplot2,
     loo
 VignetteBuilder: knitr
-Config/Needs/website: cmdstanr
+Additional_repositories: https://stan-dev.r-universe.dev
 Config/testthat/edition: 3
 Encoding: UTF-8
 Language: en-GB

@@ -110,10 +110,8 @@ gretaR_glm <- function(formula, data, family = c("gaussian", "binomial", "poisso
   }
 
   if (style == "mgcv") {
-    cli_abort(c(
-      "Smooth term formulas (mgcv-style) are not yet supported in {.fn gretaR_glm}.",
-      "i" = "Use the gretaR DSL directly for non-linear models."
-    ))
+    return(.gretaR_glm_smooth(formula, data, family, prior, sampler,
+                               chains, n_samples, warmup, verbose, ...))
   }
 
   # --- Extract response and build design matrix ---
@@ -636,4 +634,108 @@ remove_re_bars <- function(formula) {
   }
 
   stats::as.formula(cleaned, env = environment(formula))
+}
+
+
+# =============================================================================
+# Internal: fit a GAM-style model (mgcv smooth terms)
+# =============================================================================
+
+#' Build and fit a model with mgcv-style smooth terms
+#'
+#' Uses the smooth2random decomposition from mgcv to convert penalised
+#' spline bases into fixed + random effect components for HMC/NUTS sampling.
+#'
+#' @noRd
+.gretaR_glm_smooth <- function(formula, data, family, prior, sampler,
+                                chains, n_samples, warmup, verbose, ...) {
+
+  # --- Process smooth terms ---
+  sm <- process_smooths(formula, data)
+
+  if (verbose) {
+    n_sm <- length(sm$smooth_info)
+    cli_alert_info("Smooth terms: {n_sm} random-effect blocks")
+    for (info in sm$smooth_info) {
+      cli_alert_info("  {info$label}: {info$type}, {info$n_coef} coefficients")
+    }
+    if (sm$n_smooth_fixed > 0) {
+      cli_alert_info("  Smooth fixed effects: {sm$n_smooth_fixed} columns")
+    }
+  }
+
+  # --- Parametric (fixed) part ---
+  mf <- stats::model.frame(sm$fixed_formula, data = data,
+                            na.action = stats::na.fail)
+  y_vec <- stats::model.response(mf)
+  X_fixed <- stats::model.matrix(sm$fixed_formula, data = mf)
+
+  n <- nrow(X_fixed)
+  p_fixed <- ncol(X_fixed)
+  col_names <- colnames(X_fixed)
+
+  if (verbose) {
+    cli_alert_info(
+      "Parametric: {p_fixed} columns ({paste(col_names, collapse=', ')})"
+    )
+  }
+
+  # --- Reset DAG and build model ---
+  reset_gretaR_env()
+
+  y <- as_data(y_vec)
+  x_fixed <- as_data(X_fixed)
+  beta_fixed <- prior$beta %||% normal(0, 5, dim = c(p_fixed, 1L))
+
+  # Parametric linear predictor
+  eta <- x_fixed %*% beta_fixed
+
+  # --- Add smooth contributions ---
+  smooth_parts <- build_smooth_gretaR(sm, prior_smooth_sd = prior$smooth_sd)
+
+  if (!is.null(smooth_parts$eta_smooth)) {
+    eta <- eta + smooth_parts$eta_smooth
+  }
+
+  # Collect all target variables
+  target_vars <- c(list(beta_fixed = beta_fixed), smooth_parts$target_vars)
+
+  # --- Likelihood ---
+  if (family == "gaussian") {
+    sigma <- prior$sigma %||% half_cauchy(2)
+    distribution(y) <- normal(eta, sigma)
+    target_vars$sigma <- sigma
+  } else if (family == "binomial") {
+    prob <- logistic_link(eta)
+    distribution(y) <- bernoulli(prob)
+  } else if (family == "poisson") {
+    rate <- exp(eta)
+    distribution(y) <- poisson_dist(rate)
+  }
+
+  # --- Compile and fit ---
+  m <- do.call(model, unname(target_vars))
+
+  result <- if (sampler == "map") {
+    opt(m, verbose = verbose, ...)
+  } else if (sampler == "vi") {
+    variational(m, verbose = verbose, ...)
+  } else {
+    mcmc(m, n_samples = n_samples, warmup = warmup, chains = chains,
+         sampler = sampler, verbose = verbose, ...)
+  }
+
+  # --- Build output ---
+  result$formula <- formula
+  result$family <- family
+  result$data <- data
+  result$design_matrix <- X_fixed
+  result$col_names <- col_names
+  result$random_effects <- NULL
+  result$smooth_info <- sm$smooth_info
+  result$n_smooth_fixed <- sm$n_smooth_fixed
+  result$n_smooth_random <- sm$n_smooth_random
+
+  class(result) <- c("gretaR_glm_fit", "gretaR_fit")
+  result
 }
