@@ -10,7 +10,7 @@
 
 **Status:** Phase 2 complete. 18 distributions, hierarchical models, sparse matrices, MAP/Laplace/ADVI, formula interface, 4 vignettes (getting-started, hierarchical, GLMs, migration guide), 136 passing tests, 10-model validation suite vs Stan/greta. README, pkgdown config, CRAN comments prepared. R CMD check: 0 errors, 0 warnings.
 
-**Open issues:** (1) Benchmark 10 (hierarchical) still running — awaiting final timing. (2) Windows/Linux CI untested. (3) Phase 3: advanced formula, GP/ODE, JOSS paper.
+**Open issues:** (1) Windows/Linux CI running — awaiting results. (2) GP/ODE extensions (future). (3) CRAN + JOSS submission.
 
 ---
 

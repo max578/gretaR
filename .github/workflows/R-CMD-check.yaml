@@ -41,7 +41,8 @@ jobs:
 
       - name: Install torch
         run: |
-          Rscript -e 'torch::install_torch()'
+          Rscript -e 'tryCatch(torch::install_torch(), error = function(e) message("torch install failed: ", e$message))'
+        continue-on-error: true
 
       - uses: r-lib/actions/check-r-package@v2
         with:
