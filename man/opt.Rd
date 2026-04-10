@@ -10,7 +10,8 @@ opt(
   learning_rate = 0.01,
   tolerance = 1e-06,
   init = NULL,
-  verbose = TRUE
+  verbose = TRUE,
+  backend = c("torch", "stan")
 )
 }
 \arguments{

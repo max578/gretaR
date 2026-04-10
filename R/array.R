@@ -40,6 +40,8 @@ GretaRArray <- R6::R6Class(
     is_discrete = FALSE,
     #' @field is_sparse Whether this node holds a sparse tensor.
     is_sparse = FALSE,
+    #' @field op_type Operation type string for Stan code generation.
+    op_type = NULL,
 
     initialize = function(node_type, value = NULL, operation = NULL,
                           parents = NULL, distribution = NULL, dim = NULL,

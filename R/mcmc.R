@@ -47,12 +47,21 @@
 #' }
 mcmc <- function(model, n_samples = 1000L, warmup = 1000L, chains = 4L,
                  sampler = c("nuts", "hmc"),
+                 backend = c("torch", "stan"),
                  step_size = NULL, max_treedepth = 10L,
                  n_leapfrog = 25L, target_accept = NULL,
                  init_values = NULL, verbose = TRUE) {
 
   sampler <- match.arg(sampler)
+  backend <- match.arg(backend)
 
+  # --- Stan backend dispatch ---
+  if (backend == "stan") {
+    return(stan_sample(model, n_samples = n_samples, warmup = warmup,
+                       chains = chains, verbose = verbose))
+  }
+
+  # --- Torch backend (default) ---
   # Set defaults based on sampler
   # step_size = NULL lets the sampler auto-tune via find_reasonable_epsilon
   if (is.null(target_accept)) {

@@ -34,7 +34,13 @@
 #' fit$par
 #' }
 opt <- function(model, max_iter = 2000L, learning_rate = 0.01,
-                tolerance = 1e-6, init = NULL, verbose = TRUE) {
+                tolerance = 1e-6, init = NULL, verbose = TRUE,
+                backend = c("torch", "stan")) {
+
+  backend <- match.arg(backend)
+  if (backend == "stan") {
+    return(stan_optimize(model, verbose = verbose))
+  }
 
   n_params <- model$total_dim
 

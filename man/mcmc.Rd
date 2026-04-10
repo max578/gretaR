@@ -10,6 +10,7 @@ mcmc(
   warmup = 1000L,
   chains = 4L,
   sampler = c("nuts", "hmc"),
+  backend = c("torch", "stan"),
   step_size = NULL,
   max_treedepth = 10L,
   n_leapfrog = 25L,
