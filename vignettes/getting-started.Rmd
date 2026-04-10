@@ -1,0 +1,166 @@
+---
+title: "Getting Started with gretaR"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting Started with gretaR}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = torch::torch_is_installed()
+)
+```
+
+## Overview
+
+**gretaR** is a Bayesian statistical modelling package for R built on the
+`torch` backend. It provides an intuitive, R-native syntax for defining
+probabilistic models, which are then compiled to differentiable torch
+computations and sampled using Hamiltonian Monte Carlo (HMC) or the
+No-U-Turn Sampler (NUTS).
+
+**Key features:**
+
+- Pure R — no Python or reticulate dependency
+- GPU-accelerated inference via torch
+- Familiar R syntax: standard operators, functions, and assignment
+- Output compatible with `posterior`, `bayesplot`, and `loo`
+
+## Installation
+
+```{r install, eval = FALSE}
+# Install from GitHub (development version)
+# remotes::install_github("maxmoldovan/gretaR")
+
+# Ensure torch is installed
+torch::install_torch()
+```
+
+## Example 1: Estimating a Normal Mean
+
+Suppose we observe data from a normal distribution and want to estimate
+the mean and standard deviation.
+
+```{r normal-model}
+library(gretaR)
+
+# Simulate data
+set.seed(42)
+y_obs <- rnorm(100, mean = 3, sd = 1.5)
+
+# Define priors
+mu <- normal(0, 10)
+sigma <- half_cauchy(5)
+
+# Wrap observed data
+y <- as_data(y_obs)
+
+# Define likelihood
+distribution(y) <- normal(mu, sigma)
+
+# Compile model
+m <- model(mu, sigma)
+print(m)
+```
+
+```{r normal-sample, eval = FALSE}
+# Draw posterior samples
+draws <- mcmc(m, n_samples = 1000, warmup = 1000, chains = 4)
+
+# Summarise
+summary(draws)
+```
+
+## Example 2: Bayesian Linear Regression
+
+```{r linreg-model}
+# Simulate data
+set.seed(123)
+n <- 100
+x_obs <- rnorm(n)
+y_obs <- 2 + 3 * x_obs + rnorm(n, 0, 0.5)
+
+# Reset model state for new model
+reset_gretaR_env()
+
+# Priors
+alpha <- normal(0, 10)
+beta <- normal(0, 10)
+sigma <- half_cauchy(2)
+
+# Data
+x <- as_data(x_obs)
+y <- as_data(y_obs)
+
+# Linear predictor
+mu <- alpha + beta * x
+
+# Likelihood
+distribution(y) <- normal(mu, sigma)
+
+# Compile
+m <- model(alpha, beta, sigma)
+print(m)
+```
+
+```{r linreg-sample, eval = FALSE}
+# Sample
+draws <- mcmc(m, n_samples = 1000, warmup = 1000, chains = 4)
+summary(draws)
+
+# Visualise traces (requires bayesplot)
+# plot(draws, type = "trace")
+```
+
+## Workflow Summary
+
+1. **Wrap data** with `as_data()`
+2. **Define priors** using distribution functions (`normal()`, `half_cauchy()`, etc.)
+3. **Build the model** using standard R operations (`+`, `*`, `log()`, etc.)
+4. **Assign the likelihood** with `distribution(y) <- ...`
+5. **Compile** with `model()`
+6. **Sample** with `mcmc()`
+7. **Analyse** using `posterior`, `bayesplot`, or `loo`
+
+## Available Distributions
+
+| Function | Distribution | Support |
+|---|---|---|
+| `normal(mean, sd)` | Normal | $(-\infty, \infty)$ |
+| `half_normal(sd)` | Half-Normal | $(0, \infty)$ |
+| `half_cauchy(scale)` | Half-Cauchy | $(0, \infty)$ |
+| `student_t(df, mu, sigma)` | Student-t | $(-\infty, \infty)$ |
+| `uniform(lower, upper)` | Uniform | $(a, b)$ |
+| `exponential(rate)` | Exponential | $(0, \infty)$ |
+| `gamma_dist(shape, rate)` | Gamma | $(0, \infty)$ |
+| `beta_dist(alpha, beta)` | Beta | $(0, 1)$ |
+| `bernoulli(prob)` | Bernoulli | $\{0, 1\}$ |
+| `binomial(size, prob)` | Binomial | $\{0, \ldots, n\}$ |
+| `poisson_dist(rate)` | Poisson | $\{0, 1, 2, \ldots\}$ |
+| `multivariate_normal(mean, cov)` | Multivariate Normal | $\mathbb{R}^k$ |
+
+## Choosing a Sampler
+
+- **NUTS** (default): Adaptive, no tuning of leapfrog steps needed. Recommended
+  for most models.
+- **HMC**: Fixed number of leapfrog steps. Useful for debugging or when NUTS
+  tree depth is a concern.
+
+```{r sampler-choice, eval = FALSE}
+# NUTS (default)
+draws <- mcmc(m, sampler = "nuts")
+
+# HMC with 25 leapfrog steps
+draws <- mcmc(m, sampler = "hmc", n_leapfrog = 25)
+```
+
+## Next Steps
+
+- Explore hierarchical models (coming in v0.2)
+- Use `bayesplot::mcmc_trace()` and `bayesplot::mcmc_dens_overlay()` for
+  diagnostics
+- Compare models with `loo::loo()` on the posterior draws

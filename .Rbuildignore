@@ -1,0 +1,13 @@
+^.*\.Rproj$
+^\.Rproj\.user$
+^LICENSE\.md$
+^README\.md$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
+^\.github$
+^aa_notes_gretaR\.md$
+^plan_v1\.md$
+^PROJECT_LOG\.md$
+^CLAUDE\.md$
+^feasibility_assessment_v1\.md$
