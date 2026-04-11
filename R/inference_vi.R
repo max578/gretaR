@@ -171,7 +171,12 @@ variational <- function(model, n_samples = 1L, max_iter = 5000L,
 
   if (method == "meanfield") {
     sigma_final <- as.numeric(torch_exp(log_sigma)$detach()$cpu())
-    cov_mat <- diag(sigma_final^2)
+    # diag(scalar) in R creates a 0x0 matrix — use matrix() for 1-param case
+    if (length(sigma_final) == 1L) {
+      cov_mat <- matrix(sigma_final^2, 1, 1)
+    } else {
+      cov_mat <- diag(sigma_final^2)
+    }
   } else {
     L_final <- build_lower_triangular(L_flat$detach(), n_params)
     L_mat <- as.matrix(L_final$cpu())

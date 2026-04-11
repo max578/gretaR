@@ -573,9 +573,21 @@ gretaR_matmul <- function(x, y) {
   wrap_gretaR_array(result_node)
 }
 
-# Register %*% for gretaR_array
-#' @noRd
-`%*%.gretaR_array` <- function(x, y) gretaR_matmul(x, y)
+#' Matrix multiplication with gretaR_array support
+#'
+#' Overrides base `%*%` to dispatch to sparse-aware matrix multiplication
+#' when either argument is a `gretaR_array`.
+#'
+#' @param x A matrix, gretaR_array, or numeric.
+#' @param y A matrix, gretaR_array, or numeric.
+#' @return A gretaR_array (if either input is gretaR_array) or the base result.
+#' @export
+`%*%` <- function(x, y) {
+  if (inherits(x, "gretaR_array") || inherits(y, "gretaR_array")) {
+    return(gretaR_matmul(x, y))
+  }
+  base::`%*%`(x, y)
+}
 
 # =============================================================================
 # Reduction operations (sum, mean, etc.)
