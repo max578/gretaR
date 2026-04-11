@@ -4,12 +4,15 @@
 \alias{half_cauchy}
 \title{Half-Cauchy Distribution}
 \usage{
-half_cauchy(scale = 1, dim = NULL)
+half_cauchy(scale = 1, dim = NULL, truncation = NULL)
 }
 \arguments{
 \item{scale}{Scale parameter (positive numeric or \code{gretaR_array}).}
 
 \item{dim}{Integer vector of dimensions (default scalar).}
+
+\item{truncation}{Optional length-2 numeric vector \code{c(lower, upper)}
+specifying truncation bounds. Default \code{NULL} (no truncation).}
 }
 \value{
 A \code{gretaR_array} with support on the positive reals.

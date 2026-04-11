@@ -4,7 +4,7 @@
 \alias{beta_dist}
 \title{Beta Distribution}
 \usage{
-beta_dist(alpha, beta, dim = NULL)
+beta_dist(alpha, beta, dim = NULL, truncation = NULL)
 }
 \arguments{
 \item{alpha}{First shape parameter (positive numeric or \code{gretaR_array}).}
@@ -12,6 +12,9 @@ beta_dist(alpha, beta, dim = NULL)
 \item{beta}{Second shape parameter (positive numeric or \code{gretaR_array}).}
 
 \item{dim}{Integer vector of dimensions (default scalar).}
+
+\item{truncation}{Optional length-2 numeric vector \code{c(lower, upper)}
+specifying truncation bounds. Default \code{NULL} (no truncation).}
 }
 \value{
 A \code{gretaR_array}.

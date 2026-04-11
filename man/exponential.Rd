@@ -4,12 +4,15 @@
 \alias{exponential}
 \title{Exponential Distribution}
 \usage{
-exponential(rate = 1, dim = NULL)
+exponential(rate = 1, dim = NULL, truncation = NULL)
 }
 \arguments{
 \item{rate}{Rate parameter (positive numeric or \code{gretaR_array}).}
 
 \item{dim}{Integer vector of dimensions (default scalar).}
+
+\item{truncation}{Optional length-2 numeric vector \code{c(lower, upper)}
+specifying truncation bounds. Default \code{NULL} (no truncation).}
 }
 \value{
 A \code{gretaR_array}.

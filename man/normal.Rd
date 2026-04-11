@@ -4,7 +4,7 @@
 \alias{normal}
 \title{Normal Distribution}
 \usage{
-normal(mean = 0, sd = 1, dim = NULL)
+normal(mean = 0, sd = 1, dim = NULL, truncation = NULL)
 }
 \arguments{
 \item{mean}{Mean of the distribution (numeric or \code{gretaR_array}).}
@@ -12,6 +12,10 @@ normal(mean = 0, sd = 1, dim = NULL)
 \item{sd}{Standard deviation (numeric or \code{gretaR_array}, positive).}
 
 \item{dim}{Integer vector of dimensions (default scalar).}
+
+\item{truncation}{Optional length-2 numeric vector \code{c(lower, upper)}
+specifying truncation bounds. Default \code{NULL} (no truncation).
+Compatible with greta's truncation syntax.}
 }
 \value{
 A \code{gretaR_array} representing a normally-distributed variable.
@@ -24,5 +28,6 @@ and standard deviation. Support is on the entire real line.
 \dontrun{
 x <- normal(0, 1)
 beta <- normal(0, 5, dim = c(3, 1))
+x_pos <- normal(0, 1, truncation = c(0, Inf))
 }
 }

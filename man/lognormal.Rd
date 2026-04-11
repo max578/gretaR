@@ -4,7 +4,7 @@
 \alias{lognormal}
 \title{Log-Normal Distribution}
 \usage{
-lognormal(meanlog = 0, sdlog = 1, dim = NULL)
+lognormal(meanlog = 0, sdlog = 1, dim = NULL, truncation = NULL)
 }
 \arguments{
 \item{meanlog}{Mean of the log-scale distribution.}
@@ -12,6 +12,9 @@ lognormal(meanlog = 0, sdlog = 1, dim = NULL)
 \item{sdlog}{Standard deviation on the log scale (positive).}
 
 \item{dim}{Dimensions.}
+
+\item{truncation}{Optional length-2 numeric vector \code{c(lower, upper)}
+specifying truncation bounds. Default \code{NULL} (no truncation).}
 }
 \value{
 A \code{gretaR_array} with support on the positive reals.

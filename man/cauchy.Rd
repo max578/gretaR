@@ -4,7 +4,7 @@
 \alias{cauchy}
 \title{Cauchy Distribution}
 \usage{
-cauchy(location = 0, scale = 1, dim = NULL)
+cauchy(location = 0, scale = 1, dim = NULL, truncation = NULL)
 }
 \arguments{
 \item{location}{Location parameter.}
@@ -12,6 +12,9 @@ cauchy(location = 0, scale = 1, dim = NULL)
 \item{scale}{Scale parameter (positive).}
 
 \item{dim}{Dimensions.}
+
+\item{truncation}{Optional length-2 numeric vector \code{c(lower, upper)}
+specifying truncation bounds. Default \code{NULL} (no truncation).}
 }
 \value{
 A \code{gretaR_array}.

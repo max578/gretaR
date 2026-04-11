@@ -4,7 +4,7 @@
 \alias{student_t}
 \title{Student-t Distribution}
 \usage{
-student_t(df = 3, mu = 0, sigma = 1, dim = NULL)
+student_t(df = 3, mu = 0, sigma = 1, dim = NULL, truncation = NULL)
 }
 \arguments{
 \item{df}{Degrees of freedom (positive numeric or \code{gretaR_array}).}
@@ -14,6 +14,9 @@ student_t(df = 3, mu = 0, sigma = 1, dim = NULL)
 \item{sigma}{Scale parameter (positive numeric or \code{gretaR_array}).}
 
 \item{dim}{Integer vector of dimensions (default scalar).}
+
+\item{truncation}{Optional length-2 numeric vector \code{c(lower, upper)}
+specifying truncation bounds. Default \code{NULL} (no truncation).}
 }
 \value{
 A \code{gretaR_array}.

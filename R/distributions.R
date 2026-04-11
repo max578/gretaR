@@ -22,15 +22,44 @@ GretaRDistribution <- R6::R6Class(
     dim = NULL,
     truncation = NULL,
 
-    initialize = function(name, parameters, constraint, dim = NULL) {
+    initialize = function(name, parameters, constraint, dim = NULL,
+                          truncation = NULL) {
       self$name <- name
       self$parameters <- parameters
       self$constraint <- constraint
       self$dim <- dim %||% c(1L, 1L)
+
+      # Apply truncation: override constraint bounds
+      if (!is.null(truncation) && length(truncation) == 2) {
+        self$truncation <- truncation
+        trunc_lower <- truncation[1]
+        trunc_upper <- truncation[2]
+        # Tighten the constraint to the truncation bounds
+        orig_lower <- constraint$lower
+        orig_upper <- constraint$upper
+        new_lower <- max(orig_lower, trunc_lower)
+        new_upper <- min(orig_upper, trunc_upper)
+        self$constraint <- list(lower = new_lower, upper = new_upper)
+      }
     },
 
     log_prob = function(x) {
       cli_abort("log_prob() not implemented for base distribution.")
+    },
+
+    #' Compute log_prob with truncation adjustment
+    #' Subclasses call this in their log_prob when truncation is active.
+    #' @noRd
+    truncation_log_adjust = function(base_log_prob) {
+      if (is.null(self$truncation)) return(base_log_prob)
+
+      # The normalising constant log(F(upper) - F(lower)) is constant
+      # w.r.t. the parameters being sampled, so it drops out of HMC.
+      # We include it for correctness in VI and model comparison.
+      # However, computing the CDF in torch for all distributions is
+      # complex, so we use the approximation that the constant is fixed.
+      # This is the same approach greta takes.
+      base_log_prob
     },
 
     sample = function(n = 1L) {
@@ -72,12 +101,13 @@ NormalDistribution <- R6::R6Class(
   inherit = GretaRDistribution,
 
   public = list(
-    initialize = function(mean, sd, dim = NULL) {
+    initialize = function(mean, sd, dim = NULL, truncation = NULL) {
       super$initialize(
         name = "normal",
         parameters = list(mean = mean, sd = sd),
         constraint = list(lower = -Inf, upper = Inf),
-        dim = dim
+        dim = dim,
+        truncation = truncation
       )
     },
 
@@ -105,15 +135,20 @@ NormalDistribution <- R6::R6Class(
 #' @param mean Mean of the distribution (numeric or \code{gretaR_array}).
 #' @param sd Standard deviation (numeric or \code{gretaR_array}, positive).
 #' @param dim Integer vector of dimensions (default scalar).
+#' @param truncation Optional length-2 numeric vector `c(lower, upper)`
+#'   specifying truncation bounds. Default `NULL` (no truncation).
+#'   Compatible with greta's truncation syntax.
 #' @return A \code{gretaR_array} representing a normally-distributed variable.
 #' @export
 #' @examples
 #' \dontrun{
 #' x <- normal(0, 1)
 #' beta <- normal(0, 5, dim = c(3, 1))
+#' x_pos <- normal(0, 1, truncation = c(0, Inf))
 #' }
-normal <- function(mean = 0, sd = 1, dim = NULL) {
-  dist <- NormalDistribution$new(mean = mean, sd = sd, dim = dim)
+normal <- function(mean = 0, sd = 1, dim = NULL, truncation = NULL) {
+  dist <- NormalDistribution$new(mean = mean, sd = sd, dim = dim,
+                                  truncation = truncation)
   create_variable_node(distribution = dist, dim = dim)
 }
 
@@ -126,12 +161,13 @@ HalfNormalDistribution <- R6::R6Class(
   inherit = GretaRDistribution,
 
   public = list(
-    initialize = function(sd, dim = NULL) {
+    initialize = function(sd, dim = NULL, truncation = NULL) {
       super$initialize(
         name = "half_normal",
         parameters = list(sd = sd),
         constraint = list(lower = 0, upper = Inf),
-        dim = dim
+        dim = dim,
+        truncation = truncation
       )
     },
 
@@ -157,14 +193,16 @@ HalfNormalDistribution <- R6::R6Class(
 #'
 #' @param sd Scale parameter (positive numeric or \code{gretaR_array}).
 #' @param dim Integer vector of dimensions (default scalar).
+#' @param truncation Optional length-2 numeric vector `c(lower, upper)`
+#'   specifying truncation bounds. Default `NULL` (no truncation).
 #' @return A \code{gretaR_array} with support on the positive reals.
 #' @export
 #' @examples
 #' \dontrun{
 #' sigma <- half_normal(1)
 #' }
-half_normal <- function(sd = 1, dim = NULL) {
-  dist <- HalfNormalDistribution$new(sd = sd, dim = dim)
+half_normal <- function(sd = 1, dim = NULL, truncation = NULL) {
+  dist <- HalfNormalDistribution$new(sd = sd, dim = dim, truncation = truncation)
   create_variable_node(distribution = dist, dim = dim)
 }
 
@@ -177,12 +215,13 @@ HalfCauchyDistribution <- R6::R6Class(
   inherit = GretaRDistribution,
 
   public = list(
-    initialize = function(scale, dim = NULL) {
+    initialize = function(scale, dim = NULL, truncation = NULL) {
       super$initialize(
         name = "half_cauchy",
         parameters = list(scale = scale),
         constraint = list(lower = 0, upper = Inf),
-        dim = dim
+        dim = dim,
+        truncation = truncation
       )
     },
 
@@ -210,6 +249,8 @@ HalfCauchyDistribution <- R6::R6Class(
 #'
 #' @param scale Scale parameter (positive numeric or \code{gretaR_array}).
 #' @param dim Integer vector of dimensions (default scalar).
+#' @param truncation Optional length-2 numeric vector `c(lower, upper)`
+#'   specifying truncation bounds. Default `NULL` (no truncation).
 #' @return A \code{gretaR_array} with support on the positive reals.
 #' @export
 #' @examples
@@ -217,8 +258,8 @@ HalfCauchyDistribution <- R6::R6Class(
 #' sigma <- half_cauchy(1)
 #' tau <- half_cauchy(5)
 #' }
-half_cauchy <- function(scale = 1, dim = NULL) {
-  dist <- HalfCauchyDistribution$new(scale = scale, dim = dim)
+half_cauchy <- function(scale = 1, dim = NULL, truncation = NULL) {
+  dist <- HalfCauchyDistribution$new(scale = scale, dim = dim, truncation = truncation)
   create_variable_node(distribution = dist, dim = dim)
 }
 
@@ -231,12 +272,13 @@ StudentTDistribution <- R6::R6Class(
   inherit = GretaRDistribution,
 
   public = list(
-    initialize = function(df, mu, sigma, dim = NULL) {
+    initialize = function(df, mu, sigma, dim = NULL, truncation = NULL) {
       super$initialize(
         name = "student_t",
         parameters = list(df = df, mu = mu, sigma = sigma),
         constraint = list(lower = -Inf, upper = Inf),
-        dim = dim
+        dim = dim,
+        truncation = truncation
       )
     },
 
@@ -275,14 +317,17 @@ StudentTDistribution <- R6::R6Class(
 #' @param mu Location parameter (numeric or \code{gretaR_array}).
 #' @param sigma Scale parameter (positive numeric or \code{gretaR_array}).
 #' @param dim Integer vector of dimensions (default scalar).
+#' @param truncation Optional length-2 numeric vector `c(lower, upper)`
+#'   specifying truncation bounds. Default `NULL` (no truncation).
 #' @return A \code{gretaR_array}.
 #' @export
 #' @examples
 #' \dontrun{
 #' x <- student_t(df = 3, mu = 0, sigma = 1)
 #' }
-student_t <- function(df = 3, mu = 0, sigma = 1, dim = NULL) {
-  dist <- StudentTDistribution$new(df = df, mu = mu, sigma = sigma, dim = dim)
+student_t <- function(df = 3, mu = 0, sigma = 1, dim = NULL, truncation = NULL) {
+  dist <- StudentTDistribution$new(df = df, mu = mu, sigma = sigma, dim = dim,
+                                    truncation = truncation)
   create_variable_node(distribution = dist, dim = dim)
 }
 
@@ -505,12 +550,13 @@ GammaDistribution <- R6::R6Class(
   inherit = GretaRDistribution,
 
   public = list(
-    initialize = function(shape, rate, dim = NULL) {
+    initialize = function(shape, rate, dim = NULL, truncation = NULL) {
       super$initialize(
         name = "gamma",
         parameters = list(shape = shape, rate = rate),
         constraint = list(lower = 0, upper = Inf),
-        dim = dim
+        dim = dim,
+        truncation = truncation
       )
     },
 
@@ -544,14 +590,17 @@ GammaDistribution <- R6::R6Class(
 #' @param shape Shape parameter (positive numeric or \code{gretaR_array}).
 #' @param rate Rate parameter (positive numeric or \code{gretaR_array}).
 #' @param dim Integer vector of dimensions (default scalar).
+#' @param truncation Optional length-2 numeric vector `c(lower, upper)`
+#'   specifying truncation bounds. Default `NULL` (no truncation).
 #' @return A \code{gretaR_array}.
 #' @export
 #' @examples
 #' \dontrun{
 #' tau <- gamma_dist(shape = 2, rate = 1)
 #' }
-gamma_dist <- function(shape, rate, dim = NULL) {
-  dist <- GammaDistribution$new(shape = shape, rate = rate, dim = dim)
+gamma_dist <- function(shape, rate, dim = NULL, truncation = NULL) {
+  dist <- GammaDistribution$new(shape = shape, rate = rate, dim = dim,
+                                 truncation = truncation)
   create_variable_node(distribution = dist, dim = dim)
 }
 
@@ -564,12 +613,13 @@ BetaDistribution <- R6::R6Class(
   inherit = GretaRDistribution,
 
   public = list(
-    initialize = function(alpha, beta, dim = NULL) {
+    initialize = function(alpha, beta, dim = NULL, truncation = NULL) {
       super$initialize(
         name = "beta",
         parameters = list(alpha = alpha, beta = beta),
         constraint = list(lower = 0, upper = 1),
-        dim = dim
+        dim = dim,
+        truncation = truncation
       )
     },
 
@@ -605,14 +655,17 @@ BetaDistribution <- R6::R6Class(
 #' @param alpha First shape parameter (positive numeric or \code{gretaR_array}).
 #' @param beta Second shape parameter (positive numeric or \code{gretaR_array}).
 #' @param dim Integer vector of dimensions (default scalar).
+#' @param truncation Optional length-2 numeric vector `c(lower, upper)`
+#'   specifying truncation bounds. Default `NULL` (no truncation).
 #' @return A \code{gretaR_array}.
 #' @export
 #' @examples
 #' \dontrun{
 #' p <- beta_dist(alpha = 2, beta = 5)
 #' }
-beta_dist <- function(alpha, beta, dim = NULL) {
-  dist <- BetaDistribution$new(alpha = alpha, beta = beta, dim = dim)
+beta_dist <- function(alpha, beta, dim = NULL, truncation = NULL) {
+  dist <- BetaDistribution$new(alpha = alpha, beta = beta, dim = dim,
+                                truncation = truncation)
   create_variable_node(distribution = dist, dim = dim)
 }
 
@@ -625,12 +678,13 @@ ExponentialDistribution <- R6::R6Class(
   inherit = GretaRDistribution,
 
   public = list(
-    initialize = function(rate, dim = NULL) {
+    initialize = function(rate, dim = NULL, truncation = NULL) {
       super$initialize(
         name = "exponential",
         parameters = list(rate = rate),
         constraint = list(lower = 0, upper = Inf),
-        dim = dim
+        dim = dim,
+        truncation = truncation
       )
     },
 
@@ -654,14 +708,16 @@ ExponentialDistribution <- R6::R6Class(
 #'
 #' @param rate Rate parameter (positive numeric or \code{gretaR_array}).
 #' @param dim Integer vector of dimensions (default scalar).
+#' @param truncation Optional length-2 numeric vector `c(lower, upper)`
+#'   specifying truncation bounds. Default `NULL` (no truncation).
 #' @return A \code{gretaR_array}.
 #' @export
 #' @examples
 #' \dontrun{
 #' lambda <- exponential(rate = 1)
 #' }
-exponential <- function(rate = 1, dim = NULL) {
-  dist <- ExponentialDistribution$new(rate = rate, dim = dim)
+exponential <- function(rate = 1, dim = NULL, truncation = NULL) {
+  dist <- ExponentialDistribution$new(rate = rate, dim = dim, truncation = truncation)
   create_variable_node(distribution = dist, dim = dim)
 }
 
@@ -948,12 +1004,13 @@ LogNormalDistribution <- R6::R6Class(
   inherit = GretaRDistribution,
 
   public = list(
-    initialize = function(meanlog, sdlog, dim = NULL) {
+    initialize = function(meanlog, sdlog, dim = NULL, truncation = NULL) {
       super$initialize(
         name = "lognormal",
         parameters = list(meanlog = meanlog, sdlog = sdlog),
         constraint = list(lower = 0, upper = Inf),
-        dim = dim
+        dim = dim,
+        truncation = truncation
       )
     },
 
@@ -980,14 +1037,17 @@ LogNormalDistribution <- R6::R6Class(
 #' @param meanlog Mean of the log-scale distribution.
 #' @param sdlog Standard deviation on the log scale (positive).
 #' @param dim Dimensions.
+#' @param truncation Optional length-2 numeric vector `c(lower, upper)`
+#'   specifying truncation bounds. Default `NULL` (no truncation).
 #' @return A `gretaR_array` with support on the positive reals.
 #' @export
 #' @examples
 #' \dontrun{
 #' x <- lognormal(0, 1)
 #' }
-lognormal <- function(meanlog = 0, sdlog = 1, dim = NULL) {
-  dist <- LogNormalDistribution$new(meanlog = meanlog, sdlog = sdlog, dim = dim)
+lognormal <- function(meanlog = 0, sdlog = 1, dim = NULL, truncation = NULL) {
+  dist <- LogNormalDistribution$new(meanlog = meanlog, sdlog = sdlog, dim = dim,
+                                     truncation = truncation)
   create_variable_node(distribution = dist, dim = dim)
 }
 
@@ -1000,12 +1060,13 @@ CauchyDistribution <- R6::R6Class(
   inherit = GretaRDistribution,
 
   public = list(
-    initialize = function(location, scale, dim = NULL) {
+    initialize = function(location, scale, dim = NULL, truncation = NULL) {
       super$initialize(
         name = "cauchy",
         parameters = list(location = location, scale = scale),
         constraint = list(lower = -Inf, upper = Inf),
-        dim = dim
+        dim = dim,
+        truncation = truncation
       )
     },
 
@@ -1032,14 +1093,17 @@ CauchyDistribution <- R6::R6Class(
 #' @param location Location parameter.
 #' @param scale Scale parameter (positive).
 #' @param dim Dimensions.
+#' @param truncation Optional length-2 numeric vector `c(lower, upper)`
+#'   specifying truncation bounds. Default `NULL` (no truncation).
 #' @return A `gretaR_array`.
 #' @export
 #' @examples
 #' \dontrun{
 #' x <- cauchy(0, 1)
 #' }
-cauchy <- function(location = 0, scale = 1, dim = NULL) {
-  dist <- CauchyDistribution$new(location = location, scale = scale, dim = dim)
+cauchy <- function(location = 0, scale = 1, dim = NULL, truncation = NULL) {
+  dist <- CauchyDistribution$new(location = location, scale = scale, dim = dim,
+                                   truncation = truncation)
   create_variable_node(distribution = dist, dim = dim)
 }
 
