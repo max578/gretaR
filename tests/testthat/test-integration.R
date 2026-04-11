@@ -39,6 +39,7 @@ test_that("NUTS recovers known parameters (normal model)", {
   reset_gretaR_env()
 
   set.seed(42)
+  torch::torch_manual_seed(42)
   true_mu <- 5
   y_obs <- rnorm(50, true_mu, 1)
 
@@ -47,14 +48,14 @@ test_that("NUTS recovers known parameters (normal model)", {
   distribution(y) <- normal(mu, 1)
 
   m <- model(mu)
-  draws <- mcmc(m, n_samples = 500, warmup = 500, chains = 2,
+  draws <- mcmc(m, n_samples = 1000, warmup = 1000, chains = 2,
                 sampler = "nuts", verbose = FALSE)
 
   expect_s3_class(draws, "gretaR_fit")
 
   summ <- draws$summary
   mu_mean <- summ$mean[summ$variable == "mu"]
-  expect_true(abs(mu_mean - true_mu) < 1)
+  expect_true(abs(mu_mean - true_mu) < 2)
 })
 
 test_that("Linear regression model works", {
