@@ -128,7 +128,7 @@ fit$par
 For faster approximate inference:
 
 ```{r vi-estimate, eval = FALSE}
-fit <- vi(m, method = "meanfield", max_iter = 3000)
+fit <- variational(m, method = "meanfield", max_iter = 3000)
 fit$mean
 fit$sd
 summary(fit$draws)

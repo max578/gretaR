@@ -23,6 +23,10 @@ navbar:
           href: articles/hierarchical-models.html
         - text: GLM Models
           href: articles/glm-models.html
+        - text: Complete Guide
+          href: articles/complete-guide.html
+        - text: Migrating from greta
+          href: articles/migrating-from-greta.html
     news:
       text: News
       href: news/index.html
@@ -86,6 +90,12 @@ reference:
       - gretaR_glm
       - parse_re_bars
       - remove_re_bars
+      - process_smooths
+
+  - title: Stan Backend
+    desc: Stan code generation and inference.
+    contents:
+      - compile_to_stan
 
   - title: Utilities
     desc: Helper functions for data handling and environment management.

@@ -28,10 +28,9 @@
 #'   random number generators.
 #' @param verbose Logical; print progress (default TRUE).
 #'
-#' @return A `gretaR_vi` object with components:
+#' @return A `gretaR_fit` object (method = "vi") with standard fields plus:
 #'   \describe{
-#'     \item{mean}{Named vector of posterior means (constrained space).}
-#'     \item{mean_unconstrained}{Posterior means in unconstrained space.}
+#'     \item{par}{Named vector of posterior means (constrained space).}
 #'     \item{sd}{Named vector of posterior SDs (unconstrained space).}
 #'     \item{covariance}{Posterior covariance matrix (unconstrained, fullrank only).}
 #'     \item{elbo}{Vector of ELBO values per iteration.}

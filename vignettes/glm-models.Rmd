@@ -122,7 +122,7 @@ gretaR offers four inference methods:
 |--------|----------|-------|----------|----------|
 | **NUTS** | `mcmc(sampler="nuts")` | Slow | Exact | Final analysis |
 | **HMC** | `mcmc(sampler="hmc")` | Slow | Exact | Debugging |
-| **ADVI** | `vi()` | Fast | Approximate | Quick checks, large data |
+| **ADVI** | `variational()` | Fast | Approximate | Quick checks, large data |
 | **MAP** | `opt()` | Very fast | Point estimate | Model verification |
 
 ```{r inference-methods, eval = FALSE}
@@ -130,7 +130,7 @@ gretaR offers four inference methods:
 map_fit <- opt(m)
 
 # Variational inference (seconds to minutes)
-vi_fit <- vi(m, method = "meanfield")
+vi_fit <- variational(m, method = "meanfield")
 
 # NUTS (minutes)
 mcmc_draws <- mcmc(m, n_samples = 1000, warmup = 1000)

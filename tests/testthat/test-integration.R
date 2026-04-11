@@ -20,10 +20,10 @@ test_that("HMC recovers known parameters (normal model)", {
   draws <- mcmc(m, n_samples = 500, warmup = 500, chains = 2,
                 sampler = "hmc", n_leapfrog = 20, verbose = FALSE)
 
-  expect_s3_class(draws, "gretaR_draws")
+  expect_s3_class(draws, "gretaR_fit")
 
   # Check posterior means are in the right ballpark
-  summ <- posterior::summarise_draws(draws)
+  summ <- draws$summary
   mu_mean <- summ$mean[summ$variable == "mu"]
   sigma_mean <- summ$mean[summ$variable == "sigma"]
 
@@ -50,9 +50,9 @@ test_that("NUTS recovers known parameters (normal model)", {
   draws <- mcmc(m, n_samples = 500, warmup = 500, chains = 2,
                 sampler = "nuts", verbose = FALSE)
 
-  expect_s3_class(draws, "gretaR_draws")
+  expect_s3_class(draws, "gretaR_fit")
 
-  summ <- posterior::summarise_draws(draws)
+  summ <- draws$summary
   mu_mean <- summ$mean[summ$variable == "mu"]
   expect_true(abs(mu_mean - true_mu) < 1)
 })
@@ -81,7 +81,7 @@ test_that("Linear regression model works", {
   draws <- mcmc(m, n_samples = 500, warmup = 500, chains = 2,
                 sampler = "hmc", n_leapfrog = 20, verbose = FALSE)
 
-  summ <- posterior::summarise_draws(draws)
+  summ <- draws$summary
 
   alpha_mean <- summ$mean[summ$variable == "alpha"]
   beta_mean <- summ$mean[summ$variable == "beta"]

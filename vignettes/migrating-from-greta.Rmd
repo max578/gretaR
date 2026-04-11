@@ -32,7 +32,7 @@ Three reasons to migrate:
 
 2. **Broader inference methods.** In addition to HMC/NUTS, gretaR ships MAP
    optimisation (`opt()`), Laplace approximation (`laplace()`), and automatic
-   differentiation variational inference (`vi()`). These are useful for rapid
+   differentiation variational inference (`variational()`). These are useful for rapid
    prototyping, model comparison, and large-data settings where full MCMC is
    impractical.
 
@@ -133,7 +133,7 @@ la$mean
 la$sd
 
 # Variational inference (ADVI) — mean-field or full-rank Gaussian
-vi_fit <- vi(m, method = "meanfield")
+vi_fit <- variational(m, method = "meanfield")
 vi_fit$mean
 vi_fit$draws  # samples from the variational posterior
 ```
@@ -326,6 +326,6 @@ Everything else — `as_data()`, `normal()`, `variable()`, `distribution<-()`,
 - [ ] Replace `poisson(...)` with `poisson_dist(...)`
 - [ ] Replace truncated Cauchy/normal priors with `half_cauchy()` / `half_normal()`
 - [ ] Replace `coda::` summary/plotting calls with `posterior::` / `bayesplot::` equivalents
-- [ ] If using `greta::opt()` or `greta::calculate()`: check gretaR equivalents (`opt()`, `laplace()`, `vi()`)
+- [ ] If using `greta::opt()` or `greta::calculate()`: check gretaR equivalents (`opt()`, `laplace()`, `variational()`)
 - [ ] Remove `greta::install_greta_deps()` and any Python/conda setup from your workflow
 - [ ] If using custom TensorFlow operations: rewrite using torch

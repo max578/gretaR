@@ -170,7 +170,7 @@ kable(dists, booktabs = TRUE, escape = FALSE,
 ```{r disc-table, echo=FALSE, eval=TRUE}
 disc <- data.frame(
   Distribution = c("Bernoulli", "Binomial", "Poisson", "Negative Binomial"),
-  Constructor = c("\\texttt{bernoulli()}", "\\texttt{binomial()}",
+  Constructor = c("\\texttt{bernoulli()}", "\\texttt{binomial\\_dist()}",
                    "\\texttt{poisson\\_dist()}", "\\texttt{negative\\_binomial()}"),
   Support = c("$\\{0,1\\}$", "$\\{0,\\ldots,n\\}$",
                "$\\mathbb{Z}_{\\geq 0}$", "$\\mathbb{Z}_{\\geq 0}$"),
