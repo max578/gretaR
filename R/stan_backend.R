@@ -112,7 +112,7 @@ compile_to_stan <- function(model) {
         data_arrays[[stan_name]] <- vals
       } else {
         data_block[[length(data_block) + 1]] <- sprintf("  matrix[%d, %d] %s;", n_rows, n_cols, stan_name)
-        data_arrays[[stan_name]] <- vals
+        data_arrays[[stan_name]] <- matrix(vals, nrow = n_rows, ncol = n_cols)
       }
       node_stan_names[[nid]] <- stan_name
     }
@@ -161,7 +161,7 @@ compile_to_stan <- function(model) {
       if (length(d) == 2 && d[2] == 1) {
         param_block[[length(param_block) + 1]] <- sprintf("  vector%s[%d] %s;", bounds, d[1], stan_name)
       } else if (length(d) == 2) {
-        param_block[[length(param_block) + 1]] <- sprintf("  matrix%s[%d, %d] %s;", bounds, d[1], d[2], stan_name)
+        param_block[[length(param_block) + 1]] <- sprintf("  matrix[%d, %d] %s;", d[1], d[2], stan_name)
       }
     }
 
@@ -356,8 +356,8 @@ node_to_stan_expr <- function(node, dag_nodes, param_names, node_stan_names = li
       stan_expr <- switch(ot,
         "binary_+" = sprintf("(%s + %s)", a, b),
         "binary_-" = sprintf("(%s - %s)", a, b),
-        "binary_*" = sprintf("(%s .* %s)", a, b),
-        "binary_/" = sprintf("(%s ./ %s)", a, b),
+        "binary_*" = sprintf("(%s * %s)", a, b),
+        "binary_/" = sprintf("(%s / %s)", a, b),
         "binary_^" = sprintf("pow(%s, %s)", a, b),
         "matmul"   = sprintf("(%s * %s)", a, b),
         "index_select" = sprintf("%s[%s]", a, b),

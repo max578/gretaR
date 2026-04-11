@@ -82,8 +82,8 @@ summary(draws)
 |---|---|---|
 | Hamiltonian Monte Carlo | `hmc()` / `mcmc(sampler = "hmc")` | Full posterior, simpler models |
 | No-U-Turn Sampler | `nuts()` / `mcmc(sampler = "nuts")` | Full posterior, general purpose (default) |
-| ADVI (mean-field) | `vi(method = "meanfield")` | Fast approximate posterior |
-| ADVI (full-rank) | `vi(method = "fullrank")` | Approximate posterior with correlations |
+| ADVI (mean-field) | `variational(method = "meanfield")` | Fast approximate posterior |
+| ADVI (full-rank) | `variational(method = "fullrank")` | Approximate posterior with correlations |
 | MAP estimation | `opt()` | Point estimate (mode of posterior) |
 | Laplace approximation | `laplace()` | Gaussian approximation around MAP |
 

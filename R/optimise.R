@@ -13,6 +13,7 @@
 #' @param init Optional initial values (numeric vector in unconstrained space).
 #' @param verbose Logical; print progress (default TRUE).
 #' @param backend Inference backend: \code{"torch"} (default) or \code{"stan"}.
+#' @param seed Optional integer seed for reproducibility.
 #'
 #' @return A `gretaR_fit` object (method = "map") with components:
 #'   \describe{
@@ -36,7 +37,14 @@
 #' }
 opt <- function(model, max_iter = 2000L, learning_rate = 0.01,
                 tolerance = 1e-6, init = NULL, verbose = TRUE,
-                backend = c("torch", "stan")) {
+                backend = c("torch", "stan"), seed = NULL) {
+
+  if (!is.null(seed)) {
+    set.seed(seed)
+    if (requireNamespace("torch", quietly = TRUE)) {
+      torch::torch_manual_seed(seed)
+    }
+  }
 
   backend <- match.arg(backend)
   if (backend == "stan") {

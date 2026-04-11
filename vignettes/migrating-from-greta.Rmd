@@ -58,7 +58,7 @@ at all.
 | Poisson | `greta::poisson(lambda)` | `gretaR::poisson_dist(rate)` | Renamed to avoid masking `stats::poisson()` |
 | Uniform | `greta::uniform(min, max)` | `gretaR::uniform(lower, upper)` | Parameter names differ |
 | Bernoulli | `greta::bernoulli(prob)` | `gretaR::bernoulli(prob)` | Identical API |
-| Binomial | `greta::binomial(size, prob)` | `gretaR::binomial(size, prob)` | Identical API |
+| Binomial | `greta::binomial(size, prob)` | `gretaR::binomial_dist(size, prob)` | Renamed to avoid masking `stats::binomial` |
 | Exponential | `greta::exponential(rate)` | `gretaR::exponential(rate)` | Identical API |
 | Multivariate normal | `greta::multivariate_normal(mean, Sigma)` | `gretaR::multivariate_normal(mean, covariance)` | Identical API |
 | Dirichlet | `greta::dirichlet(alpha)` | `gretaR::dirichlet(concentration)` | Parameter name differs |

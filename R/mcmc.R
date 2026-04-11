@@ -20,6 +20,8 @@
 #' @param target_accept Target average acceptance probability (default 0.8 for
 #'   NUTS, 0.65 for HMC).
 #' @param init_values Optional list of initial parameter vectors (one per chain).
+#' @param seed Optional integer seed for reproducibility. Sets both R and torch
+#'   random number generators.
 #' @param verbose Logical; print progress information (default \code{TRUE}).
 #'
 #' @return A `gretaR_fit` object with components:
@@ -52,7 +54,15 @@ mcmc <- function(model, n_samples = 1000L, warmup = 1000L, chains = 4L,
                  backend = c("torch", "stan"),
                  step_size = NULL, max_treedepth = 10L,
                  n_leapfrog = 25L, target_accept = NULL,
-                 init_values = NULL, verbose = TRUE) {
+                 init_values = NULL, seed = NULL, verbose = TRUE) {
+
+  # Set seeds for reproducibility
+  if (!is.null(seed)) {
+    set.seed(seed)
+    if (requireNamespace("torch", quietly = TRUE)) {
+      torch::torch_manual_seed(seed)
+    }
+  }
 
   sampler <- match.arg(sampler)
   backend <- match.arg(backend)

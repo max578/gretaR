@@ -139,7 +139,7 @@ summary(draws)
 | `gamma_dist(shape, rate)` | Gamma | $(0, \infty)$ |
 | `beta_dist(alpha, beta)` | Beta | $(0, 1)$ |
 | `bernoulli(prob)` | Bernoulli | $\{0, 1\}$ |
-| `binomial(size, prob)` | Binomial | $\{0, \ldots, n\}$ |
+| `binomial_dist(size, prob)` | Binomial | $\{0, \ldots, n\}$ |
 | `poisson_dist(rate)` | Poisson | $\{0, 1, 2, \ldots\}$ |
 | `multivariate_normal(mean, cov)` | Multivariate Normal | $\mathbb{R}^k$ |
 

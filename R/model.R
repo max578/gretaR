@@ -198,6 +198,14 @@ log_prob <- function(model, theta_free) {
     lp <- lp + lik_lp
   }
 
+  # Final NaN/Inf diagnostic check (warn only — sampler handles rejection)
+  lp_val <- lp$item()
+  if (is.nan(lp_val) || is.infinite(lp_val)) {
+    cli_alert_warning(
+      "NaN or Inf detected in log_prob (value: {lp_val}). Model may be misspecified or parameters out of support."
+    )
+  }
+
   lp
 }
 

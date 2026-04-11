@@ -114,6 +114,7 @@ NormalDistribution <- R6::R6Class(
     log_prob = function(x) {
       mu <- resolve_param(self$parameters$mean)
       sigma <- resolve_param(self$parameters$sd)
+      sigma <- torch_clamp(sigma, min = 1e-30)
       # -0.5 * log(2*pi) - log(sigma) - 0.5 * ((x - mu) / sigma)^2
       z <- (x - mu) / sigma
       torch_sum(-0.9189385 - torch_log(sigma) - 0.5 * z * z)
@@ -173,6 +174,7 @@ HalfNormalDistribution <- R6::R6Class(
 
     log_prob = function(x) {
       sigma <- resolve_param(self$parameters$sd)
+      sigma <- torch_clamp(sigma, min = 1e-30)
       # log(sqrt(2/pi)) - log(sigma) - 0.5 * (x/sigma)^2, for x >= 0
       z <- x / sigma
       torch_sum(-0.2257914 - torch_log(sigma) - 0.5 * z * z)
@@ -227,6 +229,7 @@ HalfCauchyDistribution <- R6::R6Class(
 
     log_prob = function(x) {
       gamma_val <- resolve_param(self$parameters$scale)
+      gamma_val <- torch_clamp(gamma_val, min = 1e-30)
       # log(2/(pi*gamma)) - log(1 + (x/gamma)^2), for x >= 0
       torch_sum(
         log(2) - log(pi) - torch_log(gamma_val) -
@@ -286,6 +289,8 @@ StudentTDistribution <- R6::R6Class(
       nu <- resolve_param(self$parameters$df)
       mu <- resolve_param(self$parameters$mu)
       sigma <- resolve_param(self$parameters$sigma)
+      nu <- torch_clamp(nu, min = 1e-30)
+      sigma <- torch_clamp(sigma, min = 1e-30)
       z <- (x - mu) / sigma
       # log-pdf of Student-t
       torch_sum(
@@ -563,6 +568,8 @@ GammaDistribution <- R6::R6Class(
     log_prob = function(x) {
       alpha <- resolve_param(self$parameters$shape)
       beta <- resolve_param(self$parameters$rate)
+      alpha <- torch_clamp(alpha, min = 1e-30)
+      beta <- torch_clamp(beta, min = 1e-30)
       x <- torch_clamp(x, min = 1e-30)
       # alpha*log(beta) - lgamma(alpha) + (alpha-1)*log(x) - beta*x
       torch_sum(
@@ -626,6 +633,8 @@ BetaDistribution <- R6::R6Class(
     log_prob = function(x) {
       a <- resolve_param(self$parameters$alpha)
       b <- resolve_param(self$parameters$beta)
+      a <- torch_clamp(a, min = 1e-30)
+      b <- torch_clamp(b, min = 1e-30)
       x <- torch_clamp(x, min = 1e-7, max = 1 - 1e-7)
       torch_sum(
         torch_lgamma(a + b) - torch_lgamma(a) - torch_lgamma(b) +
@@ -690,6 +699,7 @@ ExponentialDistribution <- R6::R6Class(
 
     log_prob = function(x) {
       lambda <- resolve_param(self$parameters$rate)
+      lambda <- torch_clamp(lambda, min = 1e-30)
       torch_sum(torch_log(lambda) - lambda * x)
     },
 
@@ -1017,6 +1027,7 @@ LogNormalDistribution <- R6::R6Class(
     log_prob = function(x) {
       mu <- resolve_param(self$parameters$meanlog)
       sigma <- resolve_param(self$parameters$sdlog)
+      sigma <- torch_clamp(sigma, min = 1e-30)
       x <- torch_clamp(x, min = 1e-30)
       z <- (torch_log(x) - mu) / sigma
       torch_sum(-torch_log(x) - torch_log(sigma) - 0.9189385 - 0.5 * z * z)
@@ -1073,6 +1084,7 @@ CauchyDistribution <- R6::R6Class(
     log_prob = function(x) {
       loc <- resolve_param(self$parameters$location)
       sc <- resolve_param(self$parameters$scale)
+      sc <- torch_clamp(sc, min = 1e-30)
       z <- (x - loc) / sc
       torch_sum(-log(pi) - torch_log(sc) - torch_log(1 + z * z))
     },

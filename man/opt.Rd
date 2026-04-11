@@ -11,7 +11,8 @@ opt(
   tolerance = 1e-06,
   init = NULL,
   verbose = TRUE,
-  backend = c("torch", "stan")
+  backend = c("torch", "stan"),
+  seed = NULL
 )
 }
 \arguments{
@@ -29,6 +30,8 @@ opt(
 \item{verbose}{Logical; print progress (default TRUE).}
 
 \item{backend}{Inference backend: \code{"torch"} (default) or \code{"stan"}.}
+
+\item{seed}{Optional integer seed for reproducibility.}
 }
 \value{
 A \code{gretaR_fit} object (method = "map") with components:

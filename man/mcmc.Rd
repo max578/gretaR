@@ -16,6 +16,7 @@ mcmc(
   n_leapfrog = 25L,
   target_accept = NULL,
   init_values = NULL,
+  seed = NULL,
   verbose = TRUE
 )
 }
@@ -44,6 +45,9 @@ or \code{"stan"} (generates Stan code, compiles and runs via cmdstanr).}
 NUTS, 0.65 for HMC).}
 
 \item{init_values}{Optional list of initial parameter vectors (one per chain).}
+
+\item{seed}{Optional integer seed for reproducibility. Sets both R and torch
+random number generators.}
 
 \item{verbose}{Logical; print progress information (default \code{TRUE}).}
 }

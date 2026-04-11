@@ -130,7 +130,10 @@ eval_grad <- function(model, theta_vec) {
   theta_t <- torch_tensor(theta_vec, dtype = model$dtype)
   glp <- grad_log_prob(model, theta_t)
   grad_vec <- as.numeric(glp$grad)
-  if (any(is.nan(grad_vec))) grad_vec[is.nan(grad_vec)] <- 0
+  if (any(is.nan(grad_vec))) {
+    cli_alert_warning("NaN gradient detected; replacing with 0 (model may be misspecified)")
+    grad_vec[is.nan(grad_vec)] <- 0
+  }
   list(lp = glp$lp, grad = grad_vec)
 }
 

@@ -4,6 +4,15 @@
   reset_gretaR_env()
 }
 
+#' @noRd
+.onAttach <- function(libname, pkgname) {
+  if (!torch::torch_is_installed()) {
+    packageStartupMessage(
+      "gretaR requires the torch backend. Run torch::install_torch() to set up."
+    )
+  }
+}
+
 #' @title Reset the gretaR Global Environment
 #'
 #' @description Clear all tracked nodes, distributions, and reset the node

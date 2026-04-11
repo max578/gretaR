@@ -24,6 +24,8 @@
 #' @param tolerance Convergence tolerance on relative ELBO change (default 1e-4).
 #' @param method Variational family: `"meanfield"` (default) or `"fullrank"`.
 #' @param init_from_map Logical; initialise from MAP estimate (default TRUE).
+#' @param seed Optional integer seed for reproducibility. Sets both R and torch
+#'   random number generators.
 #' @param verbose Logical; print progress (default TRUE).
 #'
 #' @return A `gretaR_vi` object with components:
@@ -51,7 +53,12 @@
 variational <- function(model, n_samples = 1L, max_iter = 5000L,
                learning_rate = 0.01, tolerance = 1e-4,
                method = c("meanfield", "fullrank"),
-               init_from_map = TRUE, verbose = TRUE) {
+               init_from_map = TRUE, seed = NULL, verbose = TRUE) {
+
+  if (!is.null(seed)) {
+    set.seed(seed)
+    torch::torch_manual_seed(seed)
+  }
 
   method <- match.arg(method)
   n_params <- model$total_dim

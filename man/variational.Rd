@@ -12,6 +12,7 @@ variational(
   tolerance = 1e-04,
   method = c("meanfield", "fullrank"),
   init_from_map = TRUE,
+  seed = NULL,
   verbose = TRUE
 )
 }
@@ -30,6 +31,9 @@ variational(
 \item{method}{Variational family: \code{"meanfield"} (default) or \code{"fullrank"}.}
 
 \item{init_from_map}{Logical; initialise from MAP estimate (default TRUE).}
+
+\item{seed}{Optional integer seed for reproducibility. Sets both R and torch
+random number generators.}
 
 \item{verbose}{Logical; print progress (default TRUE).}
 }
