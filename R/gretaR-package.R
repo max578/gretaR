@@ -21,6 +21,7 @@
 #' @importFrom cli cli_progress_bar cli_progress_update cli_progress_done
 #' @importFrom stats runif rnorm dnorm dt var model.frame model.matrix
 #'   model.response na.fail median
+#' @importFrom utils tail
 #' @importFrom methods as
 #'
 #' @keywords internal
