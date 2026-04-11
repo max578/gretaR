@@ -13,7 +13,7 @@ test_that("opt() finds the MAP for a simple normal model", {
   m <- model(mu)
 
   fit <- opt(m, verbose = FALSE)
-  expect_true(fit$convergence)
+  expect_true(fit$convergence$converged)
   expect_true(abs(fit$par["mu"] - mean(y_obs)) < 0.5)
 })
 
@@ -48,7 +48,7 @@ test_that("laplace() returns posterior approximation", {
   m <- model(mu)
 
   la <- laplace(m, verbose = FALSE)
-  expect_true(abs(la$mean["mu"] - mean(y_obs)) < 0.5)
+  expect_true(abs(la$par["mu"] - mean(y_obs)) < 0.5)
   expect_true(la$sd["mu"] > 0)
   # Analytical SD = 1/sqrt(50) ≈ 0.14
   expect_true(abs(la$sd["mu"] - 1/sqrt(50)) < 0.1)

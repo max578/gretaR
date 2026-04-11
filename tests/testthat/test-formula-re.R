@@ -116,7 +116,7 @@ test_that("gretaR_glm fits a random intercepts model with MAP", {
   expect_equal(fit$random_effects[[1]]$group, "group")
   expect_equal(fit$random_effects[[1]]$n_groups, n_groups)
   expect_equal(fit$random_effects[[1]]$type, "intercept")
-  expect_true(!is.null(fit$result$par))
+  expect_true(!is.null(fit$par))
 })
 
 test_that("gretaR_glm fits multiple random intercepts with MAP", {

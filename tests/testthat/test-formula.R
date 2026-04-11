@@ -33,7 +33,7 @@ test_that("gretaR_glm fits a Gaussian model with MAP", {
                      sampler = "map", verbose = FALSE)
   expect_s3_class(fit, "gretaR_glm_fit")
   expect_equal(fit$family, "gaussian")
-  expect_true(!is.null(fit$result$par))
+  expect_true(!is.null(fit$par))
 })
 
 test_that("gretaR_glm handles lme4-style random intercepts", {

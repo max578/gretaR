@@ -438,7 +438,7 @@ detect_formula_style <- function(formula, explicit = NULL) {
 print.gretaR_glm_fit <- function(x, ...) {
   has_re <- !is.null(x$random_effects) && length(x$random_effects) > 0
   type_str <- if (has_re) "mixed" else "GLM"
-  cat(sprintf("gretaR %s fit (%s, %s)\n", type_str, x$family, x$sampler))
+  cat(sprintf("gretaR %s fit (%s, %s)\n", type_str, x$family, x$method))
   cat(sprintf("  Formula: %s\n", deparse(x$formula)))
   cat(sprintf("  Observations: %d, Fixed predictors: %d\n",
               nrow(x$design_matrix), ncol(x$design_matrix)))
@@ -459,9 +459,9 @@ print.gretaR_glm_fit <- function(x, ...) {
     cat("\nPosterior summary:\n")
     summ <- posterior::summarise_draws(x$draws)
     print(summ, n = min(nrow(summ), 20))
-  } else if (x$sampler == "map") {
+  } else if (x$method == "map") {
     cat("\nMAP estimates:\n")
-    print(round(x$result$par, 4))
+    print(round(x$par, 4))
   }
 
   invisible(x)
