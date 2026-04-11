@@ -93,9 +93,10 @@ reference:
       - reset_gretaR_env
 
 articles:
-  - title: Getting Started
+  - title: Tutorials
     navbar: ~
     contents:
+      - complete-guide
       - getting-started
 
   - title: Model Types
