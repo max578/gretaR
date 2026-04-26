@@ -352,7 +352,8 @@ node_to_stan_expr <- function(node, dag_nodes, param_names, node_stan_names = li
 
     # --- Binary operations ---
     if (length(parent_exprs) == 2) {
-      a <- parent_exprs[1]; b <- parent_exprs[2]
+      a <- parent_exprs[1]
+      b <- parent_exprs[2]
       stan_expr <- switch(ot,
         "binary_+" = sprintf("(%s + %s)", a, b),
         "binary_-" = sprintf("(%s - %s)", a, b),

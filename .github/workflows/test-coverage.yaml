@@ -39,10 +39,12 @@ jobs:
           covr::to_cobertura(cov)
         shell: Rscript {0}
 
-      - uses: codecov/codecov-action@v4
+      - uses: codecov/codecov-action@v5
         with:
-          fail_ci_if_error: ${{ github.event_name != 'pull_request' && true || false }}
-          file: ./cobertura.xml
+          # Tokenless upload works for public repos but is best-effort.
+          # Flip to true once CODECOV_TOKEN is configured as a repo secret.
+          fail_ci_if_error: false
+          files: ./cobertura.xml
           plugin: noop
           disable_search: true
           token: ${{ secrets.CODECOV_TOKEN }}

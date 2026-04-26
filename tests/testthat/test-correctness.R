@@ -24,8 +24,10 @@ test_that("autograd gradient matches finite-difference approximation", {
   # Finite-difference gradient
   fd_grad <- numeric(length(theta))
   for (i in seq_along(theta)) {
-    theta_plus <- theta; theta_plus[i] <- theta_plus[i] + eps
-    theta_minus <- theta; theta_minus[i] <- theta_minus[i] - eps
+    theta_plus <- theta
+    theta_plus[i] <- theta_plus[i] + eps
+    theta_minus <- theta
+    theta_minus[i] <- theta_minus[i] - eps
     lp_plus <- log_prob(m, torch_tensor(theta_plus, dtype = m$dtype))$item()
     lp_minus <- log_prob(m, torch_tensor(theta_minus, dtype = m$dtype))$item()
     fd_grad[i] <- (lp_plus - lp_minus) / (2 * eps)

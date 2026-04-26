@@ -97,10 +97,23 @@ reference:
     contents:
       - compile_to_stan
 
+  - title: Methods and operators
+    desc: S3 methods and operators on gretaR objects.
+    contents:
+      - "`%*%`"
+      - print.gretaR_fit
+      - summary.gretaR_fit
+      - coef.gretaR_fit
+      - plot.gretaR_fit
+
   - title: Utilities
     desc: Helper functions for data handling and environment management.
     contents:
       - reset_gretaR_env
+
+  - title: Package
+    contents:
+      - gretaR-package
 
 articles:
   - title: Tutorials
