@@ -27,6 +27,6 @@ remove_re_bars(y ~ x + (1 | group))
 #> Warning: the ‘nobars’ function has moved to the reformulas package. Please update your imports, or ask an upstream package maintainer to do so.
 #> This warning is displayed once per session.
 #> y ~ x
-#> <environment: 0x555ac92955c8>
+#> <environment: 0x55fba52a4c18>
 # y ~ x
 ```
