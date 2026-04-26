@@ -23,7 +23,7 @@
 #' m <- model(alpha, beta, sigma)
 #' }
 model <- function(..., precision = c("float32", "float64")) {
-  precision <- match.arg(precision)
+  precision <- rlang::arg_match(precision)
   dtype <- if (precision == "float64") torch_float64() else torch_float32()
 
   targets <- list(...)

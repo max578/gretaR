@@ -1,0 +1,28 @@
+cff-version: 1.2.0
+message: "If you use gretaR in your research, please cite it as below."
+title: "gretaR: Bayesian Statistical Modelling with Torch"
+type: software
+version: 0.2.0
+date-released: "2026-04-20"
+license: MIT
+repository-code: "https://github.com/max578/gretaR"
+url: "https://github.com/max578/gretaR"
+abstract: >
+  A probabilistic programming package for Bayesian statistical modelling in R
+  using native R syntax. Models are defined interactively with gretaR_array
+  objects, then compiled to torch tensors for GPU-accelerated Hamiltonian
+  Monte Carlo and No-U-Turn Sampler inference. No Python dependency required.
+keywords:
+  - Bayesian statistics
+  - probabilistic programming
+  - MCMC
+  - HMC
+  - NUTS
+  - variational inference
+  - torch
+  - R
+authors:
+  - family-names: Moldovan
+    given-names: Max
+    email: max.moldovan@adelaide.edu.au
+    orcid: "https://orcid.org/0000-0001-9680-8474"

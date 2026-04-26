@@ -214,7 +214,7 @@ coef.gretaR_fit <- function(object, ...) {
 #' @export
 plot.gretaR_fit <- function(x, type = c("trace", "density", "pairs",
                                          "rhat", "neff"), ...) {
-  type <- match.arg(type)
+  type <- rlang::arg_match(type)
 
   if (is.null(x$draws)) {
     cli_abort("No posterior draws available for plotting.")

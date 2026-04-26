@@ -59,7 +59,7 @@ variational <- function(model, n_samples = 1L, max_iter = 5000L,
     torch::torch_manual_seed(seed)
   }
 
-  method <- match.arg(method)
+  method <- rlang::arg_match(method)
   n_params <- model$total_dim
 
   if (verbose) {

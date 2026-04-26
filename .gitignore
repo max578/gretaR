@@ -7,4 +7,7 @@
 .Ruserdata
 inst/doc
 docs/
+revdep/
 ~$*
+.DS_Store
+cran-comments.md

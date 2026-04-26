@@ -1,3 +1,36 @@
+# gretaR 0.2.0
+
+## Packaging & infrastructure
+
+* Language set to `en-AU`; parallel testthat enabled.
+* Maintainer role extended with `cph`.
+* Replaced `match.arg()` with `rlang::arg_match()` across all R sources for
+  clearer error messages; `rlang` added to `Imports`.
+* Added `inst/CITATION` and `CITATION.cff` for machine-readable citation metadata.
+* Added `codemeta.json` for software citation and discovery.
+* Added `inst/WORDLIST` to silence spellcheck false positives.
+* Added `.lintr` (snake_case, tidyverse-style, 100-char lines) and `air.toml`
+  for reproducible formatting.
+* Added `cran-comments.md` and `codecov.yml` templates.
+* `.gitignore` and `.Rbuildignore` tightened; `.DS_Store` untracked.
+
+## Continuous integration
+
+* Added `pkgdown.yaml`, `test-coverage.yaml`, `lint.yaml`, `revdep.yaml`, and
+  `pr-commands.yaml` workflows.
+
+## Tests
+
+* Added `tests/testthat/setup.R` that pins locale to `C`, seeds torch
+  deterministically, redirects user cache dirs to tempfiles, and strips
+  auth-style env vars.
+
+## Documentation
+
+* README converted to `README.Rmd` source with badges (R-CMD-check, pkgdown,
+  test-coverage, lifecycle, codecov). Install instruction switched from
+  `remotes::install_github()` to `pak::pak()`.
+
 # gretaR 0.1.0
 
 ## Core Features

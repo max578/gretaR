@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 ## Introduction
 
 **gretaR** is a ground-up reimplementation of the
-[greta](https://greta-stats.org/) probabilistic programming interface for R.
+[greta](https://github.com/greta-dev/greta) probabilistic programming interface for R.
 It preserves the elegant, intuitive API that made greta popular while removing
 its most significant pain point — the Python/TensorFlow dependency — and adding
 modern inference capabilities.

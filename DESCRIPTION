@@ -1,9 +1,9 @@
 Package: gretaR
 Title: Bayesian Statistical Modelling with Torch
-Version: 0.1.0
+Version: 0.2.0
 Authors@R:
     person("Max", "Moldovan", , "max.moldovan@adelaide.edu.au",
-           role = c("aut", "cre"),
+           role = c("aut", "cre", "cph"),
            comment = c(ORCID = "0000-0001-9680-8474"))
 Description: A probabilistic programming package for Bayesian statistical
     modelling in R using native R syntax. Models are defined interactively
@@ -20,6 +20,7 @@ Imports:
     torch (>= 0.12.0),
     cli (>= 3.6.0),
     posterior (>= 1.5.0),
+    rlang (>= 1.1.0),
     methods
 Suggests:
     Matrix,
@@ -31,11 +32,13 @@ Suggests:
     rmarkdown,
     bayesplot,
     ggplot2,
-    loo
+    loo,
+    withr
 VignetteBuilder: knitr
 Additional_repositories: https://stan-dev.r-universe.dev
 Config/testthat/edition: 3
+Config/testthat/parallel: true
 Encoding: UTF-8
-Language: en-GB
+Language: en-AU
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3

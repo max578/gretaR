@@ -1,0 +1,16 @@
+citHeader("To cite gretaR in publications, use:")
+
+bibentry(
+  bibtype  = "Manual",
+  title    = "gretaR: Bayesian Statistical Modelling with Torch",
+  author   = person("Max", "Moldovan",
+                    email = "max.moldovan@adelaide.edu.au",
+                    comment = c(ORCID = "0000-0001-9680-8474")),
+  year     = 2026,
+  note     = sprintf("R package version %s", meta$Version),
+  url      = "https://github.com/max578/gretaR",
+  textVersion = sprintf(
+    "Moldovan, M. (2026). gretaR: Bayesian Statistical Modelling with Torch. R package version %s. https://github.com/max578/gretaR",
+    meta$Version
+  )
+)

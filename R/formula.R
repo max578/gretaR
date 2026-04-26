@@ -94,8 +94,8 @@ gretaR_glm <- function(formula, data, family = c("gaussian", "binomial", "poisso
                         chains = 4L, iter = 2000L, warmup = NULL,
                         formula_style = NULL, verbose = TRUE, ...) {
 
-  family <- match.arg(family)
-  sampler <- match.arg(sampler)
+  family <- rlang::arg_match(family)
+  sampler <- rlang::arg_match(sampler)
   if (is.null(warmup)) warmup <- as.integer(iter / 2)
   n_samples <- iter - warmup
 
@@ -410,8 +410,8 @@ logistic_link <- function(eta) {
 #' @noRd
 detect_formula_style <- function(formula, explicit = NULL) {
   if (!is.null(explicit)) {
-    explicit <- match.arg(explicit, c("base", "lme4", "brms", "mgcv",
-                                       "glmmTMB", "asreml"))
+    explicit <- rlang::arg_match(explicit, c("base", "lme4", "brms", "mgcv",
+                                              "glmmTMB", "asreml"))
     return(explicit)
   }
 

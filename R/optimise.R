@@ -46,7 +46,7 @@ opt <- function(model, max_iter = 2000L, learning_rate = 0.01,
     }
   }
 
-  backend <- match.arg(backend)
+  backend <- rlang::arg_match(backend)
   if (backend == "stan") {
     return(stan_optimize(model, verbose = verbose))
   }

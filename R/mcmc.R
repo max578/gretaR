@@ -64,8 +64,8 @@ mcmc <- function(model, n_samples = 1000L, warmup = 1000L, chains = 4L,
     }
   }
 
-  sampler <- match.arg(sampler)
-  backend <- match.arg(backend)
+  sampler <- rlang::arg_match(sampler)
+  backend <- rlang::arg_match(backend)
 
   # --- Stan backend dispatch ---
   if (backend == "stan") {
@@ -258,7 +258,7 @@ summary.gretaR_draws <- function(object, ...) {
 
 #' @export
 plot.gretaR_draws <- function(x, type = c("trace", "density", "pairs"), ...) {
-  type <- match.arg(type)
+  type <- rlang::arg_match(type)
 
   if (!requireNamespace("bayesplot", quietly = TRUE)) {
     cli_abort("Package {.pkg bayesplot} is required for plotting. Install with {.code install.packages('bayesplot')}.")
