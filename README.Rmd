@@ -33,11 +33,18 @@ approximation.
 ## Installation
 
 ```r
-# Install from GitHub (requires R >= 4.1.0)
-pak::pak("max578/gretaR")
+# Install from GitHub with vignettes (requires R >= 4.1.0)
+# install.packages("remotes")
+remotes::install_github("max578/gretaR", build_vignettes = TRUE)
 
 # Install the torch backend (one-time setup)
 torch::install_torch()
+```
+
+After installation, browse the bundled vignettes:
+
+```r
+browseVignettes("gretaR")
 ```
 
 ## Quick Start
