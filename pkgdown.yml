@@ -1,0 +1,13 @@
+pandoc: 3.1.11
+pkgdown: 2.2.0
+pkgdown_sha: ~
+articles:
+  complete-guide: complete-guide.html
+  getting-started: getting-started.html
+  glm-models: glm-models.html
+  hierarchical-models: hierarchical-models.html
+  migrating-from-greta: migrating-from-greta.html
+last_built: 2026-04-26T12:51Z
+urls:
+  reference: https://max578.github.io/gretaR/reference
+  article: https://max578.github.io/gretaR/articles
