@@ -21,6 +21,8 @@ hmc(model, n_samples = 1000L, warmup = 1000L, chains = 4L, ...)
 A \code{gretaR_fit} object.
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
+
 Convenience wrapper around \code{\link{mcmc}} that selects the
 static Hamiltonian Monte Carlo sampler.
 }

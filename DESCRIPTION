@@ -11,7 +11,7 @@ Description: A probabilistic programming package for Bayesian statistical
     GPU-accelerated Hamiltonian Monte Carlo and No-U-Turn Sampler inference.
     No Python dependency required.
 License: MIT + file LICENSE
-URL: https://github.com/max578/gretaR
+URL: https://github.com/max578/gretaR, https://max578.github.io/gretaR/
 BugReports: https://github.com/max578/gretaR/issues
 Depends:
     R (>= 4.1.0)
@@ -21,10 +21,12 @@ Imports:
     cli (>= 3.6.0),
     posterior (>= 1.5.0),
     rlang (>= 1.1.0),
+    lifecycle (>= 1.0.0),
     methods
 Suggests:
     Matrix,
     lme4,
+    reformulas,
     mgcv,
     cmdstanr,
     testthat (>= 3.0.0),

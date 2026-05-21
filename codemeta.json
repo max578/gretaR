@@ -4,6 +4,7 @@
   "identifier": "gretaR",
   "description": "A probabilistic programming package for Bayesian statistical modelling in R using native R syntax. Models are defined interactively with 'gretaR_array' objects, then compiled to 'torch' tensors for GPU-accelerated Hamiltonian Monte Carlo and No-U-Turn Sampler inference. No Python dependency required.",
   "name": "gretaR: Bayesian Statistical Modelling with Torch",
+  "relatedLink": "https://max578.github.io/gretaR/",
   "codeRepository": "https://github.com/max578/gretaR",
   "issueTracker": "https://github.com/max578/gretaR/issues",
   "license": "https://spdx.org/licenses/MIT",
@@ -13,8 +14,17 @@
     "name": "R",
     "url": "https://r-project.org"
   },
-  "runtimePlatform": "R (>= 4.1.0)",
+  "runtimePlatform": "R version 4.5.2 (2025-10-31)",
   "author": [
+    {
+      "@type": "Person",
+      "givenName": "Max",
+      "familyName": "Moldovan",
+      "email": "max.moldovan@adelaide.edu.au",
+      "@id": "https://orcid.org/0000-0001-9680-8474"
+    }
+  ],
+  "copyrightHolder": [
     {
       "@type": "Person",
       "givenName": "Max",
@@ -32,23 +42,234 @@
       "@id": "https://orcid.org/0000-0001-9680-8474"
     }
   ],
-  "copyrightHolder": [
+  "softwareSuggestions": [
     {
-      "@type": "Person",
-      "givenName": "Max",
-      "familyName": "Moldovan",
-      "@id": "https://orcid.org/0000-0001-9680-8474"
+      "@type": "SoftwareApplication",
+      "identifier": "Matrix",
+      "name": "Matrix",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=Matrix"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "lme4",
+      "name": "lme4",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=lme4"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "mgcv",
+      "name": "mgcv",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=mgcv"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "cmdstanr",
+      "name": "cmdstanr"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "testthat",
+      "name": "testthat",
+      "version": ">= 3.0.0",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=testthat"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "knitr",
+      "name": "knitr",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=knitr"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "rmarkdown",
+      "name": "rmarkdown",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=rmarkdown"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "bayesplot",
+      "name": "bayesplot",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=bayesplot"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "ggplot2",
+      "name": "ggplot2",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=ggplot2"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "loo",
+      "name": "loo",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=loo"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "withr",
+      "name": "withr",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=withr"
     }
   ],
-  "keywords": [
-    "bayesian-statistics",
-    "probabilistic-programming",
-    "mcmc",
-    "hmc",
-    "nuts",
-    "variational-inference",
-    "torch",
-    "r-package"
+  "softwareRequirements": {
+    "1": {
+      "@type": "SoftwareApplication",
+      "identifier": "R",
+      "name": "R",
+      "version": ">= 4.1.0"
+    },
+    "2": {
+      "@type": "SoftwareApplication",
+      "identifier": "R6",
+      "name": "R6",
+      "version": ">= 2.5.0",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=R6"
+    },
+    "3": {
+      "@type": "SoftwareApplication",
+      "identifier": "torch",
+      "name": "torch",
+      "version": ">= 0.12.0",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=torch"
+    },
+    "4": {
+      "@type": "SoftwareApplication",
+      "identifier": "cli",
+      "name": "cli",
+      "version": ">= 3.6.0",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=cli"
+    },
+    "5": {
+      "@type": "SoftwareApplication",
+      "identifier": "posterior",
+      "name": "posterior",
+      "version": ">= 1.5.0",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=posterior"
+    },
+    "6": {
+      "@type": "SoftwareApplication",
+      "identifier": "rlang",
+      "name": "rlang",
+      "version": ">= 1.1.0",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=rlang"
+    },
+    "7": {
+      "@type": "SoftwareApplication",
+      "identifier": "methods",
+      "name": "methods"
+    },
+    "SystemRequirements": null
+  },
+  "fileSize": "499.676KB",
+  "citation": [
+    {
+      "@type": "SoftwareSourceCode",
+      "datePublished": "2026",
+      "author": [
+        {
+          "@type": "Person",
+          "givenName": "Max",
+          "familyName": "Moldovan",
+          "email": "max.moldovan@adelaide.edu.au",
+          "@id": "https://orcid.org/0000-0001-9680-8474"
+        }
+      ],
+      "name": "gretaR: Bayesian Statistical Modelling with Torch",
+      "url": "https://github.com/max578/gretaR",
+      "description": "R package version 0.2.0"
+    }
   ],
-  "developmentStatus": "https://www.repostatus.org/#wip"
+  "releaseNotes": "https://github.com/max578/gretaR/blob/main/NEWS.md",
+  "readme": "https://github.com/max578/gretaR/blob/main/README.md",
+  "contIntegration": ["https://github.com/max578/gretaR/actions/workflows/R-CMD-check.yaml", "https://github.com/max578/gretaR/actions/workflows/pkgdown.yaml", "https://github.com/max578/gretaR/actions/workflows/test-coverage.yaml", "https://app.codecov.io/gh/max578/gretaR?branch=main"],
+  "developmentStatus": "https://lifecycle.r-lib.org/articles/stages.html#experimental"
 }

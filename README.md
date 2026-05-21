@@ -24,16 +24,33 @@ and Laplace approximation.
 
 ## Installation
 
+gretaR will be available from CRAN after acceptance. In the meantime,
+install binaries from R-Universe (built within ~1 hour of every commit
+to `main`):
+
 ``` r
-# Install from GitHub with vignettes (requires R >= 4.1.0)
+options(repos = c(
+  max578 = "https://max578.r-universe.dev",
+  CRAN   = "https://cloud.r-project.org"
+))
+install.packages("gretaR")
+```
+
+Or build from source with vignettes:
+
+``` r
 # install.packages("remotes")
 remotes::install_github("max578/gretaR", build_vignettes = TRUE)
+```
 
-# Install the torch backend (one-time setup)
+After installing the package, set up the torch backend (one-time
+download of LibTorch on first use):
+
+``` r
 torch::install_torch()
 ```
 
-After installation, browse the bundled vignettes:
+Browse the bundled vignettes:
 
 ``` r
 browseVignettes("gretaR")

@@ -9,7 +9,10 @@
 
 #' @title Fit a Bayesian GLM Using Formula Syntax
 #'
-#' @description A high-level interface for specifying and fitting generalised
+#' @description
+#' `r lifecycle::badge("experimental")`
+#'
+#' A high-level interface for specifying and fitting generalised
 #'   linear models (including mixed / hierarchical models) using standard R
 #'   formula syntax. Internally translates to the gretaR DSL, constructs the
 #'   model, and runs MCMC inference.
@@ -597,8 +600,9 @@ parse_re_bars <- function(formula) {
 #' Remove random effects bar terms from a formula
 #'
 #' Returns the fixed-effects-only formula by stripping all \code{(expr|group)}
-#' terms. If lme4 is installed, delegates to \code{lme4::nobars()}; otherwise
-#' uses regex substitution.
+#' terms. If \pkg{reformulas} is installed, delegates to
+#' \code{reformulas::nobars()}; otherwise falls back to \code{lme4::nobars()},
+#' and finally to regex substitution.
 #'
 #' @param formula A formula potentially containing bar terms.
 #' @return A formula with bar terms removed.
@@ -609,9 +613,14 @@ parse_re_bars <- function(formula) {
 #'
 #' @export
 remove_re_bars <- function(formula) {
-  # Try lme4::nobars() if available (most robust)
+  # reformulas is the canonical home for nobars() (lme4 v1.1-36+ deprecated its copy)
+  if (requireNamespace("reformulas", quietly = TRUE)) {
+    nb <- reformulas::nobars(formula)
+    if (!is.null(nb)) return(nb)
+  }
+  # Fall back to lme4::nobars() for older lme4 without reformulas
   if (requireNamespace("lme4", quietly = TRUE)) {
-    nb <- lme4::nobars(formula)
+    nb <- suppressWarnings(lme4::nobars(formula))
     if (!is.null(nb)) return(nb)
   }
 

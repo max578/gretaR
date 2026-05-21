@@ -25,6 +25,8 @@ A list with components:
 }
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
+
 Approximate the posterior distribution using a multivariate
 normal centred at the MAP estimate with covariance equal to the inverse
 of the negative Hessian of the log-joint density.

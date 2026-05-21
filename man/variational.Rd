@@ -49,6 +49,8 @@ A \code{gretaR_fit} object (method = "vi") with standard fields plus:
 }
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
+
 Fit a model using Automatic Differentiation Variational
 Inference. Approximates the posterior with a multivariate Gaussian
 in unconstrained parameter space.

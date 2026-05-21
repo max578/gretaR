@@ -12,7 +12,10 @@
 
 #' @title Variational Inference (ADVI)
 #'
-#' @description Fit a model using Automatic Differentiation Variational
+#' @description
+#' `r lifecycle::badge("experimental")`
+#'
+#' Fit a model using Automatic Differentiation Variational
 #'   Inference. Approximates the posterior with a multivariate Gaussian
 #'   in unconstrained parameter space.
 #'

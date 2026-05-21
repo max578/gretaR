@@ -64,6 +64,8 @@ A \code{gretaR_glm_fit} object with components:
 }
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
+
 A high-level interface for specifying and fitting generalised
 linear models (including mixed / hierarchical models) using standard R
 formula syntax. Internally translates to the gretaR DSL, constructs the

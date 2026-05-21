@@ -19,6 +19,7 @@
 #' @importFrom posterior as_draws_array as_draws_df summarise_draws
 #' @importFrom cli cli_alert_info cli_alert_success cli_alert_warning cli_abort
 #' @importFrom cli cli_progress_bar cli_progress_update cli_progress_done
+#' @importFrom lifecycle deprecated
 #' @importFrom stats runif rnorm dnorm dt var model.frame model.matrix
 #'   model.response na.fail median
 #' @importFrom utils tail

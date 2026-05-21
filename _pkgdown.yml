@@ -23,6 +23,8 @@ navbar:
           href: articles/hierarchical-models.html
         - text: GLM Models
           href: articles/glm-models.html
+        - text: "----------"
+        - text: "Long-form articles (web only)"
         - text: Complete Guide
           href: articles/complete-guide.html
         - text: Migrating from greta
@@ -119,7 +121,6 @@ articles:
   - title: Tutorials
     navbar: ~
     contents:
-      - complete-guide
       - getting-started
 
   - title: Model Types
@@ -128,7 +129,8 @@ articles:
       - hierarchical-models
       - glm-models
 
-  - title: Migration
-    navbar: ~
+  - title: Long-form (web only)
+    desc: Comprehensive walkthroughs hosted on the pkgdown site only — not bundled with the installed package.
     contents:
-      - migrating-from-greta
+      - articles/complete-guide
+      - articles/migrating-from-greta

@@ -14,8 +14,9 @@ A formula with bar terms removed.
 }
 \description{
 Returns the fixed-effects-only formula by stripping all \code{(expr|group)}
-terms. If lme4 is installed, delegates to \code{lme4::nobars()}; otherwise
-uses regex substitution.
+terms. If \pkg{reformulas} is installed, delegates to
+\code{reformulas::nobars()}; otherwise falls back to \code{lme4::nobars()},
+and finally to regex substitution.
 }
 \examples{
 remove_re_bars(y ~ x + (1 | group))

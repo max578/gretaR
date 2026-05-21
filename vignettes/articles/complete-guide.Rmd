@@ -1,10 +1,5 @@
 ---
 title: "Complete Guide to gretaR"
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{Complete Guide to gretaR}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include = FALSE}

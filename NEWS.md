@@ -1,5 +1,26 @@
 # gretaR 0.2.0
 
+## User-facing API
+
+* Added `lifecycle::badge("experimental")` markers to the user-facing inference
+  API (`mcmc()`, `nuts()`, `hmc()`, `variational()`, `opt()`, `laplace()`,
+  `gretaR_glm()`) so users see the stability tier in `?fun`. `lifecycle` added
+  to `Imports`.
+
+## Documentation
+
+* Long-form articles `complete-guide` and `migrating-from-greta` moved to
+  `vignettes/articles/` (pkgdown-only). They remain visible on the website but
+  no longer ship with the installed package. The three bundled vignettes
+  (`getting-started`, `glm-models`, `hierarchical-models`) cover the core API.
+* README install section now defaults to r-universe binaries; source-build
+  via `remotes::install_github()` kept as the secondary path.
+* DESCRIPTION `URL:` now lists both the GitHub repo and the pkgdown site.
+
+## Continuous integration
+
+* CI matrix extended with `ubuntu-latest × R oldrel-1` (now 3 OS × 3 R versions).
+
 ## Packaging & infrastructure
 
 * Language set to `en-AU`; parallel testthat enabled.

@@ -2,7 +2,10 @@
 
 #' @title Draw MCMC Samples from a gretaR Model
 #'
-#' @description Run Hamiltonian Monte Carlo or the No-U-Turn Sampler on a
+#' @description
+#' `r lifecycle::badge("experimental")`
+#'
+#' Run Hamiltonian Monte Carlo or the No-U-Turn Sampler on a
 #'   compiled \code{gretaR_model} and return posterior draws in a format
 #'   compatible with the \code{posterior} and \code{bayesplot} packages.
 #'
@@ -155,7 +158,10 @@ mcmc <- function(model, n_samples = 1000L, warmup = 1000L, chains = 4L,
 
 #' @title Run HMC Sampling
 #'
-#' @description Convenience wrapper around \code{\link{mcmc}} that selects the
+#' @description
+#' `r lifecycle::badge("experimental")`
+#'
+#' Convenience wrapper around \code{\link{mcmc}} that selects the
 #'   static Hamiltonian Monte Carlo sampler.
 #'
 #' @inheritParams mcmc
@@ -175,7 +181,10 @@ hmc <- function(model, n_samples = 1000L, warmup = 1000L, chains = 4L, ...) {
 
 #' @title Run NUTS Sampling
 #'
-#' @description Convenience wrapper around \code{\link{mcmc}} that selects the
+#' @description
+#' `r lifecycle::badge("experimental")`
+#'
+#' Convenience wrapper around \code{\link{mcmc}} that selects the
 #'   No-U-Turn Sampler (NUTS).
 #'
 #' @inheritParams mcmc

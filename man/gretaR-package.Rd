@@ -27,12 +27,13 @@ inference.
 Useful links:
 \itemize{
   \item \url{https://github.com/max578/gretaR}
+  \item \url{https://max578.github.io/gretaR/}
   \item Report bugs at \url{https://github.com/max578/gretaR/issues}
 }
 
 }
 \author{
-\strong{Maintainer}: Max Moldovan \email{max.moldovan@adelaide.edu.au} (\href{https://orcid.org/0000-0001-9680-8474}{ORCID})
+\strong{Maintainer}: Max Moldovan \email{max.moldovan@adelaide.edu.au} (\href{https://orcid.org/0000-0001-9680-8474}{ORCID}) [copyright holder]
 
 }
 \keyword{internal}

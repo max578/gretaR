@@ -30,6 +30,14 @@ justification, per the project policy of itemising each one):
   remain — these are correct English usage of the package names. No
   action.
 
+* **NOTE: Found the following (possibly) invalid URLs:
+  `https://max578.github.io/gretaR/` Status: 404.**
+  Category: source-fix-attempted (deferred). The pkgdown site is built
+  and deployed by the `pkgdown.yaml` GitHub Actions workflow on the
+  first push to `main` after v0.2.0 release; the URL becomes live once
+  that deploy completes. Submission to CRAN will be timed for *after*
+  the deploy lands so this NOTE clears. No source action.
+
 ## Downstream dependencies
 
 No reverse dependencies on CRAN at this time (first submission).

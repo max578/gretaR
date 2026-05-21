@@ -17,6 +17,7 @@
 ^\.lintr$
 ^vignettes/!precompile\.R$
 ^vignettes/.*\.Rmd\.orig$
+^vignettes/articles$
 ^audit_.*\.md$
 ^critical_review_.*\.md$
 ^CITATION\.cff$

@@ -66,6 +66,8 @@ Use \code{coef()} for point estimates, \code{summary()} for full table,
 \code{plot()} for diagnostics.
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
+
 Run Hamiltonian Monte Carlo or the No-U-Turn Sampler on a
 compiled \code{gretaR_model} and return posterior draws in a format
 compatible with the \code{posterior} and \code{bayesplot} packages.

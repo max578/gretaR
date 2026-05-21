@@ -2,7 +2,10 @@
 
 #' @title Find the Maximum A Posteriori (MAP) Estimate
 #'
-#' @description Optimise the log-joint density using gradient-based methods
+#' @description
+#' `r lifecycle::badge("experimental")`
+#'
+#' Optimise the log-joint density using gradient-based methods
 #'   to find the posterior mode. Uses the Adam optimiser via torch.
 #'
 #' @param model A `gretaR_model` object created by [model()].
@@ -147,7 +150,10 @@ opt <- function(model, max_iter = 2000L, learning_rate = 0.01,
 
 #' @title Laplace Approximation
 #'
-#' @description Approximate the posterior distribution using a multivariate
+#' @description
+#' `r lifecycle::badge("experimental")`
+#'
+#' Approximate the posterior distribution using a multivariate
 #'   normal centred at the MAP estimate with covariance equal to the inverse
 #'   of the negative Hessian of the log-joint density.
 #'

@@ -44,6 +44,8 @@ A \code{gretaR_fit} object (method = "map") with components:
 }
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
+
 Optimise the log-joint density using gradient-based methods
 to find the posterior mode. Uses the Adam optimiser via torch.
 }
