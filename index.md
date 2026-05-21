@@ -10,18 +10,39 @@ and Laplace approximation.
 
 ## Installation
 
+gretaR will be available from CRAN after acceptance. In the meantime,
+install binaries from R-Universe (built within ~1 hour of every commit
+to `main`):
+
 ``` r
-# Install from GitHub with vignettes (requires R >= 4.1.0)
+
+options(repos = c(
+  max578 = "https://max578.r-universe.dev",
+  CRAN   = "https://cloud.r-project.org"
+))
+install.packages("gretaR")
+```
+
+Or build from source with vignettes:
+
+``` r
+
 # install.packages("remotes")
 remotes::install_github("max578/gretaR", build_vignettes = TRUE)
+```
 
-# Install the torch backend (one-time setup)
+After installing the package, set up the torch backend (one-time
+download of LibTorch on first use):
+
+``` r
+
 torch::install_torch()
 ```
 
-After installation, browse the bundled vignettes:
+Browse the bundled vignettes:
 
 ``` r
+
 browseVignettes("gretaR")
 ```
 
@@ -30,6 +51,7 @@ browseVignettes("gretaR")
 Bayesian linear regression in 15 lines:
 
 ``` r
+
 library(gretaR)
 
 # Observed data
@@ -76,29 +98,29 @@ summary(draws)
 
 ## Comparison with Other Frameworks
 
-| Feature                       | gretaR                                                                    | greta               | brms           | RStan                    |
-|-------------------------------|---------------------------------------------------------------------------|---------------------|----------------|--------------------------|
-| **Backend**                   | torch (R)                                                                 | TensorFlow (Python) | Stan (C++)     | Stan (C++)               |
-| **Python dependency**         | None                                                                      | Required            | None           | None                     |
-| **Installation**              | Simple                                                                    | Fragile (TF/Python) | Moderate       | Moderate (C++ toolchain) |
-| **Syntax style**              | Interactive R DSL                                                         | Interactive R DSL   | Formula        | Stan language            |
-| **GPU support**               | Yes (CUDA/MPS)                                                            | Yes (CUDA)          | No             | Limited (OpenCL)         |
-| **Automatic differentiation** | torch autograd                                                            | TF autograd         | Stan autodiff  | Stan autodiff            |
-| **HMC/NUTS**                  | Yes                                                                       | Yes                 | Yes (via Stan) | Yes                      |
-| **Variational inference**     | ADVI (MF + FR)                                                            | No                  | No             | Yes                      |
-| **Formula interface**         | [`gretaR_glm()`](https://max578.github.io/gretaR/reference/gretaR_glm.md) | No                  | `brm()`        | No                       |
-| **Maintenance status**        | Active                                                                    | Maintenance-only    | Active         | Active                   |
+| Feature | gretaR | greta | brms | RStan |
+|----|----|----|----|----|
+| **Backend** | torch (R) | TensorFlow (Python) | Stan (C++) | Stan (C++) |
+| **Python dependency** | None | Required | None | None |
+| **Installation** | Simple | Fragile (TF/Python) | Moderate | Moderate (C++ toolchain) |
+| **Syntax style** | Interactive R DSL | Interactive R DSL | Formula | Stan language |
+| **GPU support** | Yes (CUDA/MPS) | Yes (CUDA) | No | Limited (OpenCL) |
+| **Automatic differentiation** | torch autograd | TF autograd | Stan autodiff | Stan autodiff |
+| **HMC/NUTS** | Yes | Yes | Yes (via Stan) | Yes |
+| **Variational inference** | ADVI (MF + FR) | No | No | Yes |
+| **Formula interface** | [`gretaR_glm()`](https://max578.github.io/gretaR/reference/gretaR_glm.md) | No | `brm()` | No |
+| **Maintenance status** | Active | Maintenance-only | Active | Active |
 
 ## Inference Methods
 
-| Method                  | Function                                                                                 | Use Case                                  |
-|-------------------------|------------------------------------------------------------------------------------------|-------------------------------------------|
-| Hamiltonian Monte Carlo | [`hmc()`](https://max578.github.io/gretaR/reference/hmc.md) / `mcmc(sampler = "hmc")`    | Full posterior, simpler models            |
-| No-U-Turn Sampler       | [`nuts()`](https://max578.github.io/gretaR/reference/nuts.md) / `mcmc(sampler = "nuts")` | Full posterior, general purpose (default) |
-| ADVI (mean-field)       | `variational(method = "meanfield")`                                                      | Fast approximate posterior                |
-| ADVI (full-rank)        | `variational(method = "fullrank")`                                                       | Approximate posterior with correlations   |
-| MAP estimation          | [`opt()`](https://max578.github.io/gretaR/reference/opt.md)                              | Point estimate (mode of posterior)        |
-| Laplace approximation   | [`laplace()`](https://max578.github.io/gretaR/reference/laplace.md)                      | Gaussian approximation around MAP         |
+| Method | Function | Use Case |
+|----|----|----|
+| Hamiltonian Monte Carlo | [`hmc()`](https://max578.github.io/gretaR/reference/hmc.md) / `mcmc(sampler = "hmc")` | Full posterior, simpler models |
+| No-U-Turn Sampler | [`nuts()`](https://max578.github.io/gretaR/reference/nuts.md) / `mcmc(sampler = "nuts")` | Full posterior, general purpose (default) |
+| ADVI (mean-field) | `variational(method = "meanfield")` | Fast approximate posterior |
+| ADVI (full-rank) | `variational(method = "fullrank")` | Approximate posterior with correlations |
+| MAP estimation | [`opt()`](https://max578.github.io/gretaR/reference/opt.md) | Point estimate (mode of posterior) |
+| Laplace approximation | [`laplace()`](https://max578.github.io/gretaR/reference/laplace.md) | Gaussian approximation around MAP |
 
 ## Vignettes
 
@@ -114,6 +136,7 @@ summary(draws)
 After installation, browse vignettes with:
 
 ``` r
+
 browseVignettes("gretaR")
 ```
 
@@ -122,6 +145,7 @@ browseVignettes("gretaR")
 If you use gretaR in your research, please cite:
 
 ``` r
+
 citation("gretaR")
 ```
 

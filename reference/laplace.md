@@ -1,5 +1,7 @@
 # Laplace Approximation
 
+**\[experimental\]**
+
 Approximate the posterior distribution using a multivariate normal
 centred at the MAP estimate with covariance equal to the inverse of the
 negative Hessian of the log-joint density.

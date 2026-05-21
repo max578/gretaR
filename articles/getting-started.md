@@ -18,6 +18,7 @@ the No-U-Turn Sampler (NUTS).
 ## Installation
 
 ``` r
+
 # Install from GitHub (development version)
 # remotes::install_github("maxmoldovan/gretaR")
 
@@ -31,12 +32,8 @@ Suppose we observe data from a normal distribution and want to estimate
 the mean and standard deviation.
 
 ``` r
+
 library(gretaR)
-#> 
-#> Attaching package: 'gretaR'
-#> The following object is masked from 'package:base':
-#> 
-#>     %*%
 
 # Simulate data
 set.seed(42)
@@ -55,15 +52,10 @@ distribution(y) <- normal(mu, sigma)
 # Compile model
 m <- model(mu, sigma)
 print(m)
-#> gretaR model
-#>   Free parameters: 2 (2 total elements)
-#>   Variables:
-#>     mu ~ normal [1 x 1]
-#>     sigma ~ half_cauchy [1 x 1]
-#>   Likelihood terms: 1
 ```
 
 ``` r
+
 # Draw posterior samples
 draws <- mcmc(m, n_samples = 1000, warmup = 1000, chains = 4)
 
@@ -74,6 +66,7 @@ summary(draws)
 ## Example 2: Bayesian Linear Regression
 
 ``` r
+
 # Simulate data
 set.seed(123)
 n <- 100
@@ -101,16 +94,10 @@ distribution(y) <- normal(mu, sigma)
 # Compile
 m <- model(alpha, beta, sigma)
 print(m)
-#> gretaR model
-#>   Free parameters: 3 (3 total elements)
-#>   Variables:
-#>     alpha ~ normal [1 x 1]
-#>     beta ~ normal [1 x 1]
-#>     sigma ~ half_cauchy [1 x 1]
-#>   Likelihood terms: 1
 ```
 
 ``` r
+
 # Sample
 draws <- mcmc(m, n_samples = 1000, warmup = 1000, chains = 4)
 summary(draws)
@@ -138,20 +125,20 @@ summary(draws)
 
 ## Available Distributions
 
-| Function                         | Distribution        | Support              |
-|----------------------------------|---------------------|----------------------|
-| `normal(mean, sd)`               | Normal              | $( - \infty,\infty)$ |
-| `half_normal(sd)`                | Half-Normal         | $(0,\infty)$         |
-| `half_cauchy(scale)`             | Half-Cauchy         | $(0,\infty)$         |
-| `student_t(df, mu, sigma)`       | Student-t           | $( - \infty,\infty)$ |
-| `uniform(lower, upper)`          | Uniform             | $(a,b)$              |
-| `exponential(rate)`              | Exponential         | $(0,\infty)$         |
-| `gamma_dist(shape, rate)`        | Gamma               | $(0,\infty)$         |
-| `beta_dist(alpha, beta)`         | Beta                | $(0,1)$              |
-| `bernoulli(prob)`                | Bernoulli           | $\{ 0,1\}$           |
-| `binomial_dist(size, prob)`      | Binomial            | $\{ 0,\ldots,n\}$    |
-| `poisson_dist(rate)`             | Poisson             | $\{ 0,1,2,\ldots\}$  |
-| `multivariate_normal(mean, cov)` | Multivariate Normal | ${\mathbb{R}}^{k}$   |
+| Function | Distribution | Support |
+|----|----|----|
+| `normal(mean, sd)` | Normal | $`(-\infty, \infty)`$ |
+| `half_normal(sd)` | Half-Normal | $`(0, \infty)`$ |
+| `half_cauchy(scale)` | Half-Cauchy | $`(0, \infty)`$ |
+| `student_t(df, mu, sigma)` | Student-t | $`(-\infty, \infty)`$ |
+| `uniform(lower, upper)` | Uniform | $`(a, b)`$ |
+| `exponential(rate)` | Exponential | $`(0, \infty)`$ |
+| `gamma_dist(shape, rate)` | Gamma | $`(0, \infty)`$ |
+| `beta_dist(alpha, beta)` | Beta | $`(0, 1)`$ |
+| `bernoulli(prob)` | Bernoulli | $`\{0, 1\}`$ |
+| `binomial_dist(size, prob)` | Binomial | $`\{0, \ldots, n\}`$ |
+| `poisson_dist(rate)` | Poisson | $`\{0, 1, 2, \ldots\}`$ |
+| `multivariate_normal(mean, cov)` | Multivariate Normal | $`\mathbb{R}^k`$ |
 
 ## Choosing a Sampler
 
@@ -161,6 +148,7 @@ summary(draws)
   NUTS tree depth is a concern.
 
 ``` r
+
 # NUTS (default)
 draws <- mcmc(m, sampler = "nuts")
 

@@ -1,5 +1,7 @@
 # Find the Maximum A Posteriori (MAP) Estimate
 
+**\[experimental\]**
+
 Optimise the log-joint density using gradient-based methods to find the
 posterior mode. Uses the Adam optimiser via torch.
 

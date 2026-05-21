@@ -64,18 +64,18 @@ Probability distributions for priors and likelihoods.
 
 MCMC samplers, variational inference, and optimisation.
 
-- [`mcmc()`](https://max578.github.io/gretaR/reference/mcmc.md) : Draw
-  MCMC Samples from a gretaR Model
-- [`hmc()`](https://max578.github.io/gretaR/reference/hmc.md) : Run HMC
-  Sampling
-- [`nuts()`](https://max578.github.io/gretaR/reference/nuts.md) : Run
-  NUTS Sampling
+- [`mcmc()`](https://max578.github.io/gretaR/reference/mcmc.md)
+  **\[experimental\]** : Draw MCMC Samples from a gretaR Model
+- [`hmc()`](https://max578.github.io/gretaR/reference/hmc.md)
+  **\[experimental\]** : Run HMC Sampling
+- [`nuts()`](https://max578.github.io/gretaR/reference/nuts.md)
+  **\[experimental\]** : Run NUTS Sampling
 - [`variational()`](https://max578.github.io/gretaR/reference/variational.md)
-  : Variational Inference (ADVI)
-- [`opt()`](https://max578.github.io/gretaR/reference/opt.md) : Find the
-  Maximum A Posteriori (MAP) Estimate
-- [`laplace()`](https://max578.github.io/gretaR/reference/laplace.md) :
-  Laplace Approximation
+  **\[experimental\]** : Variational Inference (ADVI)
+- [`opt()`](https://max578.github.io/gretaR/reference/opt.md)
+  **\[experimental\]** : Find the Maximum A Posteriori (MAP) Estimate
+- [`laplace()`](https://max578.github.io/gretaR/reference/laplace.md)
+  **\[experimental\]** : Laplace Approximation
 
 ## Custom & Mixture
 
@@ -91,7 +91,7 @@ User-defined distributions and mixture models.
 High-level formula-based model specification.
 
 - [`gretaR_glm()`](https://max578.github.io/gretaR/reference/gretaR_glm.md)
-  : Fit a Bayesian GLM Using Formula Syntax
+  **\[experimental\]** : Fit a Bayesian GLM Using Formula Syntax
 - [`parse_re_bars()`](https://max578.github.io/gretaR/reference/parse_re_bars.md)
   : Parse random effects bar terms from an lme4-style formula
 - [`remove_re_bars()`](https://max578.github.io/gretaR/reference/remove_re_bars.md)

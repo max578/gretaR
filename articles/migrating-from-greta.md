@@ -36,26 +36,26 @@ The table below maps the most common greta operations to their gretaR
 equivalents. Where the syntax is identical, migration requires no code
 changes at all.
 
-| Task                    | greta                                             | gretaR                                          | Notes                                                                              |
-|:------------------------|:--------------------------------------------------|:------------------------------------------------|:-----------------------------------------------------------------------------------|
-| Data wrapping           | `greta::as_data(x)`                               | `gretaR::as_data(x)`                            | Identical API                                                                      |
-| Variable creation       | `greta::variable(lower, upper, dim)`              | `gretaR::variable(lower, upper, dim)`           | Identical API                                                                      |
-| Normal distribution     | `greta::normal(mean, sd)`                         | `gretaR::normal(mean, sd)`                      | Identical API                                                                      |
-| Half-Cauchy             | `greta::cauchy(0, scale, truncation = c(0, Inf))` | `gretaR::half_cauchy(scale)`                    | Dedicated constructor in gretaR                                                    |
-| Student-t               | `greta::student(df, mu, sigma)`                   | `gretaR::student_t(df, mu, sigma)`              | Name differs slightly                                                              |
-| Gamma                   | `greta::gamma(shape, rate)`                       | `gretaR::gamma_dist(shape, rate)`               | Renamed to avoid masking [`base::gamma()`](https://rdrr.io/r/base/Special.html)    |
-| Beta                    | `greta::beta(shape1, shape2)`                     | `gretaR::beta_dist(alpha, beta)`                | Renamed to avoid masking [`base::beta()`](https://rdrr.io/r/base/Special.html)     |
-| Poisson                 | `greta::poisson(lambda)`                          | `gretaR::poisson_dist(rate)`                    | Renamed to avoid masking [`stats::poisson()`](https://rdrr.io/r/stats/family.html) |
-| Uniform                 | `greta::uniform(min, max)`                        | `gretaR::uniform(lower, upper)`                 | Parameter names differ                                                             |
-| Bernoulli               | `greta::bernoulli(prob)`                          | `gretaR::bernoulli(prob)`                       | Identical API                                                                      |
-| Binomial                | `greta::binomial(size, prob)`                     | `gretaR::binomial_dist(size, prob)`             | Renamed to avoid masking [`stats::binomial`](https://rdrr.io/r/stats/family.html)  |
-| Exponential             | `greta::exponential(rate)`                        | `gretaR::exponential(rate)`                     | Identical API                                                                      |
-| Multivariate normal     | `greta::multivariate_normal(mean, Sigma)`         | `gretaR::multivariate_normal(mean, covariance)` | Identical API                                                                      |
-| Dirichlet               | `greta::dirichlet(alpha)`                         | `gretaR::dirichlet(concentration)`              | Parameter name differs                                                             |
-| LKJ correlation         | `greta::lkj_correlation(eta, dimension)`          | `gretaR::lkj_correlation(eta, dim)`             | Parameter name differs                                                             |
-| Distribution assignment | `distribution(y) <- normal(mu, sigma)`            | `distribution(y) <- normal(mu, sigma)`          | Identical syntax                                                                   |
-| Model creation          | `greta::model(...)`                               | `gretaR::model(...)`                            | Identical API                                                                      |
-| MCMC sampling           | `greta::mcmc(model)`                              | `gretaR::mcmc(model)`                           | Arguments differ (see below)                                                       |
+| Task | greta | gretaR | Notes |
+|:---|:---|:---|:---|
+| Data wrapping | `greta::as_data(x)` | `gretaR::as_data(x)` | Identical API |
+| Variable creation | `greta::variable(lower, upper, dim)` | `gretaR::variable(lower, upper, dim)` | Identical API |
+| Normal distribution | `greta::normal(mean, sd)` | `gretaR::normal(mean, sd)` | Identical API |
+| Half-Cauchy | `greta::cauchy(0, scale, truncation = c(0, Inf))` | `gretaR::half_cauchy(scale)` | Dedicated constructor in gretaR |
+| Student-t | `greta::student(df, mu, sigma)` | `gretaR::student_t(df, mu, sigma)` | Name differs slightly |
+| Gamma | `greta::gamma(shape, rate)` | `gretaR::gamma_dist(shape, rate)` | Renamed to avoid masking [`base::gamma()`](https://rdrr.io/r/base/Special.html) |
+| Beta | `greta::beta(shape1, shape2)` | `gretaR::beta_dist(alpha, beta)` | Renamed to avoid masking [`base::beta()`](https://rdrr.io/r/base/Special.html) |
+| Poisson | `greta::poisson(lambda)` | `gretaR::poisson_dist(rate)` | Renamed to avoid masking [`stats::poisson()`](https://rdrr.io/r/stats/family.html) |
+| Uniform | `greta::uniform(min, max)` | `gretaR::uniform(lower, upper)` | Parameter names differ |
+| Bernoulli | `greta::bernoulli(prob)` | `gretaR::bernoulli(prob)` | Identical API |
+| Binomial | `greta::binomial(size, prob)` | `gretaR::binomial_dist(size, prob)` | Renamed to avoid masking [`stats::binomial`](https://rdrr.io/r/stats/family.html) |
+| Exponential | `greta::exponential(rate)` | `gretaR::exponential(rate)` | Identical API |
+| Multivariate normal | `greta::multivariate_normal(mean, Sigma)` | `gretaR::multivariate_normal(mean, covariance)` | Identical API |
+| Dirichlet | `greta::dirichlet(alpha)` | `gretaR::dirichlet(concentration)` | Parameter name differs |
+| LKJ correlation | `greta::lkj_correlation(eta, dimension)` | `gretaR::lkj_correlation(eta, dim)` | Parameter name differs |
+| Distribution assignment | `distribution(y) <- normal(mu, sigma)` | `distribution(y) <- normal(mu, sigma)` | Identical syntax |
+| Model creation | `greta::model(...)` | `gretaR::model(...)` | Identical API |
+| MCMC sampling | `greta::mcmc(model)` | `gretaR::mcmc(model)` | Arguments differ (see below) |
 
 ### Distributions unique to gretaR
 
@@ -83,6 +83,7 @@ installation failures. gretaR replaces the entire Python stack with
 with pre-built binaries for macOS, Linux, and Windows.
 
 ``` r
+
 # greta — requires Python + TensorFlow
 # install.packages("greta")
 # greta::install_greta_deps()  # can fail in many creative ways
@@ -109,6 +110,7 @@ greta provides only
 (HMC/NUTS). gretaR adds three more:
 
 ``` r
+
 m <- model(mu, sigma)
 
 # MCMC (HMC or NUTS) — same as greta
@@ -141,6 +143,7 @@ a high-level convenience function for fitting Bayesian generalised
 linear models using standard R formula syntax:
 
 ``` r
+
 # Bayesian linear regression in one call
 fit <- gretaR_glm(
   Sepal.Length ~ Sepal.Width + Petal.Length,
@@ -170,11 +173,11 @@ greta uses names like [`gamma()`](https://rdrr.io/r/base/Special.html),
 [`poisson()`](https://rdrr.io/r/stats/family.html) that mask base R
 functions. gretaR avoids this by appending `_dist`:
 
-| greta                  | gretaR                    | Reason                                                                   |
-|:-----------------------|:--------------------------|:-------------------------------------------------------------------------|
-| `gamma(shape, rate)`   | `gamma_dist(shape, rate)` | Avoids masking [`base::gamma()`](https://rdrr.io/r/base/Special.html)    |
-| `beta(shape1, shape2)` | `beta_dist(alpha, beta)`  | Avoids masking [`base::beta()`](https://rdrr.io/r/base/Special.html)     |
-| `poisson(lambda)`      | `poisson_dist(rate)`      | Avoids masking [`stats::poisson()`](https://rdrr.io/r/stats/family.html) |
+| greta | gretaR | Reason |
+|:---|:---|:---|
+| `gamma(shape, rate)` | `gamma_dist(shape, rate)` | Avoids masking [`base::gamma()`](https://rdrr.io/r/base/Special.html) |
+| `beta(shape1, shape2)` | `beta_dist(alpha, beta)` | Avoids masking [`base::beta()`](https://rdrr.io/r/base/Special.html) |
+| `poisson(lambda)` | `poisson_dist(rate)` | Avoids masking [`stats::poisson()`](https://rdrr.io/r/stats/family.html) |
 
 ### 6. Sparse matrix support
 
@@ -185,6 +188,7 @@ important for large, sparse design matrices common in ecology, genomics,
 and spatial models.
 
 ``` r
+
 library(Matrix)
 X_sparse <- sparseMatrix(i = c(1, 2, 3), j = c(1, 2, 3), x = 1.0, dims = c(3, 3))
 X <- as_data(X_sparse)
@@ -200,6 +204,7 @@ objects, which integrate directly with the modern **posterior** and
 **bayesplot** ecosystems.
 
 ``` r
+
 # greta
 draws <- greta::mcmc(m)
 class(draws)
@@ -217,6 +222,7 @@ bayesplot::mcmc_trace(draws)
 If your downstream code expects `coda::mcmc.list`, convert with:
 
 ``` r
+
 coda_draws <- posterior::as_mcmc.list(draws)
 ```
 
@@ -225,16 +231,16 @@ coda_draws <- posterior::as_mcmc.list(draws)
 The [`mcmc()`](https://max578.github.io/gretaR/reference/mcmc.md)
 signatures are similar but not identical:
 
-| Argument    | greta                                                                                                                                | gretaR                        | Default    |
-|:------------|:-------------------------------------------------------------------------------------------------------------------------------------|:------------------------------|:-----------|
-| Samples     | `n_samples`                                                                                                                          | `n_samples`                   | 1000       |
-| Warmup      | `warmup`                                                                                                                             | `warmup`                      | 1000       |
-| Chains      | `chains`                                                                                                                             | `chains`                      | 4          |
-| Sampler     | `sampler = hmc()` or `sampler = nuts()`                                                                                              | `sampler = "nuts"` or `"hmc"` | NUTS       |
-| Verbose     | `verbose`                                                                                                                            | `verbose`                     | TRUE       |
-| Step size   | Set inside [`hmc()`](https://max578.github.io/gretaR/reference/hmc.md)/[`nuts()`](https://max578.github.io/gretaR/reference/nuts.md) | `step_size`                   | Auto-tuned |
-| Tree depth  | Set inside [`nuts()`](https://max578.github.io/gretaR/reference/nuts.md)                                                             | `max_treedepth`               | 10         |
-| Accept rate | Set inside sampler                                                                                                                   | `target_accept`               | 0.8 (NUTS) |
+| Argument | greta | gretaR | Default |
+|:---|:---|:---|:---|
+| Samples | `n_samples` | `n_samples` | 1000 |
+| Warmup | `warmup` | `warmup` | 1000 |
+| Chains | `chains` | `chains` | 4 |
+| Sampler | `sampler = hmc()` or `sampler = nuts()` | `sampler = "nuts"` or `"hmc"` | NUTS |
+| Verbose | `verbose` | `verbose` | TRUE |
+| Step size | Set inside [`hmc()`](https://max578.github.io/gretaR/reference/hmc.md)/[`nuts()`](https://max578.github.io/gretaR/reference/nuts.md) | `step_size` | Auto-tuned |
+| Tree depth | Set inside [`nuts()`](https://max578.github.io/gretaR/reference/nuts.md) | `max_treedepth` | 10 |
+| Accept rate | Set inside sampler | `target_accept` | 0.8 (NUTS) |
 
 In greta, sampler configuration is done via sampler objects passed to
 [`mcmc()`](https://max578.github.io/gretaR/reference/mcmc.md). In
@@ -249,6 +255,7 @@ side by side.
 ### greta version
 
 ``` r
+
 library(greta)
 
 # Simulate data
@@ -281,6 +288,7 @@ summary(draws)
 ### gretaR version
 
 ``` r
+
 library(gretaR)
 
 # Simulate data

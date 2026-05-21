@@ -1,8 +1,10 @@
 # Remove random effects bar terms from a formula
 
 Returns the fixed-effects-only formula by stripping all `(expr|group)`
-terms. If lme4 is installed, delegates to `lme4::nobars()`; otherwise
-uses regex substitution.
+terms. If reformulas is installed, delegates to
+[`reformulas::nobars()`](https://rdrr.io/pkg/reformulas/man/nobars.html);
+otherwise falls back to `lme4::nobars()`, and finally to regex
+substitution.
 
 ## Usage
 
@@ -24,9 +26,7 @@ A formula with bar terms removed.
 
 ``` r
 remove_re_bars(y ~ x + (1 | group))
-#> Warning: the ‘nobars’ function has moved to the reformulas package. Please update your imports, or ask an upstream package maintainer to do so.
-#> This warning is displayed once per session.
 #> y ~ x
-#> <environment: 0x55fba52a4c18>
+#> <environment: 0x55acb8fb4060>
 # y ~ x
 ```

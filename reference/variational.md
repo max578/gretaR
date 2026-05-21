@@ -1,5 +1,7 @@
 # Variational Inference (ADVI)
 
+**\[experimental\]**
+
 Fit a model using Automatic Differentiation Variational Inference.
 Approximates the posterior with a multivariate Gaussian in unconstrained
 parameter space.

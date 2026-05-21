@@ -11,17 +11,17 @@ observation.
 
 Consider data from `J` groups, each with `n_j` observations:
 
-$$y_{ij} = \alpha_{j} + \epsilon_{ij},\quad\epsilon_{ij} \sim N\left( 0,\sigma^{2} \right)$$
+``` math
+y_{ij} = \alpha_j + \epsilon_{ij}, \quad \epsilon_{ij} \sim N(0, \sigma^2)
+```
 
-$$\alpha_{j} \sim N\left( \mu,\tau^{2} \right)$$
+``` math
+\alpha_j \sim N(\mu, \tau^2)
+```
 
 ``` r
+
 library(gretaR)
-#> 
-#> Attaching package: 'gretaR'
-#> The following object is masked from 'package:base':
-#> 
-#>     %*%
 
 # Simulate grouped data
 set.seed(42)
@@ -48,14 +48,6 @@ distribution(y) <- normal(fitted_vals, sigma)
 
 m <- model(mu, tau, sigma, alpha)
 print(m)
-#> gretaR model
-#>   Free parameters: 4 (8 total elements)
-#>   Variables:
-#>     mu ~ normal [1 x 1]
-#>     tau ~ half_cauchy [1 x 1]
-#>     sigma ~ half_cauchy [1 x 1]
-#>     alpha ~ normal [5 x 1]
-#>   Likelihood terms: 1
 ```
 
 The `alpha[group_id]` syntax creates an operation node in the DAG that
@@ -63,6 +55,7 @@ selects the appropriate group-level parameter for each observation. This
 is equivalent to the indexing notation used in Stan and JAGS.
 
 ``` r
+
 # Fit with NUTS
 draws <- mcmc(m, n_samples = 1000, warmup = 1000, chains = 4)
 summary(draws)
@@ -72,11 +65,16 @@ summary(draws)
 
 Extend to include a group-level slope:
 
-$$y_{ij} = \alpha_{j} + \beta_{j}x_{ij} + \epsilon_{ij}$$
+``` math
+y_{ij} = \alpha_j + \beta_j x_{ij} + \epsilon_{ij}
+```
 
-$$\alpha_{j} \sim N\left( \mu_{\alpha},\tau_{\alpha}^{2} \right),\quad\beta_{j} \sim N\left( \mu_{\beta},\tau_{\beta}^{2} \right)$$
+``` math
+\alpha_j \sim N(\mu_\alpha, \tau_\alpha^2), \quad \beta_j \sim N(\mu_\beta, \tau_\beta^2)
+```
 
 ``` r
+
 reset_gretaR_env()
 set.seed(123)
 
@@ -111,17 +109,6 @@ distribution(y) <- normal(mu_y, sigma)
 
 m <- model(mu_a, mu_b, tau_a, tau_b, sigma, alpha, beta)
 print(m)
-#> gretaR model
-#>   Free parameters: 7 (21 total elements)
-#>   Variables:
-#>     mu_a ~ normal [1 x 1]
-#>     mu_b ~ normal [1 x 1]
-#>     tau_a ~ half_cauchy [1 x 1]
-#>     tau_b ~ half_cauchy [1 x 1]
-#>     sigma ~ half_cauchy [1 x 1]
-#>     alpha ~ normal [8 x 1]
-#>     beta ~ normal [8 x 1]
-#>   Likelihood terms: 1
 ```
 
 ## Using MAP for Quick Estimates
@@ -131,6 +118,7 @@ For quick model checking, use
 MAP estimate:
 
 ``` r
+
 fit <- opt(m, verbose = TRUE)
 fit$par
 ```
@@ -140,6 +128,7 @@ fit$par
 For faster approximate inference:
 
 ``` r
+
 fit <- variational(m, method = "meanfield", max_iter = 3000)
 fit$mean
 fit$sd
@@ -151,6 +140,7 @@ summary(fit$draws)
 For standard GLMs, use the formula interface:
 
 ``` r
+
 # Simple linear regression via formula
 dat <- data.frame(y = y_obs, x = x_obs, group = factor(group_id))
 fit <- gretaR_glm(y ~ x, data = dat, family = "gaussian", sampler = "map")

@@ -1,5 +1,7 @@
 # Draw MCMC Samples from a gretaR Model
 
+**\[experimental\]**
+
 Run Hamiltonian Monte Carlo or the No-U-Turn Sampler on a compiled
 `gretaR_model` and return posterior draws in a format compatible with
 the `posterior` and `bayesplot` packages.

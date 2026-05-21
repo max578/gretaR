@@ -28,6 +28,7 @@ independently.
 ## 1. Installation and Setup
 
 ``` r
+
 # Install from GitHub
 remotes::install_github("max578/gretaR")
 
@@ -45,6 +46,7 @@ gretaR models are built from three types of objects:
 ### Data nodes — fixed observations
 
 ``` r
+
 library(gretaR)
 
 # Vectors become n x 1 matrices
@@ -65,6 +67,7 @@ try(as_data(c(1, NA, 3)))
 ### Variable nodes — parameters to estimate
 
 ``` r
+
 # Unconstrained variable
 v <- variable()
 
@@ -81,6 +84,7 @@ v_vec <- variable(dim = c(5, 1))
 ### Distribution nodes — priors and likelihoods
 
 ``` r
+
 # Priors: create variable nodes with distributions
 mu <- normal(0, 10)          # mu ~ N(0, 10)
 sigma <- half_cauchy(2)      # sigma ~ HalfCauchy(2), constrained > 0
@@ -98,6 +102,7 @@ print(m)
 ### Operations — build the computation graph
 
 ``` r
+
 reset_gretaR_env()
 
 # Arithmetic
@@ -124,6 +129,7 @@ trig <- sin(alpha) + cos(beta)   # trigonometric
 ### Linear regression
 
 ``` r
+
 reset_gretaR_env()
 set.seed(42)
 
@@ -157,6 +163,7 @@ coef(fit)
 ### Accessing results
 
 ``` r
+
 # Posterior summary table
 summary(fit)
 
@@ -177,6 +184,7 @@ constraint and transform for unconstrained sampling.
 ### Continuous distributions
 
 ``` r
+
 reset_gretaR_env()
 
 # Unbounded (identity transform)
@@ -217,6 +225,7 @@ x15 <- wishart(df = 5, scale_matrix = diag(3))
 ### Discrete distributions (used as likelihoods)
 
 ``` r
+
 reset_gretaR_env()
 
 p <- beta_dist(2, 5)
@@ -246,6 +255,7 @@ samples in unconstrained space. You never need to think about this
 unless debugging.
 
 ``` r
+
 reset_gretaR_env()
 
 # Positive parameter → LogTransform (samples on log scale)
@@ -270,6 +280,7 @@ mu <- normal(0, 10)     # no constraint
 ### MAP — fast point estimates
 
 ``` r
+
 reset_gretaR_env()
 set.seed(42)
 y_obs <- rnorm(200, 5, 2)
@@ -290,6 +301,7 @@ coef(fit_map)
 ### Laplace — approximate posterior with covariance
 
 ``` r
+
 # Laplace approximation (uses MAP + Hessian)
 fit_lap <- laplace(m)
 fit_lap$par         # posterior means
@@ -301,6 +313,7 @@ fit_lap$log_evidence  # approximate log marginal likelihood
 ## 7. Variational Inference (ADVI)
 
 ``` r
+
 reset_gretaR_env()
 set.seed(42)
 
@@ -329,6 +342,7 @@ The `[` indexing operator enables multi-level models.
 ### Random intercepts
 
 ``` r
+
 reset_gretaR_env()
 set.seed(42)
 
@@ -361,6 +375,7 @@ print(fit)
 ### Random intercepts + slopes
 
 ``` r
+
 reset_gretaR_env()
 set.seed(42)
 
@@ -395,6 +410,7 @@ provides a high-level interface using standard R formulas.
 ### Gaussian linear model
 
 ``` r
+
 fit <- gretaR_glm(
   Sepal.Length ~ Sepal.Width + Petal.Length,
   data = iris,
@@ -408,6 +424,7 @@ coef(fit)
 ### Logistic regression
 
 ``` r
+
 set.seed(42)
 dat <- data.frame(
   x1 = rnorm(200), x2 = rnorm(200)
@@ -422,6 +439,7 @@ coef(fit)
 ### Poisson regression
 
 ``` r
+
 dat <- data.frame(x = rnorm(150))
 dat$y <- rpois(150, exp(1 + 0.5 * dat$x))
 
@@ -433,6 +451,7 @@ coef(fit)
 ### Custom priors
 
 ``` r
+
 fit <- gretaR_glm(
   Sepal.Length ~ Sepal.Width,
   data = iris,
@@ -450,6 +469,7 @@ fit <- gretaR_glm(
 lme4-style random effects are parsed via regex (lme4 not required).
 
 ``` r
+
 set.seed(42)
 dat <- data.frame(
   y = rnorm(120),
@@ -475,6 +495,7 @@ Full mgcv spline syntax is supported via the `smooth2random`
 decomposition.
 
 ``` r
+
 set.seed(42)
 n <- 200
 dat <- data.frame(x = runif(n, 0, 2 * pi))
@@ -518,6 +539,7 @@ All 21 mgcv basis types work, including:
 Define distributions with any torch-differentiable log-probability.
 
 ``` r
+
 reset_gretaR_env()
 
 # Laplace distribution (not built in)
@@ -551,6 +573,7 @@ Finite mixtures use log-sum-exp marginalisation over discrete
 components.
 
 ``` r
+
 reset_gretaR_env()
 set.seed(42)
 
@@ -587,6 +610,7 @@ coef(fit)
 Large, sparse design matrices are handled efficiently.
 
 ``` r
+
 library(Matrix)
 reset_gretaR_env()
 
@@ -613,6 +637,7 @@ Use Stan’s compiled C++ sampler for 30-150x faster inference on standard
 models.
 
 ``` r
+
 reset_gretaR_env()
 set.seed(42)
 
@@ -644,19 +669,20 @@ coef(fit_stan_map)
 
 #### When to use which backend
 
-| Scenario             | Backend                                                                 | Why                                         |
-|----------------------|-------------------------------------------------------------------------|---------------------------------------------|
-| Production inference | `"stan"`                                                                | 30-150x faster for standard models          |
-| Custom distributions | `"torch"`                                                               | Stan can’t express arbitrary torch log_prob |
-| GPU models           | `"torch"`                                                               | Stan has no GPU support                     |
-| Quick prototyping    | `"torch"` + [`opt()`](https://max578.github.io/gretaR/reference/opt.md) | No compilation wait                         |
-| Hierarchical models  | `"stan"`                                                                | Massive speedup (100x+)                     |
+| Scenario | Backend | Why |
+|----|----|----|
+| Production inference | `"stan"` | 30-150x faster for standard models |
+| Custom distributions | `"torch"` | Stan can’t express arbitrary torch log_prob |
+| GPU models | `"torch"` | Stan has no GPU support |
+| Quick prototyping | `"torch"` + [`opt()`](https://max578.github.io/gretaR/reference/opt.md) | No compilation wait |
+| Hierarchical models | `"stan"` | Massive speedup (100x+) |
 
 ## 16. The Unified Output Object
 
 All inference functions return a `gretaR_fit` object.
 
 ``` r
+
 # Same structure regardless of method
 fit <- mcmc(m, backend = "torch")  # or "stan", opt(), variational(), laplace()
 
@@ -682,6 +708,7 @@ plot(fit, "neff")     # ESS ratio plot
 ## 17. Diagnostics and Plotting
 
 ``` r
+
 # Check convergence
 fit$convergence$max_rhat       # < 1.05 is good
 fit$convergence$min_ess        # > 400 is adequate
@@ -708,6 +735,7 @@ library(loo)
 ### Choose the right inference method
 
 ``` r
+
 # Fastest to slowest:
 # 1. MAP: opt(m)                    ~seconds
 # 2. Laplace: laplace(m)            ~seconds
@@ -724,6 +752,7 @@ library(loo)
 ### Non-centred parameterisation for hierarchical models
 
 ``` r
+
 # BAD: centred parameterisation (funnel geometry)
 # alpha <- normal(mu, tau, dim = c(J, 1))
 
@@ -735,6 +764,7 @@ alpha <- mu + tau * z_raw
 ### Use Stan backend for hierarchical models
 
 ``` r
+
 # The Stan backend is 30-150x faster for standard models.
 # Always prefer backend = "stan" for production runs on
 # models that use standard distributions.
@@ -744,6 +774,7 @@ fit <- mcmc(m, backend = "stan", n_samples = 2000, warmup = 1000)
 ### Reset the environment between models
 
 ``` r
+
 # Always call reset_gretaR_env() before defining a new model.
 # This clears the global DAG and prevents node ID collisions.
 reset_gretaR_env()

@@ -31,9 +31,11 @@ Useful links:
 
 - <https://github.com/max578/gretaR>
 
+- <https://max578.github.io/gretaR/>
+
 - Report bugs at <https://github.com/max578/gretaR/issues>
 
 ## Author
 
 **Maintainer**: Max Moldovan <max.moldovan@adelaide.edu.au>
-([ORCID](https://orcid.org/0000-0001-9680-8474))
+([ORCID](https://orcid.org/0000-0001-9680-8474)) \[copyright holder\]

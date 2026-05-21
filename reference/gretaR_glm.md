@@ -1,5 +1,7 @@
 # Fit a Bayesian GLM Using Formula Syntax
 
+**\[experimental\]**
+
 A high-level interface for specifying and fitting generalised linear
 models (including mixed / hierarchical models) using standard R formula
 syntax. Internally translates to the gretaR DSL, constructs the model,

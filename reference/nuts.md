@@ -1,5 +1,7 @@
 # Run NUTS Sampling
 
+**\[experimental\]**
+
 Convenience wrapper around
 [`mcmc`](https://max578.github.io/gretaR/reference/mcmc.md) that selects
 the No-U-Turn Sampler (NUTS).
