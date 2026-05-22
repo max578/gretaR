@@ -103,8 +103,16 @@ model <- function(..., precision = c("float32", "float64")) {
     if (!is.null(dist) && isFALSE(dist$samplable)) {
       cli_abort(c(
         "{.fn {dist$name}} cannot yet be sampled as a latent variable.",
-        "x" = "Its constrained support (simplex / correlation matrix / SPD) requires a proper bijective transform not implemented in this release.",
-        "i" = "You may still use {.fn {dist$name}} for log-prob evaluation, fixed-value computation, or as part of a likelihood. Latent sampling is planned for v0.3."
+        "x" = paste(
+          "Its constrained support (simplex / correlation matrix / SPD)",
+          "requires a proper bijective transform not implemented in this",
+          "release."
+        ),
+        "i" = paste(
+          "You may still use {.fn {dist$name}} for log-prob evaluation,",
+          "fixed-value computation, or as part of a likelihood. Latent",
+          "sampling is planned for v0.3."
+        )
       ))
     }
   }

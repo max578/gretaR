@@ -23,11 +23,14 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::revdepcheck
+          extra-packages: |
+            github::r-lib/revdepcheck
           needs: check
 
       - name: Run revdep check
         run: |
+          # No CRAN reverse dependencies yet — revdep_check() is effectively a
+          # no-op until gretaR is published. Wired now so the gate exists.
           revdepcheck::revdep_check(num_workers = 2, timeout = as.difftime(60, units = "mins"))
         shell: Rscript {0}
 

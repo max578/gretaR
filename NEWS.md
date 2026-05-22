@@ -60,7 +60,7 @@ externally-released version.
 
 ## Tests
 
-* `tests/testthat/test-audit-2026-05-22.R` adds 14 regression tests
+* `tests/testthat/test-audit-2026-05-22.R` adds 17 regression tests
   covering every audit finding.
 
 # gretaR 0.2.0

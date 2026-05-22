@@ -323,10 +323,18 @@ gretaR_glm <- function(formula, data, family = c("gaussian", "binomial", "poisso
         # We need to index tau and z_raw per column.
         # For now, use separate tau/z_raw per coefficient to keep it simple.
         # This is handled below in the restructured approach.
+        slopes_txt <- paste(rt$slope_vars, collapse = " + ")
         cli_abort(c(
           "Correlated random intercept + slope terms are not yet supported.",
-          "x" = "{.code ({rt$lhs} | {rt$group})} requires a correlation transform planned for v0.3.",
-          "i" = "Workaround: split the term, e.g. {.code (1|{rt$group}) + (0 + {paste(rt$slope_vars, collapse=' + ')}|{rt$group})}, which fits intercept and slope as independent random effects."
+          "x" = paste(
+            "{.code ({rt$lhs} | {rt$group})} requires a correlation",
+            "transform planned for v0.3."
+          ),
+          "i" = paste(
+            "Workaround: split the term, e.g.",
+            "{.code (1|{rt$group}) + (0 + {slopes_txt}|{rt$group})},",
+            "which fits intercept and slope as independent random effects."
+          )
         ))
       }
 

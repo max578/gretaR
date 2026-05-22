@@ -103,6 +103,8 @@ reference:
     desc: S3 methods and operators on gretaR objects.
     contents:
       - "`%*%`"
+      - sum.gretaR_array
+      - mean.gretaR_array
       - print.gretaR_fit
       - summary.gretaR_fit
       - coef.gretaR_fit
