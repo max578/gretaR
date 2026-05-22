@@ -13,7 +13,7 @@ distribution is uniform over valid correlation matrices."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">gretaR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -79,9 +79,11 @@ around the identity matrix; values &lt; 1 favour extreme correlations.</p></dd>
     </div>
     <div class="section level2">
     <h2 id="note">Note<a class="anchor" aria-label="anchor" href="#note"></a></h2>
-    <p>Simplex/correlation transforms and efficient sampling are
-deferred to Phase 3. The current implementation uses an identity
-transform and stub sampling (returns identity matrices).</p>
+    <p>Latent (sampled) LKJ variables are not yet supported because a
+correct correlation-matrix transform (LKJ-Cholesky with the matching
+Jacobian) is not yet implemented. <code><a href="model.html">model()</a></code> will error if an LKJ
+variable is reachable as a free parameter. The distribution can still
+be evaluated (<code>log_prob</code>); sampler-ready support is planned for v0.3.</p>
     </div>
 
     <div class="section level2">

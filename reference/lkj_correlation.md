@@ -28,9 +28,13 @@ A `gretaR_array` representing a correlation matrix.
 
 ## Note
 
-Simplex/correlation transforms and efficient sampling are deferred to
-Phase 3. The current implementation uses an identity transform and stub
-sampling (returns identity matrices).
+Latent (sampled) LKJ variables are not yet supported because a correct
+correlation-matrix transform (LKJ-Cholesky with the matching Jacobian)
+is not yet implemented.
+[`model()`](https://max578.github.io/gretaR/reference/model.md) will
+error if an LKJ variable is reachable as a free parameter. The
+distribution can still be evaluated (`log_prob`); sampler-ready support
+is planned for v0.3.
 
 ## Examples
 

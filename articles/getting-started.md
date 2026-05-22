@@ -34,6 +34,11 @@ the mean and standard deviation.
 ``` r
 
 library(gretaR)
+#> 
+#> Attaching package: 'gretaR'
+#> The following object is masked from 'package:base':
+#> 
+#>     %*%
 
 # Simulate data
 set.seed(42)
@@ -52,6 +57,12 @@ distribution(y) <- normal(mu, sigma)
 # Compile model
 m <- model(mu, sigma)
 print(m)
+#> gretaR model
+#>   Free parameters: 2 (2 total elements)
+#>   Variables:
+#>     mu ~ normal [1 x 1]
+#>     sigma ~ half_cauchy [1 x 1]
+#>   Likelihood terms: 1
 ```
 
 ``` r
@@ -94,6 +105,13 @@ distribution(y) <- normal(mu, sigma)
 # Compile
 m <- model(alpha, beta, sigma)
 print(m)
+#> gretaR model
+#>   Free parameters: 3 (3 total elements)
+#>   Variables:
+#>     alpha ~ normal [1 x 1]
+#>     beta ~ normal [1 x 1]
+#>     sigma ~ half_cauchy [1 x 1]
+#>   Likelihood terms: 1
 ```
 
 ``` r

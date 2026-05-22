@@ -273,6 +273,10 @@ S3 methods and operators on gretaR objects.
 
 - [`` `%*%` ``](https://max578.github.io/gretaR/reference/grapes-times-grapes.md)
   : Matrix multiplication with gretaR_array support
+- [`sum(`*`<gretaR_array>`*`)`](https://max578.github.io/gretaR/reference/sum.gretaR_array.md)
+  : Sum of a gretaR_array
+- [`mean(`*`<gretaR_array>`*`)`](https://max578.github.io/gretaR/reference/mean.gretaR_array.md)
+  : Mean of a gretaR_array
 - [`print(`*`<gretaR_fit>`*`)`](https://max578.github.io/gretaR/reference/print.gretaR_fit.md)
   : Print a gretaR Fit Object
 - [`summary(`*`<gretaR_fit>`*`)`](https://max578.github.io/gretaR/reference/summary.gretaR_fit.md)

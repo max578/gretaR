@@ -25,6 +25,16 @@ dirichlet(concentration, dim = NULL)
 
 A `gretaR_array` with support on the simplex.
 
+## Note
+
+Latent (sampled) Dirichlet variables are not yet supported because a
+correct simplex transform (stick-breaking or centered softmax with the
+matching Jacobian) is not yet implemented.
+[`model()`](https://max578.github.io/gretaR/reference/model.md) will
+error if a Dirichlet variable is reachable as a free parameter. The
+distribution can still be evaluated (`log_prob`) and is planned to be
+sampler-ready in v0.3.
+
 ## Examples
 
 ``` r

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gretaR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,6 +41,46 @@
       <small>Source: <a href="https://github.com/max578/gretaR/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.2.1" id="gretar-021">gretaR 0.2.1<a class="anchor" aria-label="anchor" href="#gretar-021"></a></h2>
+<p>Correctness patch addressing findings from the 2026-05-22 audit. v0.2.0 was tagged but never submitted to CRAN; v0.2.1 supersedes it as the first externally-released version.</p>
+<div class="section level3">
+<h3 id="correctness-fixes-0-2-1">Correctness fixes<a class="anchor" aria-label="anchor" href="#correctness-fixes-0-2-1"></a></h3>
+<ul><li>
+<strong><code><a href="../reference/model.html">model()</a></code> no longer leaks unrelated variables across calls in the same R session.</strong> Variable discovery now walks parent links from the requested targets and likelihood data nodes (reachability-based), rather than enumerating every variable ever created in the global DAG. Two independent models built in one session now compile to two independent posteriors.</li>
+<li>
+<strong>Discrete latent variables (<code><a href="../reference/bernoulli.html">bernoulli()</a></code>, <code><a href="../reference/binomial_dist.html">binomial_dist()</a></code>, <code><a href="../reference/poisson_dist.html">poisson_dist()</a></code>, <code><a href="../reference/negative_binomial.html">negative_binomial()</a></code>) are rejected as HMC/NUTS targets</strong> with an actionable error pointing to observation or marginalisation. Discrete distributions as likelihood RHS (<code>distribution(y) &lt;- bernoulli(p)</code>) remain fully supported.</li>
+<li>
+<strong><code><a href="../reference/dirichlet.html">dirichlet()</a></code>, <code><a href="../reference/lkj_correlation.html">lkj_correlation()</a></code>, and <code><a href="../reference/wishart.html">wishart()</a></code> are gated as non-samplable</strong> for this release: their constrained supports (simplex, correlation matrix, positive-definite matrix) require bijective transforms not yet implemented. The new <code>samplable</code> field on <code>GretaRDistribution</code> makes this declarative; <code><a href="../reference/model.html">model()</a></code> refuses these as free variables with a clear error. Log-prob evaluation still works. Sampler-ready support is scheduled for v0.3.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="api--dispatch-0-2-1">API &amp; dispatch<a class="anchor" aria-label="anchor" href="#api--dispatch-0-2-1"></a></h3>
+<ul><li>
+<code><a href="../reference/sum.gretaR_array.html">sum.gretaR_array()</a></code> and <code><a href="../reference/mean.gretaR_array.html">mean.gretaR_array()</a></code> are now exported and registered as S3 methods. <code>sum(normal(0, 1, dim = c(3, 1)))</code> works.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="diagnostics--timing-0-2-1">Diagnostics &amp; timing<a class="anchor" aria-label="anchor" href="#diagnostics--timing-0-2-1"></a></h3>
+<ul><li>
+<code>mcmc()$run_time</code> is now the actual elapsed sampler wall-time (seconds), not a placeholder copy of <code>n_samples</code>.</li>
+<li>
+<code><a href="../reference/mcmc.html">mcmc()</a></code> divergence diagnostics now use the <strong>post-warmup</strong> window consistently. The <code>n_divergences</code> field in <code>fit$convergence</code> and the user-visible warning count exclude warmup-phase divergences. Both windows remain accessible via <code>attr(fit$draws, "divergences")</code> (post-warmup) and <code>attr(fit$draws, "warmup_divergences")</code>.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="truncation-0-2-1">Truncation<a class="anchor" aria-label="anchor" href="#truncation-0-2-1"></a></h3>
+<ul><li>
+<code>truncation_log_adjust()</code> now returns <code>-Inf</code> when an observed value falls outside <code>[lower, upper]</code>, instead of silently returning the unmodified base log-prob. Truncation is wired into the <code>log_prob</code> methods of <code><a href="../reference/normal.html">normal()</a></code>, <code><a href="../reference/student_t.html">student_t()</a></code>, <code><a href="../reference/half_normal.html">half_normal()</a></code>, <code><a href="../reference/half_cauchy.html">half_cauchy()</a></code>, <code><a href="../reference/beta_dist.html">beta_dist()</a></code>, <code><a href="../reference/gamma_dist.html">gamma_dist()</a></code>, <code><a href="../reference/exponential.html">exponential()</a></code>, <code><a href="../reference/lognormal.html">lognormal()</a></code>, and <code><a href="../reference/cauchy.html">cauchy()</a></code>. Docs now describe this as constrained sampling support — the truncated-density normalising constant <code>log(F(upper) - F(lower))</code> is not yet included, so truncated distributions should not be used for Bayes-factor / marginal likelihood comparisons. Full normalisation is planned for v0.3.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="documentation-0-2-1">Documentation<a class="anchor" aria-label="anchor" href="#documentation-0-2-1"></a></h3>
+<ul><li>
+<code><a href="../reference/gretaR_glm.html">gretaR_glm()</a></code> docs honestly describe random-effect support: <code>(1|group)</code> and <code>(0 + x | group)</code> work; correlated intercept + slope <code>(x | group)</code> raises an informative error pointing to the <code>(1|group) + (0 + x|group)</code> workaround until LKJ-Cholesky lands in v0.3.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="tests-0-2-1">Tests<a class="anchor" aria-label="anchor" href="#tests-0-2-1"></a></h3>
+<ul><li>
+<code>tests/testthat/test-audit-2026-05-22.R</code> adds 17 regression tests covering every audit finding.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.2.0" id="gretar-020">gretaR 0.2.0<a class="anchor" aria-label="anchor" href="#gretar-020"></a></h2>
 <div class="section level3">

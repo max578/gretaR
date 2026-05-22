@@ -6,9 +6,15 @@ formula syntax. Internally translates to the gretaR DSL, constructs the
 model, and runs MCMC inference.
 lme4-style random effects are supported via regex parsing (lme4 is
 not required). Recognised patterns:
-(1|group) — random intercepts by group
-(x|group) — correlated random intercepts + slopes
-(0 + x|group) — random slopes only (no intercept)
+(1|group) — random intercepts by group (supported)
+(0 + x|group) — independent random slopes, no intercept
+(supported)
+(x|group) — correlated random intercept + slope
+(not yet supported; correct support requires an LKJ
+correlation transform planned for v0.3)
+As a workaround for correlated intercept + slope, split the term:
+(1|group) + (0 + x|group) fits both as independent
+random effects.
 Multiple random effect terms are permitted, e.g.
 y ~ x + (1|site) + (1|year).
 A non-centred parameterisation is used by default for superior HMC
@@ -19,9 +25,15 @@ formula syntax. Internally translates to the gretaR DSL, constructs the
 model, and runs MCMC inference.
 lme4-style random effects are supported via regex parsing (lme4 is
 not required). Recognised patterns:
-(1|group) — random intercepts by group
-(x|group) — correlated random intercepts + slopes
-(0 + x|group) — random slopes only (no intercept)
+(1|group) — random intercepts by group (supported)
+(0 + x|group) — independent random slopes, no intercept
+(supported)
+(x|group) — correlated random intercept + slope
+(not yet supported; correct support requires an LKJ
+correlation transform planned for v0.3)
+As a workaround for correlated intercept + slope, split the term:
+(1|group) + (0 + x|group) fits both as independent
+random effects.
 Multiple random effect terms are permitted, e.g.
 y ~ x + (1|site) + (1|year).
 A non-centred parameterisation is used by default for superior HMC
@@ -33,7 +45,7 @@ geometry."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">gretaR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -75,10 +87,16 @@ linear models (including mixed / hierarchical models) using standard R
 formula syntax. Internally translates to the gretaR DSL, constructs the
 model, and runs MCMC inference.</p>
 <p>lme4-style random effects are supported via regex parsing (lme4 is
-<strong>not</strong> required). Recognised patterns:</p><ul><li><p><code>(1|group)</code> — random intercepts by group</p></li>
-<li><p><code>(x|group)</code> — correlated random intercepts + slopes</p></li>
-<li><p><code>(0 + x|group)</code> — random slopes only (no intercept)</p></li>
-</ul><p>Multiple random effect terms are permitted, e.g.
+<strong>not</strong> required). Recognised patterns:</p><ul><li><p><code>(1|group)</code> — random intercepts by group (supported)</p></li>
+<li><p><code>(0 + x|group)</code> — independent random slopes, no intercept
+(supported)</p></li>
+<li><p><code>(x|group)</code> — correlated random intercept + slope
+(<strong>not yet supported</strong>; correct support requires an LKJ
+correlation transform planned for v0.3)</p></li>
+</ul><p>As a workaround for correlated intercept + slope, split the term:
+<code>(1|group) + (0 + x|group)</code> fits both as independent
+random effects.</p>
+<p>Multiple random effect terms are permitted, e.g.
 <code>y ~ x + (1|site) + (1|year)</code>.</p>
 <p>A non-centred parameterisation is used by default for superior HMC
 geometry.</p>
@@ -212,8 +230,8 @@ auto-detected.</p></dd>
 <span class="r-in"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu">gretaR_glm</span><span class="op">(</span><span class="va">Reaction</span> <span class="op">~</span> <span class="va">Days</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span> <span class="op">|</span> <span class="va">Subject</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>                  data <span class="op">=</span> <span class="va">sleepstudy</span>, family <span class="op">=</span> <span class="st">"gaussian"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Random intercepts + slopes</span></span></span>
-<span class="r-in"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu">gretaR_glm</span><span class="op">(</span><span class="va">Reaction</span> <span class="op">~</span> <span class="va">Days</span> <span class="op">+</span> <span class="op">(</span><span class="va">Days</span> <span class="op">|</span> <span class="va">Subject</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span><span class="co"># Random intercept + independent random slope (workaround for (Days|Subject))</span></span></span>
+<span class="r-in"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu">gretaR_glm</span><span class="op">(</span><span class="va">Reaction</span> <span class="op">~</span> <span class="va">Days</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span> <span class="op">|</span> <span class="va">Subject</span><span class="op">)</span> <span class="op">+</span> <span class="op">(</span><span class="fl">0</span> <span class="op">+</span> <span class="va">Days</span> <span class="op">|</span> <span class="va">Subject</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>                  data <span class="op">=</span> <span class="va">sleepstudy</span>, family <span class="op">=</span> <span class="st">"gaussian"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 </code></pre></div>

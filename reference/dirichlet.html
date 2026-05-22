@@ -11,7 +11,7 @@ the probability simplex (non-negative, sum to one)."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">gretaR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -73,6 +73,15 @@ gretaR_array). Length determines the dimensionality of the simplex.</p></dd>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A <code>gretaR_array</code> with support on the simplex.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="note">Note<a class="anchor" aria-label="anchor" href="#note"></a></h2>
+    <p>Latent (sampled) Dirichlet variables are not yet supported because a
+correct simplex transform (stick-breaking or centered softmax with the
+matching Jacobian) is not yet implemented. <code><a href="model.html">model()</a></code> will error if a
+Dirichlet variable is reachable as a free parameter. The distribution can
+still be evaluated (<code>log_prob</code>) and is planned to be sampler-ready in
+v0.3.</p>
     </div>
 
     <div class="section level2">

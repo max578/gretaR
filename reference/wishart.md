@@ -25,7 +25,13 @@ A `gretaR_array` representing a positive-definite matrix.
 
 ## Note
 
-Full sampling via Bartlett decomposition is deferred to Phase 3.
+Latent (sampled) Wishart variables are not yet supported because a
+correct positive-definite-matrix transform (Cholesky factor with
+positive diagonal plus the matching Jacobian) is not yet implemented.
+[`model()`](https://max578.github.io/gretaR/reference/model.md) will
+error if a Wishart variable is reachable as a free parameter. The
+distribution can still be evaluated (`log_prob`); sampler-ready support
+is planned for v0.3.
 
 ## Examples
 
