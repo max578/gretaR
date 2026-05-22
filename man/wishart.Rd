@@ -19,7 +19,12 @@ The Wishart distribution over positive-definite matrices.
 Used as a prior for covariance or precision matrices.
 }
 \note{
-Full sampling via Bartlett decomposition is deferred to Phase 3.
+Latent (sampled) Wishart variables are not yet supported because a
+correct positive-definite-matrix transform (Cholesky factor with
+positive diagonal plus the matching Jacobian) is not yet implemented.
+\code{model()} will error if a Wishart variable is reachable as a free
+parameter. The distribution can still be evaluated (\code{log_prob});
+sampler-ready support is planned for v0.3.
 }
 \examples{
 \dontrun{

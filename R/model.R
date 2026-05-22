@@ -37,7 +37,6 @@ model <- function(..., precision = c("float32", "float64")) {
   mc <- match.call(expand.dots = FALSE)
   target_names <- vapply(mc[["..."]], deparse, character(1))
 
-  # Collect all free variable nodes (nodes with node_type == "variable")
   free_vars <- list()
   target_ids <- character(0)
 
@@ -55,29 +54,58 @@ model <- function(..., precision = c("float32", "float64")) {
     target_ids <- c(target_ids, node$id)
   }
 
-  # Collect likelihood terms early (needed to exclude distribution template nodes)
+  # Likelihood terms: distribution(y) <- dist assignments registered in the env
   likelihood_terms <- .gretaR_env$distributions
-
-  # Also find any variables referenced in computation that aren't targets
-  # (walk the DAG from distributions to find all variables)
-  # Exclude variable nodes used as likelihood distribution templates
   likelihood_node_ids <- character(0)
+  likelihood_data_ids <- character(0)
   for (data_id in names(likelihood_terms)) {
     lt <- likelihood_terms[[data_id]]
     lt_node <- if (inherits(lt, "gretaR_array")) get_node(lt) else lt
     if (!is.null(lt_node)) {
       likelihood_node_ids <- c(likelihood_node_ids, lt_node$id)
     }
+    likelihood_data_ids <- c(likelihood_data_ids, data_id)
   }
 
-  all_var_ids <- find_all_variables()
-  for (vid in all_var_ids) {
-    if (!vid %in% names(free_vars) && !vid %in% likelihood_node_ids) {
-      vnode <- .gretaR_env$dag$nodes[[vid]]
-      if (is.null(vnode$node_name)) {
-        vnode$node_name <- vid  # Use ID as fallback name
-      }
-      free_vars[[vid]] <- vnode
+  # Reachability walk: start from target ids + likelihood data nodes +
+  # likelihood distribution-template nodes, then walk `parents` recursively.
+  # Only variables reachable from this set become free parameters of THIS model.
+  seed_ids <- unique(c(target_ids, likelihood_data_ids, likelihood_node_ids))
+  reachable_ids <- collect_reachable_nodes(seed_ids, .gretaR_env$dag$nodes)
+
+  for (vid in reachable_ids) {
+    if (vid %in% names(free_vars) || vid %in% likelihood_node_ids) next
+    vnode <- .gretaR_env$dag$nodes[[vid]]
+    if (is.null(vnode) || vnode$node_type != "variable") next
+    if (is.null(vnode$node_name)) {
+      vnode$node_name <- vid
+    }
+    free_vars[[vid]] <- vnode
+  }
+
+  # A2: refuse discrete free variables — HMC/NUTS require continuous targets
+  for (vid in names(free_vars)) {
+    vnode <- free_vars[[vid]]
+    if (isTRUE(vnode$is_discrete)) {
+      cli_abort(c(
+        "Discrete latent variables cannot be sampled by HMC/NUTS.",
+        "x" = "{.field {vnode$node_name}} is a discrete free variable.",
+        "i" = "Use discrete variables only as observed data, or marginalise them out."
+      ))
+    }
+  }
+
+  # A3: refuse free variables whose prior distribution declares samplable = FALSE
+  # (e.g. dirichlet, lkj, wishart — pending proper simplex/correlation transforms)
+  for (vid in names(free_vars)) {
+    vnode <- free_vars[[vid]]
+    dist <- vnode$distribution
+    if (!is.null(dist) && isFALSE(dist$samplable)) {
+      cli_abort(c(
+        "{.fn {dist$name}} cannot yet be sampled as a latent variable.",
+        "x" = "Its constrained support (simplex / correlation matrix / SPD) requires a proper bijective transform not implemented in this release.",
+        "i" = "You may still use {.fn {dist$name}} for log-prob evaluation, fixed-value computation, or as part of a likelihood. Latent sampling is planned for v0.3."
+      ))
     }
   }
 
@@ -292,9 +320,58 @@ resolve_distribution_params <- function(dist_obj, dag_nodes) {
 }
 
 # =============================================================================
-# Find all variable nodes reachable from the current DAG
+# DAG reachability — used by model() to find only variables relevant to THIS
+# model's joint density, not every variable ever created in the session.
 # =============================================================================
 
+#' Walk parent links recursively from a seed set of node ids and return all
+#' node ids reachable along the parent chain (inclusive of seeds).
+#'
+#' @param seed_ids Character vector of node ids to start from.
+#' @param dag_nodes The `.gretaR_env$dag$nodes` registry.
+#' @return Character vector of reachable node ids, including the seeds.
+#' @noRd
+collect_reachable_nodes <- function(seed_ids, dag_nodes) {
+  seen <- new.env(parent = emptyenv(), hash = TRUE)
+  stack <- as.character(seed_ids)
+
+  while (length(stack) > 0L) {
+    nid <- stack[[length(stack)]]
+    stack <- stack[-length(stack)]
+    if (is.null(nid) || nchar(nid) == 0L) next
+    if (!is.null(seen[[nid]])) next
+    seen[[nid]] <- TRUE
+
+    node <- dag_nodes[[nid]]
+    if (is.null(node)) next
+
+    # Walk parents of operation/distribution/variable nodes
+    parents <- node$parents
+    if (length(parents) > 0L) {
+      stack <- c(stack, as.character(parents))
+    }
+
+    # For variable nodes carrying a prior distribution, the distribution's
+    # parameters may reference further gretaR_arrays. Pull those parent ids in.
+    dist <- node$distribution
+    if (!is.null(dist)) {
+      for (p in dist$parameters) {
+        pnode <- NULL
+        if (inherits(p, "gretaR_array")) pnode <- get_node(p)
+        else if (inherits(p, "GretaRArray")) pnode <- p
+        if (!is.null(pnode) && !is.null(pnode$id)) {
+          stack <- c(stack, pnode$id)
+        }
+      }
+    }
+  }
+
+  ls(seen)
+}
+
+#' Retained for backward compatibility with any external caller. Returns every
+#' variable node currently in the DAG; new code should use
+#' `collect_reachable_nodes()`.
 #' @noRd
 find_all_variables <- function() {
   var_ids <- character(0)

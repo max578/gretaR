@@ -20,6 +20,14 @@ Creates a variable distributed according to the Dirichlet distribution,
 the multivariate generalisation of the Beta distribution. Values lie on
 the probability simplex (non-negative, sum to one).
 }
+\note{
+Latent (sampled) Dirichlet variables are not yet supported because a
+correct simplex transform (stick-breaking or centered softmax with the
+matching Jacobian) is not yet implemented. \code{model()} will error if a
+Dirichlet variable is reachable as a free parameter. The distribution can
+still be evaluated (\code{log_prob}) and is planned to be sampler-ready in
+v0.3.
+}
 \examples{
 \dontrun{
 theta <- dirichlet(c(1, 1, 1))

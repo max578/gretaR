@@ -594,11 +594,15 @@ gretaR_matmul <- function(x, y) {
 # =============================================================================
 
 #' Sum of a gretaR_array
-#' @param x A gretaR_array.
+#'
+#' Build an operation node that reduces a `gretaR_array` to a scalar by
+#' summing over all elements.
+#'
+#' @param x A `gretaR_array`.
 #' @param ... Ignored.
 #' @param na.rm Ignored (no NAs in torch).
-#' @return A scalar gretaR_array.
-#' @noRd
+#' @return A scalar `gretaR_array`.
+#' @export
 sum.gretaR_array <- function(x, ..., na.rm = FALSE) {
   node <- get_node(x)
   result_node <- GretaRArray$new(
@@ -612,7 +616,14 @@ sum.gretaR_array <- function(x, ..., na.rm = FALSE) {
 }
 
 #' Mean of a gretaR_array
-#' @noRd
+#'
+#' Build an operation node that reduces a `gretaR_array` to a scalar by
+#' averaging over all elements.
+#'
+#' @param x A `gretaR_array`.
+#' @param ... Ignored.
+#' @return A scalar `gretaR_array`.
+#' @export
 mean.gretaR_array <- function(x, ...) {
   node <- get_node(x)
   result_node <- GretaRArray$new(

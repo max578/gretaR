@@ -40,7 +40,12 @@ new_gretaR_fit <- function(draws = NULL, model = NULL, summary = NULL,
   fit
 }
 
-#' Build convergence diagnostics from draws
+#' Build convergence diagnostics from draws.
+#'
+#' `raw_divergences` should be the **post-warmup** divergence matrix
+#' (`n_samples x chains`). Warmup divergences are not part of the reported
+#' diagnostic window — callers attach them separately via
+#' `attr(draws, "warmup_divergences")`.
 #' @noRd
 build_convergence <- function(draws, raw_divergences = NULL) {
   if (is.null(draws)) return(NULL)
@@ -65,11 +70,24 @@ build_convergence <- function(draws, raw_divergences = NULL) {
     if (!is.null(n_div)) sum(n_div, na.rm = TRUE) else 0L
   }
 
+  # Suppress "no non-missing arguments" from max/min on empty/all-NA inputs
+  # (e.g. toy 2-sample chains where rhat is undefined). Treat as NA.
+  safe_max <- function(x) {
+    if (is.null(x)) return(NA_real_)
+    finite <- x[is.finite(x)]
+    if (length(finite) == 0L) NA_real_ else max(finite)
+  }
+  safe_min <- function(x) {
+    if (is.null(x)) return(NA_real_)
+    finite <- x[is.finite(x)]
+    if (length(finite) == 0L) NA_real_ else min(finite)
+  }
+
   list(
     n_eff = n_eff,
     rhat = rhat,
-    max_rhat = if (!is.null(rhat)) max(rhat, na.rm = TRUE) else NA_real_,
-    min_ess = if (!is.null(n_eff)) min(n_eff, na.rm = TRUE) else NA_real_,
+    max_rhat = safe_max(rhat),
+    min_ess = safe_min(n_eff),
     n_divergences = n_divergences
   )
 }

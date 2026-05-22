@@ -22,9 +22,11 @@ where \eqn{R} is a correlation matrix. When \eqn{\eta = 1}, the
 distribution is uniform over valid correlation matrices.
 }
 \note{
-Simplex/correlation transforms and efficient sampling are
-deferred to Phase 3. The current implementation uses an identity
-transform and stub sampling (returns identity matrices).
+Latent (sampled) LKJ variables are not yet supported because a
+correct correlation-matrix transform (LKJ-Cholesky with the matching
+Jacobian) is not yet implemented. \code{model()} will error if an LKJ
+variable is reachable as a free parameter. The distribution can still
+be evaluated (\code{log_prob}); sampler-ready support is planned for v0.3.
 }
 \examples{
 \dontrun{

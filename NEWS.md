@@ -1,3 +1,68 @@
+# gretaR 0.2.1
+
+Correctness patch addressing findings from the 2026-05-22 audit. v0.2.0 was
+tagged but never submitted to CRAN; v0.2.1 supersedes it as the first
+externally-released version.
+
+## Correctness fixes
+
+* **`model()` no longer leaks unrelated variables across calls in the same R
+  session.** Variable discovery now walks parent links from the requested
+  targets and likelihood data nodes (reachability-based), rather than
+  enumerating every variable ever created in the global DAG. Two independent
+  models built in one session now compile to two independent posteriors.
+* **Discrete latent variables (`bernoulli()`, `binomial_dist()`,
+  `poisson_dist()`, `negative_binomial()`) are rejected as HMC/NUTS targets**
+  with an actionable error pointing to observation or marginalisation.
+  Discrete distributions as likelihood RHS (`distribution(y) <- bernoulli(p)`)
+  remain fully supported.
+* **`dirichlet()`, `lkj_correlation()`, and `wishart()` are gated as
+  non-samplable** for this release: their constrained supports (simplex,
+  correlation matrix, positive-definite matrix) require bijective transforms
+  not yet implemented. The new `samplable` field on `GretaRDistribution`
+  makes this declarative; `model()` refuses these as free variables with a
+  clear error. Log-prob evaluation still works. Sampler-ready support is
+  scheduled for v0.3.
+
+## API & dispatch
+
+* `sum.gretaR_array()` and `mean.gretaR_array()` are now exported and
+  registered as S3 methods. `sum(normal(0, 1, dim = c(3, 1)))` works.
+
+## Diagnostics & timing
+
+* `mcmc()$run_time` is now the actual elapsed sampler wall-time (seconds),
+  not a placeholder copy of `n_samples`.
+* `mcmc()` divergence diagnostics now use the **post-warmup** window
+  consistently. The `n_divergences` field in `fit$convergence` and the
+  user-visible warning count exclude warmup-phase divergences. Both windows
+  remain accessible via `attr(fit$draws, "divergences")` (post-warmup) and
+  `attr(fit$draws, "warmup_divergences")`.
+
+## Truncation
+
+* `truncation_log_adjust()` now returns `-Inf` when an observed value falls
+  outside `[lower, upper]`, instead of silently returning the unmodified base
+  log-prob. Truncation is wired into the `log_prob` methods of `normal()`,
+  `student_t()`, `half_normal()`, `half_cauchy()`, `beta_dist()`,
+  `gamma_dist()`, `exponential()`, `lognormal()`, and `cauchy()`. Docs now
+  describe this as constrained sampling support — the truncated-density
+  normalising constant `log(F(upper) - F(lower))` is not yet included, so
+  truncated distributions should not be used for Bayes-factor / marginal
+  likelihood comparisons. Full normalisation is planned for v0.3.
+
+## Documentation
+
+* `gretaR_glm()` docs honestly describe random-effect support: `(1|group)`
+  and `(0 + x | group)` work; correlated intercept + slope `(x | group)`
+  raises an informative error pointing to the
+  `(1|group) + (0 + x|group)` workaround until LKJ-Cholesky lands in v0.3.
+
+## Tests
+
+* `tests/testthat/test-audit-2026-05-22.R` adds 14 regression tests
+  covering every audit finding.
+
 # gretaR 0.2.0
 
 ## User-facing API

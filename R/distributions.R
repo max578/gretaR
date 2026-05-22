@@ -21,6 +21,11 @@ GretaRDistribution <- R6::R6Class(
     constraint = NULL,
     dim = NULL,
     truncation = NULL,
+    # Whether this distribution supports being a latent (sampled) variable.
+    # Distributions whose constrained support requires a non-trivial bijective
+    # transform we have not yet implemented (simplex, correlation matrix, SPD)
+    # set this to FALSE; model() then refuses them as free variables.
+    samplable = TRUE,
 
     initialize = function(name, parameters, constraint, dim = NULL,
                           truncation = NULL) {
@@ -47,18 +52,44 @@ GretaRDistribution <- R6::R6Class(
       cli_abort("log_prob() not implemented for base distribution.")
     },
 
-    #' Compute log_prob with truncation adjustment
-    #' Subclasses call this in their log_prob when truncation is active.
+    #' Apply support-enforcement for truncation.
+    #'
+    #' Subclasses call this in their `log_prob` when truncation is active. The
+    #' current implementation treats truncation as a sampling constraint only:
+    #' the constrained transform restricts latent variables to `[lower, upper]`,
+    #' and observed values outside `[lower, upper]` receive log-probability
+    #' `-Inf`. The normalising constant `log(F(upper) - F(lower))` is NOT
+    #' included, so the returned log-probability is the (parameter-dependent
+    #' part of the) truncated density up to that additive constant. This is
+    #' adequate for HMC/NUTS posterior sampling but should not be used for
+    #' marginal-likelihood / Bayes-factor model comparison. Proper normalised
+    #' truncation is planned for v0.3.
     #' @noRd
-    truncation_log_adjust = function(base_log_prob) {
+    truncation_log_adjust = function(base_log_prob, x = NULL) {
       if (is.null(self$truncation)) return(base_log_prob)
+      if (is.null(x)) return(base_log_prob)
 
-      # The normalising constant log(F(upper) - F(lower)) is constant
-      # w.r.t. the parameters being sampled, so it drops out of HMC.
-      # We include it for correctness in VI and model comparison.
-      # However, computing the CDF in torch for all distributions is
-      # complex, so we use the approximation that the constant is fixed.
-      # This is the same approach greta takes.
+      lo <- self$truncation[1]
+      up <- self$truncation[2]
+      out_of_support <- if (is.finite(lo) && is.finite(up)) {
+        (x < lo) | (x > up)
+      } else if (is.finite(lo)) {
+        x < lo
+      } else if (is.finite(up)) {
+        x > up
+      } else {
+        NULL
+      }
+
+      if (!is.null(out_of_support)) {
+        # `torch_any` is not exposed by the R torch binding; sum the boolean
+        # tensor cast to int and test that.
+        n_oos <- torch_sum(out_of_support$to(dtype = torch_int64()))$item()
+        if (n_oos > 0) {
+          return(torch_tensor(-Inf, dtype = base_log_prob$dtype,
+                               device = base_log_prob$device))
+        }
+      }
       base_log_prob
     },
 
@@ -117,7 +148,8 @@ NormalDistribution <- R6::R6Class(
       sigma <- torch_clamp(sigma, min = 1e-30)
       # -0.5 * log(2*pi) - log(sigma) - 0.5 * ((x - mu) / sigma)^2
       z <- (x - mu) / sigma
-      torch_sum(-0.9189385 - torch_log(sigma) - 0.5 * z * z)
+      lp <- torch_sum(-0.9189385 - torch_log(sigma) - 0.5 * z * z)
+      self$truncation_log_adjust(lp, x)
     },
 
     sample = function(n = 1L) {
@@ -177,7 +209,8 @@ HalfNormalDistribution <- R6::R6Class(
       sigma <- torch_clamp(sigma, min = 1e-30)
       # log(sqrt(2/pi)) - log(sigma) - 0.5 * (x/sigma)^2, for x >= 0
       z <- x / sigma
-      torch_sum(-0.2257914 - torch_log(sigma) - 0.5 * z * z)
+      lp <- torch_sum(-0.2257914 - torch_log(sigma) - 0.5 * z * z)
+      self$truncation_log_adjust(lp, x)
     },
 
     sample = function(n = 1L) {
@@ -231,10 +264,11 @@ HalfCauchyDistribution <- R6::R6Class(
       gamma_val <- resolve_param(self$parameters$scale)
       gamma_val <- torch_clamp(gamma_val, min = 1e-30)
       # log(2/(pi*gamma)) - log(1 + (x/gamma)^2), for x >= 0
-      torch_sum(
+      lp <- torch_sum(
         log(2) - log(pi) - torch_log(gamma_val) -
           torch_log(1 + (x / gamma_val)^2)
       )
+      self$truncation_log_adjust(lp, x)
     },
 
     sample = function(n = 1L) {
@@ -293,11 +327,12 @@ StudentTDistribution <- R6::R6Class(
       sigma <- torch_clamp(sigma, min = 1e-30)
       z <- (x - mu) / sigma
       # log-pdf of Student-t
-      torch_sum(
+      lp <- torch_sum(
         torch_lgamma((nu + 1) / 2) - torch_lgamma(nu / 2) -
           0.5 * torch_log(nu * pi) - torch_log(sigma) -
           (nu + 1) / 2 * torch_log(1 + z * z / nu)
       )
+      self$truncation_log_adjust(lp, x)
     },
 
     sample = function(n = 1L) {
@@ -570,12 +605,13 @@ GammaDistribution <- R6::R6Class(
       beta <- resolve_param(self$parameters$rate)
       alpha <- torch_clamp(alpha, min = 1e-30)
       beta <- torch_clamp(beta, min = 1e-30)
-      x <- torch_clamp(x, min = 1e-30)
+      x_clamped <- torch_clamp(x, min = 1e-30)
       # alpha*log(beta) - lgamma(alpha) + (alpha-1)*log(x) - beta*x
-      torch_sum(
+      lp <- torch_sum(
         alpha * torch_log(beta) - torch_lgamma(alpha) +
-          (alpha - 1) * torch_log(x) - beta * x
+          (alpha - 1) * torch_log(x_clamped) - beta * x_clamped
       )
+      self$truncation_log_adjust(lp, x)
     },
 
     sample = function(n = 1L) {
@@ -635,11 +671,12 @@ BetaDistribution <- R6::R6Class(
       b <- resolve_param(self$parameters$beta)
       a <- torch_clamp(a, min = 1e-30)
       b <- torch_clamp(b, min = 1e-30)
-      x <- torch_clamp(x, min = 1e-7, max = 1 - 1e-7)
-      torch_sum(
+      x_clamped <- torch_clamp(x, min = 1e-7, max = 1 - 1e-7)
+      lp <- torch_sum(
         torch_lgamma(a + b) - torch_lgamma(a) - torch_lgamma(b) +
-          (a - 1) * torch_log(x) + (b - 1) * torch_log(1 - x)
+          (a - 1) * torch_log(x_clamped) + (b - 1) * torch_log(1 - x_clamped)
       )
+      self$truncation_log_adjust(lp, x)
     },
 
     sample = function(n = 1L) {
@@ -700,7 +737,8 @@ ExponentialDistribution <- R6::R6Class(
     log_prob = function(x) {
       lambda <- resolve_param(self$parameters$rate)
       lambda <- torch_clamp(lambda, min = 1e-30)
-      torch_sum(torch_log(lambda) - lambda * x)
+      lp <- torch_sum(torch_log(lambda) - lambda * x)
+      self$truncation_log_adjust(lp, x)
     },
 
     sample = function(n = 1L) {
@@ -810,12 +848,15 @@ DirichletDistribution <- R6::R6Class(
   inherit = GretaRDistribution,
 
   public = list(
+    # Simplex support requires a stick-breaking / centered-softmax transform
+    # not yet implemented; latent sampling is gated until v0.3.
+    samplable = FALSE,
+
     initialize = function(concentration, dim = NULL) {
       k <- if (is.numeric(concentration)) length(concentration) else NULL
       super$initialize(
         name = "dirichlet",
         parameters = list(concentration = concentration),
-        # Simplex constraint — identity transform for now (Phase 3)
         constraint = list(lower = 0, upper = 1, type = "simplex"),
         dim = dim %||% if (!is.null(k)) c(k, 1L) else NULL
       )
@@ -863,6 +904,12 @@ DirichletDistribution <- R6::R6Class(
 #'   gretaR_array). Length determines the dimensionality of the simplex.
 #' @param dim Dimensions of the variable (inferred from concentration if NULL).
 #' @return A `gretaR_array` with support on the simplex.
+#' @note Latent (sampled) Dirichlet variables are not yet supported because a
+#'   correct simplex transform (stick-breaking or centered softmax with the
+#'   matching Jacobian) is not yet implemented. `model()` will error if a
+#'   Dirichlet variable is reachable as a free parameter. The distribution can
+#'   still be evaluated (`log_prob`) and is planned to be sampler-ready in
+#'   v0.3.
 #' @export
 #' @examples
 #' \dontrun{
@@ -947,11 +994,14 @@ LKJDistribution <- R6::R6Class(
   inherit = GretaRDistribution,
 
   public = list(
+    # Correlation-matrix support requires an LKJ-Cholesky transform not yet
+    # implemented; latent sampling is gated until v0.3.
+    samplable = FALSE,
+
     initialize = function(eta, dim_mat) {
       super$initialize(
         name = "lkj",
         parameters = list(eta = eta, dim_mat = dim_mat),
-        # Correlation matrix constraint — identity transform for now (Phase 3)
         constraint = list(lower = -1, upper = 1, type = "correlation"),
         dim = c(dim_mat, dim_mat)
       )
@@ -991,9 +1041,11 @@ LKJDistribution <- R6::R6Class(
 #'   around the identity matrix; values < 1 favour extreme correlations.
 #' @param dim Dimension of the correlation matrix (integer >= 2).
 #' @return A `gretaR_array` representing a correlation matrix.
-#' @note Simplex/correlation transforms and efficient sampling are
-#'   deferred to Phase 3. The current implementation uses an identity
-#'   transform and stub sampling (returns identity matrices).
+#' @note Latent (sampled) LKJ variables are not yet supported because a
+#'   correct correlation-matrix transform (LKJ-Cholesky with the matching
+#'   Jacobian) is not yet implemented. `model()` will error if an LKJ
+#'   variable is reachable as a free parameter. The distribution can still
+#'   be evaluated (`log_prob`); sampler-ready support is planned for v0.3.
 #' @export
 #' @examples
 #' \dontrun{
@@ -1028,9 +1080,10 @@ LogNormalDistribution <- R6::R6Class(
       mu <- resolve_param(self$parameters$meanlog)
       sigma <- resolve_param(self$parameters$sdlog)
       sigma <- torch_clamp(sigma, min = 1e-30)
-      x <- torch_clamp(x, min = 1e-30)
-      z <- (torch_log(x) - mu) / sigma
-      torch_sum(-torch_log(x) - torch_log(sigma) - 0.9189385 - 0.5 * z * z)
+      x_clamped <- torch_clamp(x, min = 1e-30)
+      z <- (torch_log(x_clamped) - mu) / sigma
+      lp <- torch_sum(-torch_log(x_clamped) - torch_log(sigma) - 0.9189385 - 0.5 * z * z)
+      self$truncation_log_adjust(lp, x)
     },
 
     sample = function(n = 1L) {
@@ -1086,7 +1139,8 @@ CauchyDistribution <- R6::R6Class(
       sc <- resolve_param(self$parameters$scale)
       sc <- torch_clamp(sc, min = 1e-30)
       z <- (x - loc) / sc
-      torch_sum(-log(pi) - torch_log(sc) - torch_log(1 + z * z))
+      lp <- torch_sum(-log(pi) - torch_log(sc) - torch_log(1 + z * z))
+      self$truncation_log_adjust(lp, x)
     },
 
     sample = function(n = 1L) {
@@ -1128,6 +1182,10 @@ WishartDistribution <- R6::R6Class(
   inherit = GretaRDistribution,
 
   public = list(
+    # SPD support requires a Cholesky-factor transform with positive diagonal
+    # not yet implemented; latent sampling is gated until v0.3.
+    samplable = FALSE,
+
     initialize = function(df, scale_matrix) {
       p <- if (is.matrix(scale_matrix)) nrow(scale_matrix)
            else if (is.numeric(scale_matrix)) as.integer(sqrt(length(scale_matrix)))
@@ -1179,7 +1237,12 @@ WishartDistribution <- R6::R6Class(
 #' @param df Degrees of freedom (must be >= dimension of scale matrix).
 #' @param scale_matrix Scale matrix (positive definite, p x p).
 #' @return A `gretaR_array` representing a positive-definite matrix.
-#' @note Full sampling via Bartlett decomposition is deferred to Phase 3.
+#' @note Latent (sampled) Wishart variables are not yet supported because a
+#'   correct positive-definite-matrix transform (Cholesky factor with
+#'   positive diagonal plus the matching Jacobian) is not yet implemented.
+#'   `model()` will error if a Wishart variable is reachable as a free
+#'   parameter. The distribution can still be evaluated (`log_prob`);
+#'   sampler-ready support is planned for v0.3.
 #' @export
 #' @examples
 #' \dontrun{

@@ -20,10 +20,17 @@
 #'   lme4-style random effects are supported via regex parsing (lme4 is
 #'   **not** required). Recognised patterns:
 #'   \itemize{
-#'     \item \code{(1|group)} — random intercepts by group
-#'     \item \code{(x|group)} — correlated random intercepts + slopes
-#'     \item \code{(0 + x|group)} — random slopes only (no intercept)
+#'     \item \code{(1|group)} — random intercepts by group (supported)
+#'     \item \code{(0 + x|group)} — independent random slopes, no intercept
+#'           (supported)
+#'     \item \code{(x|group)} — correlated random intercept + slope
+#'           (\strong{not yet supported}; correct support requires an LKJ
+#'           correlation transform planned for v0.3)
 #'   }
+#'   As a workaround for correlated intercept + slope, split the term:
+#'   \code{(1|group) + (0 + x|group)} fits both as independent
+#'   random effects.
+#'
 #'   Multiple random effect terms are permitted, e.g.
 #'   \code{y ~ x + (1|site) + (1|year)}.
 #'
@@ -88,8 +95,8 @@
 #' fit <- gretaR_glm(Reaction ~ Days + (1 | Subject),
 #'                   data = sleepstudy, family = "gaussian")
 #'
-#' # Random intercepts + slopes
-#' fit <- gretaR_glm(Reaction ~ Days + (Days | Subject),
+#' # Random intercept + independent random slope (workaround for (Days|Subject))
+#' fit <- gretaR_glm(Reaction ~ Days + (1 | Subject) + (0 + Days | Subject),
 #'                   data = sleepstudy, family = "gaussian")
 #' }
 gretaR_glm <- function(formula, data, family = c("gaussian", "binomial", "poisson"),
@@ -317,9 +324,9 @@ gretaR_glm <- function(formula, data, family = c("gaussian", "binomial", "poisso
         # For now, use separate tau/z_raw per coefficient to keep it simple.
         # This is handled below in the restructured approach.
         cli_abort(c(
-          "Correlated random slopes with >1 coefficient per group are not yet ",
-          "supported in a single (expr|group) term.",
-          "i" = "Use separate terms: e.g., (1|group) + (0 + x|group)."
+          "Correlated random intercept + slope terms are not yet supported.",
+          "x" = "{.code ({rt$lhs} | {rt$group})} requires a correlation transform planned for v0.3.",
+          "i" = "Workaround: split the term, e.g. {.code (1|{rt$group}) + (0 + {paste(rt$slope_vars, collapse=' + ')}|{rt$group})}, which fits intercept and slope as independent random effects."
         ))
       }
 

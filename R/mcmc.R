@@ -96,6 +96,7 @@ mcmc <- function(model, n_samples = 1000L, warmup = 1000L, chains = 4L,
     cli_alert_info("Sampler: {toupper(sampler)}")
   }
 
+  t0 <- proc.time()
   raw <- if (sampler == "nuts") {
     nuts_sampler(
       model = model,
@@ -123,23 +124,39 @@ mcmc <- function(model, n_samples = 1000L, warmup = 1000L, chains = 4L,
       compiled_fn = compiled_fn
     )
   }
+  elapsed <- (proc.time() - t0)[["elapsed"]]
 
   # Convert to posterior::draws_array
-  t0 <- proc.time()
   draws <- format_draws(raw)
-  elapsed <- (proc.time() - t0)[["elapsed"]] + raw$n_samples  # approximate
+
+  # Split divergences into warmup / post-warmup. raw$divergences is a
+  # (total_iter x chains) logical matrix; downstream diagnostics report the
+  # post-warmup slice only, matching what NUTS/HMC samplers print per-chain.
+  post_idx <- seq.int(raw$warmup + 1L, raw$warmup + raw$n_samples)
+  warmup_idx <- seq_len(raw$warmup)
+  post_divergences <- raw$divergences[post_idx, , drop = FALSE]
+  warmup_divergences <- if (length(warmup_idx) > 0L) {
+    raw$divergences[warmup_idx, , drop = FALSE]
+  } else {
+    raw$divergences[integer(0), , drop = FALSE]
+  }
+
+  # Expose both windows on the draws object for power users; keep public
+  # diagnostics on the post-warmup window.
+  attr(draws, "divergences") <- post_divergences
+  attr(draws, "warmup_divergences") <- warmup_divergences
 
   if (verbose) {
-    n_div <- sum(raw$divergences)
+    n_div <- sum(post_divergences, na.rm = TRUE)
     if (n_div > 0) {
-      cli_alert_warning("{n_div} divergent transition{?s} detected. Consider reparameterising.")
+      cli_alert_warning("{n_div} post-warmup divergent transition{?s} detected. Consider reparameterising.")
     }
-    cli_alert_success("Sampling complete.")
+    cli_alert_success("Sampling complete in {round(elapsed, 2)}s.")
   }
 
   # Build unified gretaR_fit object
   summ <- tryCatch(posterior::summarise_draws(draws), error = function(e) NULL)
-  convergence <- build_convergence(draws, raw$divergences)
+  convergence <- build_convergence(draws, post_divergences)
 
   new_gretaR_fit(
     draws = draws,
@@ -151,7 +168,7 @@ mcmc <- function(model, n_samples = 1000L, warmup = 1000L, chains = 4L,
       sampler = sampler, step_size = step_size,
       target_accept = target_accept
     ),
-    run_time = raw$n_samples,  # placeholder — actual timing in sampler
+    run_time = elapsed,
     method = sampler
   )
 }

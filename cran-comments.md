@@ -1,5 +1,14 @@
 # cran-comments
 
+## Version note
+
+This is **v0.2.1**, a correctness patch over the never-submitted v0.2.0 tag.
+The 2026-05-22 audit (`audit_2026-05-22.md`, local-only) surfaced two P0
+inference-correctness issues (graph reachability and discrete-latent
+acceptance) and several P1/P2 issues; all are addressed in this release. No
+v0.2.0 tarball was sent to CRAN, so this is still effectively a
+first-submission.
+
 ## Test environments
 
 * local: macOS 26.3.1 (Apple Silicon, aarch64-apple-darwin20), R 4.5.2
@@ -12,7 +21,10 @@
 
 Local `R CMD check --as-cran` (R 4.5.2, macOS arm64):
 
-  0 errors | 0 warnings | 0 notes
+  0 errors | 0 warnings | 1 substantive NOTE (CRAN incoming feasibility)
+
+Two further NOTEs on the local run (`future file timestamps`, `HTML Tidy`) are
+environmental and do not appear on CRAN-side machines or on win-builder.
 
 CRAN-side incoming checks may add the following NOTEs (per-NOTE
 justification, per the project policy of itemising each one):
