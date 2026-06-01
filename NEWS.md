@@ -1,3 +1,18 @@
+# gretaR (development version)
+
+## Programmatic model construction
+
+* **New `model_from_arrays()`** -- an explicit, re-entrant counterpart to
+  `model()`. Targets and their names are passed as ordinary arguments rather
+  than recovered by deparsing the call, so models can be built programmatically
+  (under `do.call()`, from a code generator, or by a host package driving gretaR
+  from its own representation) and the parameter names are caller-supplied --
+  the hook an embedding package needs to map gretaR's names onto its own scheme.
+  The likelihood is scoped to the data nodes you name, so independent models can
+  be compiled back to back in one session without `reset_gretaR_env()` between
+  them. `model()` and `model_from_arrays()` share a single compiler core, so the
+  two paths produce identical model objects; `model()` is unchanged.
+
 # gretaR 0.3.0
 
 Sampler correctness, a robustness fix, and native multi-chain batching. Both

@@ -33,9 +33,52 @@ model <- function(..., precision = c("float32", "float64")) {
     cli_abort("At least one target variable must be provided to {.fn model}.")
   }
 
-  # Extract target names from the call
+  # Extract target names from the call. This `deparse` is the ONLY
+  # call-introspection step in the build path; it is exactly why `model()` is
+  # not re-entrant under `do.call()` / programmatic construction. The
+  # `model_from_arrays()` front-end supplies names explicitly and routes to the
+  # same compiler core below, bypassing this step.
   mc <- match.call(expand.dots = FALSE)
   target_names <- vapply(mc[["..."]], deparse, character(1))
+
+  # Likelihood terms come from the session-global registry — `model()` includes
+  # every `distribution(y) <- ...` assigned in the session (historical
+  # behaviour, preserved). `model_from_arrays()` scopes them per model.
+  .compile_gretaR_model(
+    targets = targets,
+    target_names = target_names,
+    likelihood_terms = .gretaR_env$distributions,
+    dtype = dtype
+  )
+}
+
+# =============================================================================
+# Shared compiler core — the single source of truth for turning a set of
+# target variables + likelihood terms into a `gretaR_model`. Both the
+# call-introspection front-end (`model()`) and the explicit, re-entrant
+# front-end (`model_from_arrays()`) delegate here, so the two paths produce
+# byte-identical model objects.
+# =============================================================================
+
+#' Compile target variables + likelihood terms into a `gretaR_model`
+#'
+#' @param targets A list of `gretaR_array` variable nodes (the free parameters
+#'   of interest), ordered first in the resulting parameter vector.
+#' @param target_names Character vector of names, one per element of `targets`.
+#' @param likelihood_terms A named list mapping data-node id -> distribution
+#'   node (the shape held in `.gretaR_env$distributions`). Pass a scoped subset
+#'   for a re-entrant build, or the whole registry to mirror `model()`.
+#' @param dtype A torch dtype (`torch_float32()` / `torch_float64()`).
+#' @return A `gretaR_model` object.
+#' @noRd
+.compile_gretaR_model <- function(targets, target_names, likelihood_terms,
+                                  dtype) {
+  if (length(targets) != length(target_names)) {
+    cli_abort(paste(
+      "Internal: {length(targets)} targets but {length(target_names)} names.",
+      "These must be equal."
+    ))
+  }
 
   free_vars <- list()
   target_ids <- character(0)
@@ -54,8 +97,7 @@ model <- function(..., precision = c("float32", "float64")) {
     target_ids <- c(target_ids, node$id)
   }
 
-  # Likelihood terms: distribution(y) <- dist assignments registered in the env
-  likelihood_terms <- .gretaR_env$distributions
+  # Likelihood terms: distribution(y) <- dist assignments (caller-scoped)
   likelihood_node_ids <- character(0)
   likelihood_data_ids <- character(0)
   for (data_id in names(likelihood_terms)) {

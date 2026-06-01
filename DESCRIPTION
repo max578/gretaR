@@ -1,6 +1,6 @@
 Package: gretaR
 Title: Bayesian Statistical Modelling with Torch
-Version: 0.3.0
+Version: 0.3.0.9000
 Authors@R:
     person("Max", "Moldovan", , "max.moldovan@adelaide.edu.au",
            role = c("aut", "cre", "cph"),
