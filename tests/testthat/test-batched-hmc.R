@@ -27,6 +27,27 @@ test_that("batched HMC recovers a conjugate-Normal posterior (mean + sd + rhat)"
   expect_lt(r$rhat, 1.05)
 })
 
+test_that("mcmc(batched = TRUE) routes to the batched sampler and returns a fit", {
+  skip_on_cran()
+  skip_if_not(torch::torch_is_installed())
+
+  set.seed(42); torch::torch_manual_seed(42)
+  reset_gretaR_env()
+  yv <- rnorm(8, 3, 2)
+  y <- as_data(yv); mu <- normal(0, 10); distribution(y) <- normal(mu, 2)
+  fit <- mcmc(model(mu), n_samples = 1000L, warmup = 800L, chains = 4L,
+              sampler = "hmc", batched = TRUE, seed = 42L, verbose = FALSE)
+  expect_s3_class(fit, "gretaR_fit")
+  s <- posterior::summarise_draws(fit$draws)
+  expect_lt(s[s$variable == "mu", ]$rhat, 1.05)
+
+  # batched NUTS is not supported -> clear error
+  expect_error(
+    mcmc(model(mu), sampler = "nuts", batched = TRUE, verbose = FALSE),
+    "only.*hmc"
+  )
+})
+
 test_that("batched HMC posterior agrees with single-chain HMC (A/B)", {
   skip_on_cran()
   skip_if_not(torch::torch_is_installed())

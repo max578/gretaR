@@ -1,3 +1,57 @@
+# gretaR 0.3.0
+
+Sampler correctness, a robustness fix, and native multi-chain batching. Both
+samplers are now verified against closed-form analytic posteriors.
+
+## Sampler correctness
+
+* **NUTS now targets the posterior.** The previous tree selection counted every
+  non-divergent leaf and chose uniformly along the trajectory, ignoring the
+  density -- so it did not sample the target distribution. Replaced with
+  multinomial energy weighting (Betancourt 2017); the diagonal metric is now the
+  inverse posterior variance and the U-turn criterion uses the velocity
+  \eqn{M^{-1}p}. Recovers a conjugate-Normal posterior with \eqn{\hat R \to 1.00}
+  (was 1.54).
+* **HMC now mixes.** Fixed-length HMC resonated with the target's periodic flow
+  and dual averaging drove the step size above the leapfrog stability limit, so
+  it failed to converge even on trivial models (\eqn{\hat R \approx 1.5},
+  ESS ~ 10-50). HMC now adapts on the trajectory-averaged acceptance and draws an
+  integration time \eqn{T \sim U(0, 2\pi]} per iteration (`n_leapfrog` becomes a
+  safety cap). Robust across seeds and models; HMC now matches or beats NUTS.
+
+## New feature: native multi-chain batching
+
+* **`mcmc(..., sampler = "hmc", batched = TRUE)`** advances all chains together as
+  one set of batched `torch` tensor operations instead of chain-by-chain.
+  Wall-clock is then roughly flat in the number of chains, so many-chain runs are
+  much faster -- about 2x at 8 chains and 4x at 16 on CPU -- while remaining
+  statistically equivalent to the single-chain sampler. A `device =` argument
+  (`"cpu"`, `"mps"`, `"cuda"`) makes the path device-generic; CPU is the
+  recommended default (gretaR's log-density is many small ops, so GPU
+  kernel-launch overhead currently dominates). Batched NUTS is not yet supported;
+  single-chain NUTS remains the robust default.
+
+## Other correctness fixes
+
+* `summary()` on a MAP `gretaR_glm` fit no longer errors (read the correct
+  fields).
+* The Stan code emitter (`compile_to_stan()`) now translates comparison and
+  modulo operators and aborts on any untranslatable operation, instead of
+  silently emitting wrong code.
+* `[.gretaR_array` rejects column indexing instead of silently row-indexing.
+* `uniform()` returns `-Inf` outside its support and counts observations
+  correctly.
+* Compiled-gradient NaN handling now warns (parity with the standard path), and
+  JIT-trace verification uses a dtype-aware relative tolerance checked at several
+  points with no silent fallback.
+
+## Documentation
+
+* The GPU-acceleration claim is scoped honestly: gretaR is a native-R `torch`
+  (libtorch) backend; the measured performance win is CPU multi-chain batching.
+  Constrained-transform support for `dirichlet()` / `lkj_correlation()` /
+  `wishart()` as samplable latents remains scheduled for a later release.
+
 # gretaR 0.2.1
 
 Correctness patch addressing findings from the 2026-05-22 audit. v0.2.0 was

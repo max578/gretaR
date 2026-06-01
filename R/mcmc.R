@@ -28,6 +28,16 @@
 #' @param init_values Optional list of initial parameter vectors (one per chain).
 #' @param seed Optional integer seed for reproducibility. Sets both R and torch
 #'   random number generators.
+#' @param batched Logical (default \code{FALSE}). When \code{TRUE} (and
+#'   \code{sampler = "hmc"}), all chains advance together as one set of batched
+#'   \code{torch} tensor operations rather than chain-by-chain. Wall-clock is
+#'   then roughly flat in the number of chains, so many-chain runs are much
+#'   faster (e.g. ~2x at 8 chains, ~4x at 16 on CPU). Statistically equivalent to
+#'   the single-chain HMC. Batched NUTS is not yet supported.
+#' @param device Character device for the batched path: \code{"cpu"} (default),
+#'   \code{"mps"}, or \code{"cuda"}. The batched code is device-generic, but on
+#'   typical models CPU is fastest -- gretaR's log-density is many small ops, so
+#'   GPU kernel-launch overhead dominates; GPU is for future large-model use.
 #' @param verbose Logical; print progress information (default \code{TRUE}).
 #'
 #' @return A `gretaR_fit` object with components:
@@ -60,7 +70,8 @@ mcmc <- function(model, n_samples = 1000L, warmup = 1000L, chains = 4L,
                  backend = c("torch", "stan"),
                  step_size = NULL, max_treedepth = 10L,
                  n_leapfrog = 25L, target_accept = NULL,
-                 init_values = NULL, seed = NULL, verbose = TRUE) {
+                 init_values = NULL, seed = NULL,
+                 batched = FALSE, device = "cpu", verbose = TRUE) {
 
   # Set seeds for reproducibility
   if (!is.null(seed)) {
@@ -88,21 +99,37 @@ mcmc <- function(model, n_samples = 1000L, warmup = 1000L, chains = 4L,
     target_accept <- 0.8
   }
 
-  # Compile the log-prob function for faster gradient evaluation
-  compiled_fn <- tryCatch(
-    compile_model(model, use_jit = TRUE),
-    error = function(e) NULL
-  )
+  # Compile the log-prob function for faster gradient evaluation (single-chain
+  # path only; the batched path compiles its own batched log-prob).
+  compiled_fn <- if (!batched) {
+    tryCatch(compile_model(model, use_jit = TRUE), error = function(e) NULL)
+  } else {
+    NULL
+  }
   if (!is.null(compiled_fn) && verbose) {
     cli_alert_info("Compiled log-prob for fast evaluation")
   }
 
   if (verbose) {
-    cli_alert_info("Sampler: {toupper(sampler)}")
+    cli_alert_info("Sampler: {toupper(sampler)}{if (batched) ' (batched, all chains at once)' else ''}")
   }
 
   t0 <- proc.time()
-  raw <- if (sampler == "nuts") {
+  raw <- if (batched) {
+    # Batched multi-chain HMC: all chains advance in one set of tensor ops.
+    # Big win as chains grow (wall-clock ~flat in chain count); device-generic.
+    if (sampler != "hmc") {
+      cli_abort(c(
+        "Batched sampling currently supports only {.code sampler = \"hmc\"}.",
+        "i" = "Single-chain NUTS stays the robust default; batched NUTS is deferred."
+      ))
+    }
+    batched_hmc_sampler(
+      model = model, n_samples = n_samples, warmup = warmup, chains = chains,
+      n_leapfrog = n_leapfrog, target_accept = target_accept, seed = seed,
+      device = device, verbose = verbose
+    )
+  } else if (sampler == "nuts") {
     nuts_sampler(
       model = model,
       n_samples = n_samples,

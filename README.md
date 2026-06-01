@@ -98,6 +98,9 @@ summary(draws)
   `as_data_sparse()` and `sparse_matmul()`
 - **Native R torch backend** – automatic differentiation and zero
   Python dependency (GPU/MPS acceleration is on the roadmap)
+- **Multi-chain batching** – `mcmc(..., sampler = "hmc", batched = TRUE)`
+  advances all chains as one batched torch computation; wall-clock stays
+  roughly flat in the number of chains (~2x at 8 chains, ~4x at 16 on CPU)
 - **Ecosystem integration** – posterior draws returned as
   `posterior::draws_array` for seamless use with bayesplot, loo, and
   other tidyverse-compatible tools

@@ -17,6 +17,8 @@ mcmc(
   target_accept = NULL,
   init_values = NULL,
   seed = NULL,
+  batched = FALSE,
+  device = "cpu",
   verbose = TRUE
 )
 }
@@ -51,6 +53,18 @@ NUTS, 0.65 for HMC).}
 
 \item{seed}{Optional integer seed for reproducibility. Sets both R and torch
 random number generators.}
+
+\item{batched}{Logical (default \code{FALSE}). When \code{TRUE} (and
+\code{sampler = "hmc"}), all chains advance together as one set of batched
+\code{torch} tensor operations rather than chain-by-chain. Wall-clock is
+then roughly flat in the number of chains, so many-chain runs are much
+faster (e.g. ~2x at 8 chains, ~4x at 16 on CPU). Statistically equivalent to
+the single-chain HMC. Batched NUTS is not yet supported.}
+
+\item{device}{Character device for the batched path: \code{"cpu"} (default),
+\code{"mps"}, or \code{"cuda"}. The batched code is device-generic, but on
+typical models CPU is fastest -- gretaR's log-density is many small ops, so
+GPU kernel-launch overhead dominates; GPU is for future large-model use.}
 
 \item{verbose}{Logical; print progress information (default \code{TRUE}).}
 }
