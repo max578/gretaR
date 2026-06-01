@@ -22,6 +22,8 @@ mcmc(
   target_accept = NULL,
   init_values = NULL,
   seed = NULL,
+  batched = FALSE,
+  device = "cpu",
   verbose = TRUE
 )
 ```
@@ -83,6 +85,22 @@ mcmc(
 
   Optional integer seed for reproducibility. Sets both R and torch
   random number generators.
+
+- batched:
+
+  Logical (default `FALSE`). When `TRUE` (and `sampler = "hmc"`), all
+  chains advance together as one set of batched `torch` tensor
+  operations rather than chain-by-chain. Wall-clock is then roughly flat
+  in the number of chains, so many-chain runs are much faster (e.g. ~2x
+  at 8 chains, ~4x at 16 on CPU). Statistically equivalent to the
+  single-chain HMC. Batched NUTS is not yet supported.
+
+- device:
+
+  Character device for the batched path: `"cpu"` (default), `"mps"`, or
+  `"cuda"`. The batched code is device-generic, but on typical models
+  CPU is fastest – gretaR's log-density is many small ops, so GPU
+  kernel-launch overhead dominates; GPU is for future large-model use.
 
 - verbose:
 

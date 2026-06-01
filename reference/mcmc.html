@@ -13,7 +13,7 @@ compatible with the posterior and bayesplot packages."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">gretaR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -70,6 +70,8 @@ compatible with the <code>posterior</code> and <code>bayesplot</code> packages.<
 <span>  target_accept <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  init_values <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  seed <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  batched <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  device <span class="op">=</span> <span class="st">"cpu"</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -131,6 +133,22 @@ NUTS, 0.65 for HMC).</p></dd>
 <dt id="arg-seed">seed<a class="anchor" aria-label="anchor" href="#arg-seed"></a></dt>
 <dd><p>Optional integer seed for reproducibility. Sets both R and torch
 random number generators.</p></dd>
+
+
+<dt id="arg-batched">batched<a class="anchor" aria-label="anchor" href="#arg-batched"></a></dt>
+<dd><p>Logical (default <code>FALSE</code>). When <code>TRUE</code> (and
+<code>sampler = "hmc"</code>), all chains advance together as one set of batched
+<code>torch</code> tensor operations rather than chain-by-chain. Wall-clock is
+then roughly flat in the number of chains, so many-chain runs are much
+faster (e.g. ~2x at 8 chains, ~4x at 16 on CPU). Statistically equivalent to
+the single-chain HMC. Batched NUTS is not yet supported.</p></dd>
+
+
+<dt id="arg-device">device<a class="anchor" aria-label="anchor" href="#arg-device"></a></dt>
+<dd><p>Character device for the batched path: <code>"cpu"</code> (default),
+<code>"mps"</code>, or <code>"cuda"</code>. The batched code is device-generic, but on
+typical models CPU is fastest – gretaR's log-density is many small ops, so
+GPU kernel-launch overhead dominates; GPU is for future large-model use.</p></dd>
 
 
 <dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>

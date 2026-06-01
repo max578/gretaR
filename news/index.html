@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gretaR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,6 +41,37 @@
       <small>Source: <a href="https://github.com/max578/gretaR/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.3.0" id="gretar-030">gretaR 0.3.0<a class="anchor" aria-label="anchor" href="#gretar-030"></a></h2>
+<p>Sampler correctness, a robustness fix, and native multi-chain batching. Both samplers are now verified against closed-form analytic posteriors.</p>
+<div class="section level3">
+<h3 id="sampler-correctness-0-3-0">Sampler correctness<a class="anchor" aria-label="anchor" href="#sampler-correctness-0-3-0"></a></h3>
+<ul><li>
+<strong>NUTS now targets the posterior.</strong> The previous tree selection counted every non-divergent leaf and chose uniformly along the trajectory, ignoring the density – so it did not sample the target distribution. Replaced with multinomial energy weighting (Betancourt 2017); the diagonal metric is now the inverse posterior variance and the U-turn criterion uses the velocity . Recovers a conjugate-Normal posterior with  (was 1.54).</li>
+<li>
+<strong>HMC now mixes.</strong> Fixed-length HMC resonated with the target’s periodic flow and dual averaging drove the step size above the leapfrog stability limit, so it failed to converge even on trivial models (, ESS ~ 10-50). HMC now adapts on the trajectory-averaged acceptance and draws an integration time  per iteration (<code>n_leapfrog</code> becomes a safety cap). Robust across seeds and models; HMC now matches or beats NUTS.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="new-feature-native-multi-chain-batching-0-3-0">New feature: native multi-chain batching<a class="anchor" aria-label="anchor" href="#new-feature-native-multi-chain-batching-0-3-0"></a></h3>
+<ul><li>
+<strong><code>mcmc(..., sampler = "hmc", batched = TRUE)</code></strong> advances all chains together as one set of batched <code>torch</code> tensor operations instead of chain-by-chain. Wall-clock is then roughly flat in the number of chains, so many-chain runs are much faster – about 2x at 8 chains and 4x at 16 on CPU – while remaining statistically equivalent to the single-chain sampler. A <code>device =</code> argument (<code>"cpu"</code>, <code>"mps"</code>, <code>"cuda"</code>) makes the path device-generic; CPU is the recommended default (gretaR’s log-density is many small ops, so GPU kernel-launch overhead currently dominates). Batched NUTS is not yet supported; single-chain NUTS remains the robust default.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="other-correctness-fixes-0-3-0">Other correctness fixes<a class="anchor" aria-label="anchor" href="#other-correctness-fixes-0-3-0"></a></h3>
+<ul><li>
+<code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> on a MAP <code>gretaR_glm</code> fit no longer errors (read the correct fields).</li>
+<li>The Stan code emitter (<code><a href="../reference/compile_to_stan.html">compile_to_stan()</a></code>) now translates comparison and modulo operators and aborts on any untranslatable operation, instead of silently emitting wrong code.</li>
+<li>
+<code>[.gretaR_array</code> rejects column indexing instead of silently row-indexing.</li>
+<li>
+<code><a href="../reference/uniform.html">uniform()</a></code> returns <code>-Inf</code> outside its support and counts observations correctly.</li>
+<li>Compiled-gradient NaN handling now warns (parity with the standard path), and JIT-trace verification uses a dtype-aware relative tolerance checked at several points with no silent fallback.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="documentation-0-3-0">Documentation<a class="anchor" aria-label="anchor" href="#documentation-0-3-0"></a></h3>
+<ul><li>The GPU-acceleration claim is scoped honestly: gretaR is a native-R <code>torch</code> (libtorch) backend; the measured performance win is CPU multi-chain batching. Constrained-transform support for <code><a href="../reference/dirichlet.html">dirichlet()</a></code> / <code><a href="../reference/lkj_correlation.html">lkj_correlation()</a></code> / <code><a href="../reference/wishart.html">wishart()</a></code> as samplable latents remains scheduled for a later release.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.2.1" id="gretar-021">gretaR 0.2.1<a class="anchor" aria-label="anchor" href="#gretar-021"></a></h2>
 <p>Correctness patch addressing findings from the 2026-05-22 audit. v0.2.0 was tagged but never submitted to CRAN; v0.2.1 supersedes it as the first externally-released version.</p>

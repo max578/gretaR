@@ -27,6 +27,6 @@ A formula with bar terms removed.
 ``` r
 remove_re_bars(y ~ x + (1 | group))
 #> y ~ x
-#> <environment: 0x55b34d7cc008>
+#> <environment: 0x56287d033420>
 # y ~ x
 ```

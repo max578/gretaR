@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">gretaR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -126,6 +126,8 @@
 </li>
 <li>
 <strong>Native R torch backend</strong> – automatic differentiation and zero Python dependency (GPU/MPS acceleration is on the roadmap)</li>
+<li>
+<strong>Multi-chain batching</strong> – <code>mcmc(..., sampler = "hmc", batched = TRUE)</code> advances all chains as one batched torch computation; wall-clock stays roughly flat in the number of chains (~2x at 8 chains, ~4x at 16 on CPU)</li>
 <li>
 <strong>Ecosystem integration</strong> – posterior draws returned as <code><a href="https://mc-stan.org/posterior/reference/draws_array.html" class="external-link">posterior::draws_array</a></code> for seamless use with bayesplot, loo, and other tidyverse-compatible tools</li>
 </ul>
