@@ -52,9 +52,16 @@
 #'   Each must already have a distribution attached via \code{distribution(y) <-
 #'   ...}. When \code{NULL} (default), the session-global likelihood registry is
 #'   used, reproducing \code{\link{model}}'s behaviour.
-#' @param names Optional character vector of parameter names, one per element of
-#'   \code{targets}. When \code{NULL}, the names of \code{targets} are used if it
-#'   is a named list; otherwise each target falls back to its internal node id.
+#' @param names Optional parameter names, one entry per element of
+#'   \code{targets}. A character vector gives one label per target (a vector
+#'   target expands to \code{label[1]}, \code{label[2]}, ...). A list gives finer
+#'   control: each entry is either a single label or a character vector of
+#'   per-element names whose length matches that target's number of elements --
+#'   so a length-\code{p} coefficient vector can be labelled
+#'   \code{c("(Intercept)", "x1", ...)} directly, and those labels flow straight
+#'   through to the posterior draws. When \code{NULL}, the names of
+#'   \code{targets} are used if it is a named list; otherwise each target falls
+#'   back to its internal node id.
 #' @param precision Torch dtype: \code{"float32"} (default) or \code{"float64"}.
 #'
 #' @return A \code{gretaR_model} object, identical in structure to one produced
@@ -97,53 +104,108 @@ model_from_arrays <- function(targets, likelihood = NULL, names = NULL,
     ))
   }
 
-  # Resolve target names: explicit `names` wins, then the list's own names,
-  # then the node id as a last resort. No call introspection anywhere.
-  target_names <- .resolve_target_names(targets, names)
+  # Resolve names with no call introspection. `display` is one node label per
+  # target (for `model()` parity and printing); `elements` optionally carries a
+  # per-element name vector per target (the full canonical-name contract).
+  resolved <- .resolve_names(targets, names)
 
   # Scope the likelihood. NULL keeps the global registry (model() parity);
   # otherwise include only the declared data nodes' assigned distributions.
   likelihood_terms <- .scope_likelihood_terms(likelihood)
 
-  .compile_gretaR_model(
+  m <- .compile_gretaR_model(
     targets = targets,
-    target_names = target_names,
+    target_names = resolved$display,
     likelihood_terms = likelihood_terms,
     dtype = dtype
   )
-}
 
-#' Resolve one name per target without deparsing the call.
-#' @noRd
-.resolve_target_names <- function(targets, names) {
-  n <- length(targets)
-  if (!is.null(names)) {
-    names <- as.character(names)
-    if (length(names) != n) {
+  # Attach caller-supplied per-element names so they flow straight through to
+  # the draws (via make_param_names()), eliminating any downstream relabel.
+  for (i in seq_along(targets)) {
+    el <- resolved$elements[[i]]
+    if (is.null(el)) next
+    vid <- get_node(targets[[i]])$id
+    n_elem <- m$param_info[[vid]]$n_elem
+    if (length(el) != n_elem) {
       cli_abort(paste(
-        "{.arg names} has length {length(names)} but there are {n} targets.",
-        "Supply exactly one name per target."
+        "Target {i} has {n_elem} element{?s} but {length(el)} element name{?s}",
+        "were supplied. Provide one name per element, or a single node name."
       ))
     }
-    if (anyNA(names) || any(!nzchar(names))) {
-      cli_abort("{.arg names} must contain no missing or empty strings.")
-    }
-    return(names)
+    m$param_info[[vid]]$element_names <- el
   }
 
-  list_names <- base::names(targets)
-  if (!is.null(list_names) && all(nzchar(list_names))) {
-    return(list_names)
-  }
+  m
+}
 
-  # Fall back to internal node ids — traceable, never empty.
-  vapply(targets, function(a) {
+#' Resolve names without deparsing the call.
+#'
+#' Returns `list(display, elements)`: `display` is a length-n character vector
+#' of node labels (one per target); `elements[[i]]` is either `NULL` or a
+#' character vector of per-element names for target `i`. `names` may be a
+#' character vector (one node label each) or a list (each entry a single label
+#' or a per-element vector).
+#' @noRd
+.resolve_names <- function(targets, names) {
+  n <- length(targets)
+  node_id <- function(a) {
     node <- get_node(a)
     if (is.null(node)) {
       cli_abort("Every element of {.arg targets} must be a {.cls gretaR_array}.")
     }
     node$id
-  }, character(1))
+  }
+  display <- character(n)
+  elements <- vector("list", n)
+
+  check_str <- function(v, what) {
+    if (anyNA(v) || any(!nzchar(v))) {
+      cli_abort("{.arg names} must contain no missing or empty strings ({what}).")
+    }
+  }
+
+  if (is.null(names)) {
+    list_names <- base::names(targets)
+    if (!is.null(list_names) && all(nzchar(list_names))) {
+      display <- list_names
+    } else {
+      display <- vapply(targets, node_id, character(1))
+    }
+    return(list(display = display, elements = elements))
+  }
+
+  if (length(names) != n) {
+    cli_abort(paste(
+      "{.arg names} has length {length(names)} but there are {n} target{?s}.",
+      "Supply exactly one entry per target."
+    ))
+  }
+
+  # List form allows a per-element name vector per target.
+  if (is.list(names)) {
+    slot_names <- base::names(names)
+    for (i in seq_len(n)) {
+      entry <- as.character(names[[i]])
+      check_str(entry, paste("target", i))
+      if (length(entry) <= 1L) {
+        display[i] <- if (length(entry) == 1L) entry else node_id(targets[[i]])
+      } else {
+        elements[[i]] <- entry
+        display[i] <- if (!is.null(slot_names) && nzchar(slot_names[i])) {
+          slot_names[i]
+        } else {
+          node_id(targets[[i]])
+        }
+      }
+    }
+    return(list(display = display, elements = elements))
+  }
+
+  # Character vector: one node label per target.
+  display <- as.character(names)
+  check_str(display, "node labels")
+  list(display = display, elements = elements)
 }
 
 #' Build a likelihood-term list scoped to the declared data nodes.

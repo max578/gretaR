@@ -161,7 +161,14 @@ make_param_names <- function(model) {
   param_names <- character(model$total_dim)
   for (vid in model$var_order) {
     info <- model$param_info[[vid]]
-    if (info$n_elem == 1L) {
+    # Caller-supplied per-element names (via `model_from_arrays(names = ...)`)
+    # take precedence over the positional `name[j]` convention, so a host
+    # package gets exactly its own labels in the draws without a relabel pass.
+    elem_names <- info$element_names
+    if (!is.null(elem_names) && length(elem_names) == info$n_elem) {
+      idx <- (info$offset + 1L):(info$offset + info$n_elem)
+      param_names[idx] <- elem_names
+    } else if (info$n_elem == 1L) {
       param_names[info$offset + 1L] <- info$name
     } else {
       for (j in seq_len(info$n_elem)) {

@@ -12,6 +12,11 @@
   be compiled back to back in one session without `reset_gretaR_env()` between
   them. `model()` and `model_from_arrays()` share a single compiler core, so the
   two paths produce identical model objects; `model()` is unchanged.
+* **Per-element parameter names.** `model_from_arrays(names = ...)` now accepts a
+  list whose entries may be per-element name vectors, so a length-`p`
+  coefficient vector can be labelled `c("(Intercept)", "x1", ...)` and those
+  labels flow straight through to the posterior draws -- a complete
+  caller-supplied canonical-name contract, no relabel pass required.
 
 # gretaR 0.3.0
 

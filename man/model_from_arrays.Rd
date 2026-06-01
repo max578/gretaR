@@ -22,9 +22,16 @@ Each must already have a distribution attached via \code{distribution(y) <-
   ...}. When \code{NULL} (default), the session-global likelihood registry is
 used, reproducing \code{\link{model}}'s behaviour.}
 
-\item{names}{Optional character vector of parameter names, one per element of
-\code{targets}. When \code{NULL}, the names of \code{targets} are used if it
-is a named list; otherwise each target falls back to its internal node id.}
+\item{names}{Optional parameter names, one entry per element of
+\code{targets}. A character vector gives one label per target (a vector
+target expands to \code{label[1]}, \code{label[2]}, ...). A list gives finer
+control: each entry is either a single label or a character vector of
+per-element names whose length matches that target's number of elements --
+so a length-\code{p} coefficient vector can be labelled
+\code{c("(Intercept)", "x1", ...)} directly, and those labels flow straight
+through to the posterior draws. When \code{NULL}, the names of
+\code{targets} are used if it is a named list; otherwise each target falls
+back to its internal node id.}
 
 \item{precision}{Torch dtype: \code{"float32"} (default) or \code{"float64"}.}
 }

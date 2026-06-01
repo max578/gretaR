@@ -147,6 +147,81 @@ test_that("a model_from_arrays model samples and recovers the posterior", {
   expect_lt(s$rhat, 1.05)
 })
 
+test_that("per-element names label a vector target and reach make_param_names", {
+  skip_if_not(torch::torch_is_installed())
+
+  reset_gretaR_env()
+  beta <- normal(0, 5, dim = 3)
+  X <- as_data(matrix(rnorm(30 * 3), ncol = 3))
+  y <- as_data(rnorm(30))
+  distribution(y) <- normal(X %*% beta, 1)
+
+  m <- model_from_arrays(
+    targets = list(beta),
+    likelihood = y,
+    names = list(c("(Intercept)", "x1", "x2"))
+  )
+  # The canonical labels flow straight to the model's parameter-name vector,
+  # with no [j] positional fallback and no relabel pass.
+  expect_equal(make_param_names(m), c("(Intercept)", "x1", "x2"))
+})
+
+test_that("caller names propagate end to end to the draws_array", {
+  skip_on_cran()
+  skip_if_not(torch::torch_is_installed())
+
+  set.seed(3)
+  torch::torch_manual_seed(3)
+  reset_gretaR_env()
+  x <- rnorm(60)
+  beta <- normal(0, 5, dim = 2)
+  X <- as_data(cbind(1, x))
+  y <- as_data(1.5 - 0.8 * x + rnorm(60))
+  distribution(y) <- normal(X %*% beta, 1)
+
+  m <- model_from_arrays(
+    targets = list(beta),
+    likelihood = y,
+    names = list(c("(Intercept)", "x"))
+  )
+  fit <- mcmc(m, n_samples = 600L, warmup = 600L, chains = 2L,
+              seed = 3L, verbose = FALSE)
+  vars <- posterior::summarise_draws(fit$draws)$variable
+  expect_true(all(c("(Intercept)", "x") %in% vars))
+})
+
+test_that("mixed list names: a node label and a per-element vector", {
+  skip_if_not(torch::torch_is_installed())
+
+  reset_gretaR_env()
+  beta <- normal(0, 5, dim = 2)
+  sigma <- half_cauchy(1)
+  X <- as_data(matrix(rnorm(20 * 2), ncol = 2))
+  y <- as_data(rnorm(20))
+  distribution(y) <- normal(X %*% beta, sigma)
+
+  m <- model_from_arrays(
+    targets = list(beta, sigma),
+    likelihood = y,
+    names = list(c("a", "b"), "sigma")
+  )
+  expect_equal(make_param_names(m), c("a", "b", "sigma"))
+})
+
+test_that("a per-element name vector of the wrong length is rejected", {
+  skip_if_not(torch::torch_is_installed())
+
+  reset_gretaR_env()
+  beta <- normal(0, 5, dim = 3)
+  y <- as_data(rnorm(10))
+  distribution(y) <- normal(sum(beta), 1)
+
+  expect_error(
+    model_from_arrays(list(beta), likelihood = y, names = list(c("a", "b"))),
+    "element name"
+  )
+})
+
 test_that("invalid inputs are rejected with actionable errors", {
   skip_if_not(torch::torch_is_installed())
 
@@ -162,7 +237,7 @@ test_that("invalid inputs are rejected with actionable errors", {
   # Name count mismatch.
   expect_error(
     model_from_arrays(list(mu), likelihood = y, names = c("a", "b")),
-    "one name per target"
+    "one entry per target"
   )
 
   # A data node with no attached likelihood.
