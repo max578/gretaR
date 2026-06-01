@@ -2,12 +2,13 @@
 
 ## Version note
 
-This is **v0.2.1**, a correctness patch over the never-submitted v0.2.0 tag.
-The 2026-05-22 audit (`audit_2026-05-22.md`, local-only) surfaced two P0
-inference-correctness issues (graph reachability and discrete-latent
-acceptance) and several P1/P2 issues; all are addressed in this release. No
-v0.2.0 tarball was sent to CRAN, so this is still effectively a
-first-submission.
+This is **v0.3.0**, the first CRAN submission (v0.2.0 / v0.2.1 were tagged but
+never sent to CRAN). It bundles the earlier correctness patches with two
+sampler-correctness fixes verified against closed-form analytic posteriors
+(NUTS multinomial weighting; HMC integration-time adaptation) and one new
+feature -- native multi-chain batching (`mcmc(..., batched = TRUE)`), which
+advances all chains as one batched torch computation. Both samplers now recover
+a conjugate-Normal posterior to rhat ~ 1.00.
 
 ## Test environments
 
@@ -69,6 +70,6 @@ No reverse dependencies on CRAN at this time (first submission).
   vignette and example uses of `cmdstanr` are guarded with
   `requireNamespace("cmdstanr", quietly = TRUE)`.
 
-* **Test surface.** 258 PASS / 0 FAIL / 0 WARN / 22 SKIP under
-  `R CMD check --as-cran`. The 22 skips are slow MCMC integration tests
+* **Test surface.** 303 PASS / 0 FAIL / 0 WARN / 27 SKIP under
+  `R CMD check --as-cran`. The 27 skips are slow MCMC integration tests
   guarded by `skip_on_cran()`; they run in full CI on every push.
