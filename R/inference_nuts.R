@@ -113,7 +113,10 @@ nuts_sampler <- function(model, n_samples = 1000L, warmup = 500L,
             theta_mat <- do.call(rbind, warmup_thetas)
             theta_var <- apply(theta_mat, 2, var)
             theta_var[theta_var < 1e-3] <- 1e-3
-            inv_mass_vec <- theta_var
+            # GS3: inv_mass_vec is consumed as the mass M in the dynamics
+            # (momentum ~ N(0, M); leapfrog step ~ M^-1 p). The efficient
+            # metric is the INVERSE posterior variance, so set M = 1 / Var.
+            inv_mass_vec <- 1 / theta_var
           }
           # Re-find reasonable step size with new mass matrix
           eps <- find_reasonable_epsilon(model, theta_vec, inv_mass_vec)
@@ -166,6 +169,19 @@ nuts_sampler <- function(model, n_samples = 1000L, warmup = 500L,
 # NUTS tree building (numeric vectors, iterative doubling)
 # =============================================================================
 
+# Numerically stable log(exp(a) + exp(b)) for combining multinomial subtree
+# weights; handles the -Inf weight carried by divergent leaves.
+.logsumexp2 <- function(a, b) {
+  if (a == -Inf) {
+    return(b)
+  }
+  if (b == -Inf) {
+    return(a)
+  }
+  m <- if (a > b) a else b
+  m + log(exp(a - m) + exp(b - m))
+}
+
 #' Build NUTS tree
 #' @noRd
 build_nuts_tree_vec <- function(model, theta, momentum, grad, epsilon,
@@ -180,7 +196,9 @@ build_nuts_tree_vec <- function(model, theta, momentum, grad, epsilon,
 
   theta_new <- theta
   depth <- 0L
-  n_valid <- 1L
+  # Multinomial NUTS: log of the running trajectory weight. The initial
+  # state has weight exp(joint0 - joint0) = 1, i.e. log_w_total = 0.
+  log_w_total <- 0
   sum_accept <- 0
   n_accept <- 0L
   divergent <- FALSE
@@ -213,18 +231,22 @@ build_nuts_tree_vec <- function(model, theta, momentum, grad, epsilon,
       break
     }
 
-    if (result$n_prime > 0 && runif(1) < result$n_prime / n_valid) {
+    # Multinomial: take the new subtree's proposal with probability
+    # w_subtree / (w_running + w_subtree), then fold its weight into the total.
+    log_w_total_new <- .logsumexp2(log_w_total, result$log_w)
+    if (is.finite(result$log_w) &&
+      log(runif(1)) < result$log_w - log_w_total_new) {
       theta_new <- result$theta_prime
     }
-
-    n_valid <- n_valid + result$n_prime
+    log_w_total <- log_w_total_new
     sum_accept <- sum_accept + result$sum_accept
     n_accept <- n_accept + result$n_accept
 
-    # U-turn criterion
+    # U-turn criterion (GS4): dot the separation with the velocity M^-1 p
+    # (= mom / inv_mass for the diagonal metric), not the raw momentum.
     delta_theta <- theta_plus - theta_minus
-    u_turn <- (sum(delta_theta * mom_minus) < 0) ||
-              (sum(delta_theta * mom_plus) < 0)
+    u_turn <- (sum(delta_theta * (mom_minus / inv_mass)) < 0) ||
+              (sum(delta_theta * (mom_plus / inv_mass)) < 0)
 
     if (u_turn) {
       depth <- j
@@ -256,8 +278,12 @@ build_subtree_vec <- function(model, theta, momentum, grad, epsilon,
       joint_new <- lf$lp - 0.5 * sum(lf$momentum^2 / inv_mass)
       delta <- joint_new - joint0
 
+      # Divergence when the Hamiltonian error is large (Stan's Delta_max).
       div <- is.nan(delta) || delta < -1000
-      n_prime <- if (!div && delta > -1000) 1L else 0L
+      # Multinomial NUTS (Betancourt 2017): each leaf carries weight
+      # exp(joint_new - joint0); we track it in log space. A divergent leaf
+      # gets weight 0 (log_w = -Inf) and halts the doubling (s_prime = FALSE).
+      log_w <- if (div) -Inf else delta
       accept <- min(1, exp(min(0, delta)))
       if (is.nan(accept)) accept <- 0
 
@@ -266,7 +292,7 @@ build_subtree_vec <- function(model, theta, momentum, grad, epsilon,
         momentum_minus = lf$momentum, momentum_plus = lf$momentum,
         grad_minus = lf$grad, grad_plus = lf$grad,
         theta_prime = lf$theta,
-        n_prime = n_prime, s_prime = !div,
+        log_w = log_w, s_prime = !div,
         sum_accept = accept, n_accept = 1L,
         divergent = div
       )
@@ -276,7 +302,7 @@ build_subtree_vec <- function(model, theta, momentum, grad, epsilon,
         momentum_minus = momentum, momentum_plus = momentum,
         grad_minus = grad, grad_plus = grad,
         theta_prime = theta,
-        n_prime = 0L, s_prime = FALSE,
+        log_w = -Inf, s_prime = FALSE,
         sum_accept = 0, n_accept = 1L,
         divergent = TRUE
       )
@@ -304,9 +330,10 @@ build_subtree_vec <- function(model, theta, momentum, grad, epsilon,
     )
   }
 
-  # Combine subtrees
-  n_prime <- left$n_prime + right$n_prime
-  if (n_prime > 0 && runif(1) < right$n_prime / n_prime) {
+  # Combine subtrees: multinomial weighting (log-sum-exp). Select the right
+  # subtree's proposal with probability w_right / (w_left + w_right).
+  log_w <- .logsumexp2(left$log_w, right$log_w)
+  if (is.finite(right$log_w) && log(runif(1)) < right$log_w - log_w) {
     theta_prime <- right$theta_prime
   } else {
     theta_prime <- left$theta_prime
@@ -328,18 +355,18 @@ build_subtree_vec <- function(model, theta, momentum, grad, epsilon,
     grad_plus <- left$grad_plus
   }
 
-  # U-turn check
+  # U-turn check (GS4): velocity M^-1 p = mom / inv_mass for the diagonal metric.
   delta_theta <- theta_plus - theta_minus
   s_prime <- left$s_prime && right$s_prime &&
-    (sum(delta_theta * mom_minus) >= 0) &&
-    (sum(delta_theta * mom_plus) >= 0)
+    (sum(delta_theta * (mom_minus / inv_mass)) >= 0) &&
+    (sum(delta_theta * (mom_plus / inv_mass)) >= 0)
 
   list(
     theta_minus = theta_minus, theta_plus = theta_plus,
     momentum_minus = mom_minus, momentum_plus = mom_plus,
     grad_minus = grad_minus, grad_plus = grad_plus,
     theta_prime = theta_prime,
-    n_prime = n_prime, s_prime = s_prime,
+    log_w = log_w, s_prime = s_prime,
     sum_accept = left$sum_accept + right$sum_accept,
     n_accept = left$n_accept + right$n_accept,
     divergent = left$divergent || right$divergent

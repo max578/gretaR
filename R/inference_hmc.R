@@ -137,7 +137,10 @@ hmc_sampler <- function(model, n_samples = 1000L, warmup = 500L,
             theta_mat <- do.call(rbind, warmup_thetas)
             theta_var <- apply(theta_mat, 2, var)
             theta_var[theta_var < 1e-3] <- 1e-3
-            inv_mass_vec <- theta_var
+            # GS3: inv_mass_vec is consumed as the mass M in the dynamics
+            # (momentum ~ N(0, M); leapfrog step ~ M^-1 p). The efficient
+            # metric is the INVERSE posterior variance, so set M = 1 / Var.
+            inv_mass_vec <- 1 / theta_var
           }
           eps <- find_reasonable_epsilon(model, theta_vec, inv_mass_vec)
           mu <- log(10 * eps)
