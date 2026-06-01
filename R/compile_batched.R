@@ -90,28 +90,28 @@
 }
 
 # --- resolve a distribution's parameters to batched tensors --------------------
-.batched_resolve <- function(param, bcompute) {
+.batched_resolve <- function(param, bcompute, dev) {
   if (inherits(param, "gretaR_array") || inherits(param, "GretaRArray")) {
     node <- if (inherits(param, "gretaR_array")) get_node(param) else param
     bcompute(node$id)
   } else if (inherits(param, "torch_tensor")) {
-    param$reshape(c(1L, -1L, 1L))
+    param$reshape(c(1L, -1L, 1L))$to(device = dev)
   } else if (is.numeric(param)) {
-    torch_tensor(param, dtype = torch_float32())$reshape(c(1L, -1L, 1L))
+    torch_tensor(param, dtype = torch_float32())$reshape(c(1L, -1L, 1L))$to(device = dev)
   } else {
     cli_abort("Cannot batch-resolve a parameter of class {.cls {class(param)}}.")
   }
 }
 
-.batched_density <- function(dist, x, bcompute) {
+.batched_density <- function(dist, x, bcompute, dev) {
   nm <- dist$name
   fn <- .bd[[nm]]
   if (is.null(fn)) {
     cli_abort(c("Batched density not implemented for distribution {.val {nm}}.",
                 "i" = "Multivariate / gated families are the M0b follow-on."))
   }
-  # Resolve each named parameter to a batched tensor.
-  p <- lapply(dist$parameters, .batched_resolve, bcompute = bcompute)
+  # Resolve each named parameter to a batched tensor (on the input's device).
+  p <- lapply(dist$parameters, .batched_resolve, bcompute = bcompute, dev = dev)
   elementwise <- fn(x, p)
   torch_sum(elementwise, dim = c(2L, 3L))          # [C]
 }
@@ -131,11 +131,12 @@ compile_log_prob_batched <- function(model) {
 
   function(theta_mat) {
     C <- theta_mat$shape[1]
+    dev <- theta_mat$device                 # device follows the input theta
     cache <- new.env(parent = emptyenv())   # node id -> [C, d1, d2] batched value
 
     # Seed variable values from theta (inverse-transform to constrained space).
     var_constrained <- list()
-    lp <- torch_zeros(C, dtype = dtype)
+    lp <- torch_zeros(C, dtype = dtype, device = dev)
     for (vid in var_order) {
       info <- param_info[[vid]]
       raw <- theta_mat[, (info$offset + 1L):(info$offset + info$n_elem), drop = FALSE]
@@ -153,7 +154,7 @@ compile_log_prob_batched <- function(model) {
       node <- dag_nodes[[nid]]
       val <- switch(node$node_type,
         data = {
-          v <- node$value
+          v <- node$value$to(device = dev)
           if (length(dim(v)) == 2) v$reshape(c(1L, v$shape[1], v$shape[2])) else v
         },
         variable = cache[[nid]],
@@ -168,7 +169,7 @@ compile_log_prob_batched <- function(model) {
     for (vid in var_order) {
       vc <- var_constrained[[vid]]
       if (!is.null(vc$info$distribution)) {
-        lp <- lp + .batched_density(vc$info$distribution, vc$con, bcompute)
+        lp <- lp + .batched_density(vc$info$distribution, vc$con, bcompute, dev)
       }
       if (!is.null(vc$info$transform) &&
           !inherits(vc$info$transform, "IdentityTransform")) {
@@ -183,9 +184,9 @@ compile_log_prob_batched <- function(model) {
       if (is.null(dist_node) || is.null(dist_node$distribution)) next
       data_node <- dag_nodes[[data_id]]
       if (is.null(data_node)) next
-      obs <- data_node$value
+      obs <- data_node$value$to(device = dev)
       obs <- obs$reshape(c(1L, obs$shape[1], if (length(obs$shape) > 1) obs$shape[2] else 1L))
-      lp <- lp + .batched_density(dist_node$distribution, obs, bcompute)
+      lp <- lp + .batched_density(dist_node$distribution, obs, bcompute, dev)
     }
 
     lp

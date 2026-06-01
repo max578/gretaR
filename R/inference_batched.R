@@ -70,15 +70,16 @@ batched_leapfrog <- function(bgrad, theta, mom, grad, eps, n_steps, inv_mass,
   if (length(n_steps) == 1L) n_steps <- rep(as.integer(n_steps), C)
   l_max <- max(n_steps)
   track <- !is.null(joint0)
+  dev <- theta$device
   if (l_max < 1L) {
     res <- list(theta = theta, mom = mom, lp = bgrad(theta)$lp, grad = grad)
-    if (track) res$accept_stat <- torch::torch_zeros(C, dtype = theta$dtype)
+    if (track) res$accept_stat <- torch::torch_zeros(C, dtype = theta$dtype, device = dev)
     return(res)
   }
-  ns <- torch::torch_tensor(as.numeric(n_steps), dtype = theta$dtype)  # [C]
+  ns <- torch::torch_tensor(as.numeric(n_steps), dtype = theta$dtype, device = dev)  # [C]
   if (track) {
-    sum_acc <- torch::torch_zeros(C, dtype = theta$dtype)
-    n_acc <- torch::torch_zeros(C, dtype = theta$dtype)
+    sum_acc <- torch::torch_zeros(C, dtype = theta$dtype, device = dev)
+    n_acc <- torch::torch_zeros(C, dtype = theta$dtype, device = dev)
   }
   lp <- NULL
   for (s in seq_len(l_max)) {
@@ -133,18 +134,20 @@ batched_leapfrog <- function(bgrad, theta, mom, grad, eps, n_steps, inv_mass,
 batched_hmc_sampler <- function(model, n_samples = 1000L, warmup = 1000L,
                                 chains = 4L, n_leapfrog = 25L,
                                 target_accept = 0.8, seed = NULL,
-                                verbose = FALSE) {
+                                device = "cpu", verbose = FALSE) {
   if (!is.null(seed)) {
     set.seed(seed)
     if (requireNamespace("torch", quietly = TRUE)) torch::torch_manual_seed(seed)
   }
   P <- model$total_dim
   dtype <- model$dtype
-  bgrad <- batched_grad_fn(model, example = torch::torch_zeros(chains, P, dtype = dtype))
+  bgrad <- batched_grad_fn(
+    model,
+    example = torch::torch_zeros(chains, P, dtype = dtype, device = device))
 
   init <- lapply(seq_len(chains), function(i) find_initial_values(model, P))
-  theta <- torch::torch_tensor(do.call(rbind, init), dtype = dtype)   # [C,P]
-  inv_mass <- torch::torch_ones(1L, P, dtype = dtype)                 # shared mass M [1,P]
+  theta <- torch::torch_tensor(do.call(rbind, init), dtype = dtype)$to(device = device)
+  inv_mass <- torch::torch_ones(1L, P, dtype = dtype, device = device)   # shared mass M [1,P]
 
   total_iter <- warmup + n_samples
   samples <- array(NA_real_, dim = c(n_samples, chains, P))
@@ -162,10 +165,11 @@ batched_hmc_sampler <- function(model, n_samples = 1000L, warmup = 1000L,
 
   for (iter in seq_len(total_iter)) {
     eg <- bgrad(theta)
-    mom <- torch::torch_randn(chains, P, dtype = dtype) * torch::torch_sqrt(inv_mass)
+    mom <- torch::torch_randn(chains, P, dtype = dtype, device = device) *
+      torch::torch_sqrt(inv_mass)
     K0 <- 0.5 * torch::torch_sum(mom * mom / inv_mass, dim = 2L)      # [C]
     joint0 <- eg$lp - K0
-    eps_t <- torch::torch_tensor(eps, dtype = dtype)$unsqueeze(2)     # [C,1]
+    eps_t <- torch::torch_tensor(eps, dtype = dtype)$unsqueeze(2)$to(device = device)  # [C,1]
 
     # integration time T ~ U(0, 2pi], L = round(T/eps) (HB1 design). One L per
     # iteration shared across chains (avoids advance-to-max-L waste while keeping
@@ -184,7 +188,7 @@ batched_hmc_sampler <- function(model, n_samples = 1000L, warmup = 1000L,
     a_stat[divergent] <- 0
 
     accepted <- (stats::runif(chains) < a_prob) & !divergent
-    mask <- torch::torch_tensor(accepted, dtype = torch::torch_bool())$unsqueeze(2)
+    mask <- torch::torch_tensor(accepted, dtype = torch::torch_bool())$unsqueeze(2)$to(device = device)
     theta <- torch::torch_where(mask, lf$theta, theta)
     acceptance_rates[iter, ] <- a_stat
     divergences[iter, ] <- divergent
@@ -202,7 +206,7 @@ batched_hmc_sampler <- function(model, n_samples = 1000L, warmup = 1000L,
       if (iter == phase3 && length(warm_draws) > 2) {
         pooled <- do.call(rbind, warm_draws)            # [(nw*C), P]
         v <- apply(pooled, 2, stats::var); v[v < 1e-3] <- 1e-3
-        inv_mass <- torch::torch_tensor(matrix(1 / v, 1L, P), dtype = dtype)
+        inv_mass <- torch::torch_tensor(matrix(1 / v, 1L, P), dtype = dtype)$to(device = device)
         mu <- log(10 * eps); log_eps_bar <- log(eps); H_bar <- rep(0, chains)
       }
       if (iter == warmup) eps <- exp(log_eps_bar)
