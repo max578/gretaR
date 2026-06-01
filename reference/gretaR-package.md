@@ -2,8 +2,8 @@
 
 A probabilistic programming package for Bayesian statistical modelling
 in R using native R syntax. Models are defined interactively with
-`gretaR_array` objects, then compiled to torch tensors for
-GPU-accelerated HMC and NUTS inference.
+`gretaR_array` objects, then compiled to torch tensors for HMC and NUTS
+inference on a native torch (libtorch) backend.
 
 ## Core workflow
 

@@ -11,8 +11,8 @@
 <script src="deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Bayesian Statistical Modelling with Torch">
-<meta name="description" content="A probabilistic programming package for Bayesian statistical modelling in R using native R syntax. Models are defined interactively with gretaR_array objects, then compiled to torch tensors for GPU-accelerated Hamiltonian Monte Carlo and No-U-Turn Sampler inference. No Python dependency required.">
-<meta property="og:description" content="A probabilistic programming package for Bayesian statistical modelling in R using native R syntax. Models are defined interactively with gretaR_array objects, then compiled to torch tensors for GPU-accelerated Hamiltonian Monte Carlo and No-U-Turn Sampler inference. No Python dependency required.">
+<meta name="description" content="A probabilistic programming package for Bayesian statistical modelling in R using native R syntax. Models are defined interactively with gretaR_array objects, then compiled to torch tensors for Hamiltonian Monte Carlo and No-U-Turn Sampler inference. Runs on a native torch (libtorch) backend with no Python dependency required.">
+<meta property="og:description" content="A probabilistic programming package for Bayesian statistical modelling in R using native R syntax. Models are defined interactively with gretaR_array objects, then compiled to torch tensors for Hamiltonian Monte Carlo and No-U-Turn Sampler inference. Runs on a native torch (libtorch) backend with no Python dependency required.">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -62,7 +62,7 @@
 <!-- badges: start -->
 
 <p><strong>Bayesian statistical modelling in R, powered by torch – no Python required.</strong></p>
-<p>gretaR is a probabilistic programming package that lets you define Bayesian models interactively using native R syntax, then compile them to torch tensors for GPU-accelerated inference via HMC, NUTS, ADVI, MAP, and Laplace approximation.</p>
+<p>gretaR is a probabilistic programming package that lets you define Bayesian models interactively using native R syntax, then compile them to torch tensors and fit with HMC, NUTS, ADVI, MAP, and Laplace approximation — all on a native torch (libtorch) backend.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
@@ -125,7 +125,7 @@
 <strong>Sparse matrix support</strong> – efficient large design matrices via <code>as_data_sparse()</code> and <code>sparse_matmul()</code>
 </li>
 <li>
-<strong>Native R torch backend</strong> – automatic differentiation, GPU acceleration, zero Python dependency</li>
+<strong>Native R torch backend</strong> – automatic differentiation and zero Python dependency (GPU/MPS acceleration is on the roadmap)</li>
 <li>
 <strong>Ecosystem integration</strong> – posterior draws returned as <code><a href="https://mc-stan.org/posterior/reference/draws_array.html" class="external-link">posterior::draws_array</a></code> for seamless use with bayesplot, loo, and other tidyverse-compatible tools</li>
 </ul>
@@ -179,7 +179,7 @@
 </tr>
 <tr>
 <td><strong>GPU support</strong></td>
-<td>Yes (CUDA/MPS)</td>
+<td>Planned (MPS)</td>
 <td>Yes (CUDA)</td>
 <td>No</td>
 <td>Limited (OpenCL)</td>

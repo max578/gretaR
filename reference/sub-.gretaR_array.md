@@ -22,7 +22,8 @@ x[i, j, ..., drop = TRUE]
 
 - j:
 
-  Optional second index (for 2D arrays).
+  Not supported. Supplying a column index raises an error; only
+  single-index row/element selection is currently implemented.
 
 - ...:
 
