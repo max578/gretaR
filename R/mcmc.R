@@ -19,7 +19,10 @@
 #' @param step_size Initial step size for the leapfrog integrator. If
 #'   \code{NULL} (default), automatically tuned during warmup.
 #' @param max_treedepth Maximum tree depth for NUTS (default 10).
-#' @param n_leapfrog Number of leapfrog steps for static HMC (default 25).
+#' @param n_leapfrog Safety cap on leapfrog steps per static-HMC iteration
+#'   (default 25). HMC integrates for a random time \eqn{T \sim U(0, 2\pi]} and
+#'   takes \eqn{\mathrm{round}(T/\epsilon)} steps, capped at \code{10 *
+#'   n_leapfrog}, to avoid the resonance that cripples fixed-length HMC.
 #' @param target_accept Target average acceptance probability (default 0.8 for
 #'   NUTS, 0.65 for HMC).
 #' @param init_values Optional list of initial parameter vectors (one per chain).
@@ -80,7 +83,9 @@ mcmc <- function(model, n_samples = 1000L, warmup = 1000L, chains = 4L,
   # Set defaults based on sampler
   # step_size = NULL lets the sampler auto-tune via find_reasonable_epsilon
   if (is.null(target_accept)) {
-    target_accept <- if (sampler == "nuts") 0.8 else 0.65
+    # 0.8 for both: a lower HMC target let dual averaging drive the step size
+    # above the leapfrog stability limit on well-conditioned targets (HB1).
+    target_accept <- 0.8
   }
 
   # Compile the log-prob function for faster gradient evaluation

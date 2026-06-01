@@ -73,12 +73,38 @@ hmc_sampler <- function(model, n_samples = 1000L, warmup = 500L,
       current_K <- 0.5 * sum(mom_vec^2 / inv_mass_vec)
 
       # Leapfrog trajectory
+      joint0 <- current_lp - current_K
       theta_prop <- theta_vec
       mom_prop <- mom_vec
       grad_prop <- eg$grad
       divergent <- FALSE
 
-      for (step in seq_len(n_leapfrog)) {
+      # Average Metropolis acceptance over the trajectory's states -- the
+      # dual-averaging control signal (Stan's accept_stat, = NUTS's
+      # sum_accept/n_accept), NOT the single end-of-trajectory acceptance.
+      # Leapfrog energy error oscillates and can return near zero at the
+      # endpoint, so the endpoint acceptance saturates at 1 over a wide step-
+      # size band and drives eps up without bound (HB1: chains adapted to
+      # eps 1.8-4.4, ess ~45). The trajectory average is smooth in eps and
+      # stabilises adaptation, matching the robust NUTS path.
+      sum_accept <- 0
+      n_accept <- 0L
+
+      # Integration-time HMC. Fixed-length HMC resonates with the target's
+      # periodic Hamiltonian flow: a trajectory that is a near-multiple of the
+      # oscillation period returns close to its start, giving near-zero net
+      # moves and catastrophic autocorrelation (HB1: ess ~10-50, fragile to
+      # the exact L and step size). After mass adaptation the metric is
+      # M = 1/Var, so the target is approximately isotropic with oscillation
+      # period 2*pi. Each iteration we integrate for a *random time*
+      # T ~ U(0, 2*pi] and take L = round(T / eps) steps: this controls the
+      # trajectory length in time (independent of the adapted eps) and
+      # randomises it, averaging over the resonance (Neal 2011, sec 4.2-4.4).
+      # Capped for safety. NUTS achieves the same via dynamic termination.
+      traj_steps <- max(1L, as.integer(round(runif(1, 0, 2 * pi) / eps)))
+      n_lf_iter <- min(traj_steps, 10L * n_leapfrog)
+
+      for (step in seq_len(n_lf_iter)) {
         lf <- tryCatch(
           leapfrog_vec(model, theta_prop, mom_prop, grad_prop, eps, inv_mass_vec),
           error = function(e) NULL
@@ -92,12 +118,21 @@ hmc_sampler <- function(model, n_samples = 1000L, warmup = 500L,
         theta_prop <- lf$theta
         mom_prop <- lf$momentum
         grad_prop <- lf$grad
+
+        joint_step <- lf$lp - 0.5 * sum(mom_prop^2 / inv_mass_vec)
+        a_step <- min(1, exp(min(0, joint_step - joint0)))
+        if (is.nan(a_step)) a_step <- 0
+        sum_accept <- sum_accept + a_step
+        n_accept <- n_accept + 1L
       }
+
+      # Divergent trajectories contribute 0 acceptance so adaptation lowers eps.
+      accept_stat <- if (divergent || n_accept == 0L) 0 else sum_accept / n_accept
 
       if (!divergent) {
         proposed_lp <- lf$lp
         proposed_K <- 0.5 * sum(mom_prop^2 / inv_mass_vec)
-        delta_H <- (proposed_lp - proposed_K) - (current_lp - current_K)
+        delta_H <- (proposed_lp - proposed_K) - joint0
 
         if (is.nan(delta_H) || abs(delta_H) > 1000) {
           divergent <- TRUE
@@ -116,13 +151,15 @@ hmc_sampler <- function(model, n_samples = 1000L, warmup = 500L,
         theta_vec <- theta_prop
       }
 
-      acceptance_rates[iter, chain] <- accept_prob
+      # Report the averaged accept_stat (the adaptation/diagnostic statistic,
+      # as NUTS does); the actual move above uses the exact endpoint MH ratio.
+      acceptance_rates[iter, chain] <- accept_stat
 
       # Warmup adaptation (windowed)
       if (iter <= warmup) {
         m_iter <- iter
         w <- 1 / (m_iter + t0)
-        H_bar <- (1 - w) * H_bar + w * (target_accept - accept_prob)
+        H_bar <- (1 - w) * H_bar + w * (target_accept - accept_stat)
         log_eps <- mu - (sqrt(m_iter) / gamma) * H_bar
         eps <- exp(log_eps)
         m_w <- m_iter^(-kappa)

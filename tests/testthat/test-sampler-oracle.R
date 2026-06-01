@@ -21,17 +21,12 @@
 test_that("HMC recovers a conjugate-Normal posterior (mean + sd + rhat) [GS10]", {
   skip_on_cran()
   skip_if_not(torch::torch_is_installed())
-  # KNOWN OPEN DEFECT (surfaced by this oracle, 2026-06-01): the fixed-path
-  # HMC sampler does NOT converge even on this trivial conjugate-Normal model
-  # -- rhat ~1.5 persists at 8000 samples x 4 chains, the posterior SD is
-  # biased ~12% low, and NaN gradients arise that cannot occur analytically
-  # for a Gaussian (pointing at leapfrog overshoot + the divergence check
-  # being defeated by upstream NaN->0 zeroing). NUTS recovers the same model
-  # cleanly (see test-nuts-multinomial-recovery.R). Path-length jitter made it
-  # worse, so this is not simple resonance. Tracked as a distinct finding;
-  # un-skip once the HMC convergence defect is fixed. Do NOT loosen the
-  # assertions to make this pass -- that would mask the defect.
-  skip("HMC convergence defect open -- see comment + PROJECT_LOG 2026-06-01")
+  # HB1 (fixed 2026-06-01): fixed-length HMC did not converge here (rhat ~1.5,
+  # ess ~10-50) because the trajectory length resonated with the target's
+  # periodic flow and dual averaging drove the step size above the leapfrog
+  # stability limit. Fixed via accept_stat-based step adaptation + integration-
+  # time trajectories (T ~ U(0, 2*pi], L = round(T/eps)). This oracle now
+  # guards the recovery; do NOT loosen the assertions.
 
   reset_gretaR_env()
   set.seed(42)

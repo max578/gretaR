@@ -39,7 +39,10 @@ or \code{"stan"} (generates Stan code, compiles and runs via cmdstanr).}
 
 \item{max_treedepth}{Maximum tree depth for NUTS (default 10).}
 
-\item{n_leapfrog}{Number of leapfrog steps for static HMC (default 25).}
+\item{n_leapfrog}{Safety cap on leapfrog steps per static-HMC iteration
+(default 25). HMC integrates for a random time \eqn{T \sim U(0, 2\pi]} and
+takes \eqn{\mathrm{round}(T/\epsilon)} steps, capped at \code{10 *
+  n_leapfrog}, to avoid the resonance that cripples fixed-length HMC.}
 
 \item{target_accept}{Target average acceptance probability (default 0.8 for
 NUTS, 0.65 for HMC).}
