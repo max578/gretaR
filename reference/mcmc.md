@@ -65,7 +65,10 @@ mcmc(
 
 - n_leapfrog:
 
-  Number of leapfrog steps for static HMC (default 25).
+  Safety cap on leapfrog steps per static-HMC iteration (default 25).
+  HMC integrates for a random time \\T \sim U(0, 2\pi\]\\ and takes
+  \\\mathrm{round}(T/\epsilon)\\ steps, capped at `10 * n_leapfrog`, to
+  avoid the resonance that cripples fixed-length HMC.
 
 - target_accept:
 

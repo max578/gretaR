@@ -113,7 +113,10 @@ or <code>"stan"</code> (generates Stan code, compiles and runs via cmdstanr).</p
 
 
 <dt id="arg-n-leapfrog">n_leapfrog<a class="anchor" aria-label="anchor" href="#arg-n-leapfrog"></a></dt>
-<dd><p>Number of leapfrog steps for static HMC (default 25).</p></dd>
+<dd><p>Safety cap on leapfrog steps per static-HMC iteration
+(default 25). HMC integrates for a random time \(T \sim U(0, 2\pi]\) and
+takes \(\mathrm{round}(T/\epsilon)\) steps, capped at <code>10 *
+  n_leapfrog</code>, to avoid the resonance that cripples fixed-length HMC.</p></dd>
 
 
 <dt id="arg-target-accept">target_accept<a class="anchor" aria-label="anchor" href="#arg-target-accept"></a></dt>
