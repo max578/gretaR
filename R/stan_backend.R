@@ -355,15 +355,24 @@ node_to_stan_expr <- function(node, dag_nodes, param_names, node_stan_names = li
       a <- parent_exprs[1]
       b <- parent_exprs[2]
       stan_expr <- switch(ot,
-        "binary_+" = sprintf("(%s + %s)", a, b),
-        "binary_-" = sprintf("(%s - %s)", a, b),
-        "binary_*" = sprintf("(%s * %s)", a, b),
-        "binary_/" = sprintf("(%s / %s)", a, b),
-        "binary_^" = sprintf("pow(%s, %s)", a, b),
-        "matmul"   = sprintf("(%s * %s)", a, b),
+        "binary_+"  = sprintf("(%s + %s)", a, b),
+        "binary_-"  = sprintf("(%s - %s)", a, b),
+        "binary_*"  = sprintf("(%s * %s)", a, b),
+        "binary_/"  = sprintf("(%s / %s)", a, b),
+        "binary_^"  = sprintf("pow(%s, %s)", a, b),
+        "binary_%%" = sprintf("fmod(%s, %s)", a, b),
+        "binary_>"  = sprintf("(%s > %s)", a, b),
+        "binary_<"  = sprintf("(%s < %s)", a, b),
+        "binary_>=" = sprintf("(%s >= %s)", a, b),
+        "binary_<=" = sprintf("(%s <= %s)", a, b),
+        "binary_==" = sprintf("(%s == %s)", a, b),
+        "binary_!=" = sprintf("(%s != %s)", a, b),
+        "matmul"    = sprintf("(%s * %s)", a, b),
         "index_select" = sprintf("%s[%s]", a, b),
-        # fallback: try deparse
-        sprintf("(%s + %s)", a, b)
+        # No silent fallback: an unhandled binary op would emit wrong Stan code.
+        cli_abort(
+          "Cannot translate binary operation {.val {ot}} to Stan code."
+        )
       )
       return(stan_expr)
     }
@@ -388,7 +397,11 @@ node_to_stan_expr <- function(node, dag_nodes, param_names, node_stan_names = li
         "transpose"    = sprintf("(%s)'", a),
         "sum"          = sprintf("sum(%s)", a),
         "mean"         = sprintf("mean(%s)", a),
-        a  # fallback: pass through
+        # No silent pass-through: an unhandled unary op would drop a
+        # transform (e.g. floor, tanh) and emit the identity by mistake.
+        cli_abort(
+          "Cannot translate unary operation {.val {ot}} to Stan code."
+        )
       )
       return(stan_expr)
     }

@@ -11,7 +11,8 @@
 
 \item{i}{Index: an integer vector or a gretaR_array of integer indices.}
 
-\item{j}{Optional second index (for 2D arrays).}
+\item{j}{Not supported. Supplying a column index raises an error; only
+single-index row/element selection is currently implemented.}
 
 \item{...}{Additional arguments (ignored).}
 

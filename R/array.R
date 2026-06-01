@@ -315,13 +315,25 @@ distribution <- function(x) {
 #'
 #' @param x A gretaR_array.
 #' @param i Index: an integer vector or a gretaR_array of integer indices.
-#' @param j Optional second index (for 2D arrays).
+#' @param j Not supported. Supplying a column index raises an error; only
+#'   single-index row/element selection is currently implemented.
 #' @param ... Additional arguments (ignored).
 #' @param drop Logical (ignored; always returns a gretaR_array).
 #' @return A new gretaR_array with elements selected by the index.
 #' @export
 `[.gretaR_array` <- function(x, i, j, ..., drop = TRUE) {
   node <- get_node(x)
+
+  # Only single-index row/element selection (e.g. alpha[group_id]) is
+  # implemented. A second index would previously be ignored, silently
+  # row-selecting instead of returning element [i, j] -- fail loud instead.
+  if (!missing(j)) {
+    cli_abort(c(
+      "Column indexing of a {.cls gretaR_array} is not supported.",
+      "i" = "Only single-index selection is implemented (e.g. {.code alpha[group_id]}).",
+      "i" = "Two-dimensional {.code [i, j]} selection is planned for a future release."
+    ))
+  }
 
   # --- Determine the index vector and create an index data node ---
   if (inherits(i, "gretaR_array")) {

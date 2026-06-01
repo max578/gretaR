@@ -166,6 +166,9 @@ fast_grad <- function(compiled_fn, theta_vec, dtype) {
   lp <- compiled_fn(theta_t)
   grads <- autograd_grad(lp, theta_t)
   grad_vec <- as.numeric(grads[[1]])
-  if (any(is.nan(grad_vec))) grad_vec[is.nan(grad_vec)] <- 0
+  if (any(is.nan(grad_vec))) {
+    cli_alert_warning("NaN gradient detected; replacing with 0 (model may be misspecified)")
+    grad_vec[is.nan(grad_vec)] <- 0
+  }
   list(lp = lp$item(), grad = grad_vec)
 }

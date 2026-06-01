@@ -495,11 +495,11 @@ summary.gretaR_glm_fit <- function(object, ...) {
       attr(summ, "random_effects") <- object$random_effects
     }
     summ
-  } else if (object$sampler == "map") {
+  } else if (identical(object$method, "map")) {
     # Return a structured list for MAP fits
     out <- list(
       fixed_effects = object$col_names,
-      map_estimates = object$result$par,
+      map_estimates = object$par,
       random_effects = object$random_effects
     )
     class(out) <- "summary.gretaR_glm_fit"
