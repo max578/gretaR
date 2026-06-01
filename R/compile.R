@@ -135,18 +135,42 @@ compile_model <- function(model, use_jit = TRUE) {
   tryCatch({
     example_input <- torch_zeros(model$total_dim, dtype = model$dtype)
     traced <- jit_trace(compiled_fn, example_input)
-    # Verify traced output matches untraced
-    test_input <- torch_randn(model$total_dim, dtype = model$dtype) * 0.1
-    orig <- compiled_fn(test_input)$item()
-    traced_val <- traced(test_input)$item()
-    if (abs(orig - traced_val) < 1e-3) {
-      return(traced)
+
+    # Verify the trace agrees with the compiled function at several points, not
+    # one -- a single-point match can mask a divergent trace. Use a dtype-aware
+    # relative tolerance: a loose absolute 1e-3 was meaningless for large
+    # log-densities, while too tight a bound would reject benign float32 JIT
+    # reassociation. -Inf points (out-of-support) must match exactly.
+    rel_tol <- if (identical(model$dtype, torch_float64())) 1e-8 else 1e-4
+    agree <- TRUE
+    for (scale in c(0.1, 0.5, 1.0)) {
+      ti <- torch_randn(model$total_dim, dtype = model$dtype) * scale
+      o <- compiled_fn(ti)$item()
+      tv <- traced(ti)$item()
+      ok <- if (is.finite(o) && is.finite(tv)) {
+        abs(o - tv) <= rel_tol * (1 + abs(o))
+      } else {
+        identical(o, tv)
+      }
+      if (!ok) {
+        agree <- FALSE
+        break
+      }
+    }
+    if (agree) {
+      traced
     } else {
-      cli_alert_warning("JIT trace produced different output; falling back to compiled function.")
-      return(compiled_fn)
+      cli_alert_warning(
+        "JIT trace disagreed with the compiled log-density; using the compiled function."
+      )
+      compiled_fn
     }
   }, error = function(e) {
-    # JIT tracing failed — fall back to compiled (still faster than original)
+    # JIT tracing unavailable -- surface it (perf fallback, not a correctness
+    # issue: the compiled function is exact) rather than failing silently.
+    cli_alert_info(
+      "JIT tracing unavailable ({conditionMessage(e)}); using the compiled log-density."
+    )
     compiled_fn
   })
 }

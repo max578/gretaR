@@ -117,3 +117,61 @@ test_that("fast_grad warns before zeroing NaN gradients (GS7)", {
   )
   expect_false(any(is.nan(g$grad)))
 })
+
+# --- Uniform log_prob: -Inf outside support + per-observation count ---------
+
+test_that("uniform log_prob is -Inf outside [a, b] and counts observations", {
+  skip_if_not_installed("torch")
+
+  dist <- UniformDistribution$new(lower = 0, upper = 2)
+  mk <- function(v) torch::torch_tensor(matrix(v, ncol = 1))
+
+  # Single in-support observation -> -log(b - a).
+  expect_equal(dist$log_prob(mk(1.0))$item(), -log(2), tolerance = 1e-5)
+  # Two in-support observations -> -2 log(b - a) (old form under-counted to one).
+  expect_equal(dist$log_prob(mk(c(0.5, 1.5)))$item(), -2 * log(2), tolerance = 1e-5)
+  # Any out-of-support observation -> -Inf (old form returned a finite density).
+  lp_out <- dist$log_prob(mk(c(0.5, 2.5)))$item()
+  expect_true(is.infinite(lp_out) && lp_out < 0)
+  expect_true(is.infinite(dist$log_prob(mk(-0.1))$item()))
+})
+
+# --- JIT trace verification agrees with the uncompiled log-density ----------
+
+test_that("compile_model JIT path matches the uncompiled log-density", {
+  skip_if_not_installed("torch")
+  reset_gretaR_env()
+
+  set.seed(1)
+  y <- as_data(rnorm(10))
+  mu <- normal(0, 5)
+  distribution(y) <- normal(mu, 1)
+  m <- model(mu)
+
+  f_plain <- compile_model(m, use_jit = FALSE)
+  f_jit <- suppressMessages(compile_model(m, use_jit = TRUE))
+
+  # Whichever path the verification selects (traced or fallback), the result
+  # must equal the plain compiled function at several points.
+  for (v in c(0, 0.5, -1.2)) {
+    ti <- torch::torch_tensor(rep(v, m$total_dim), dtype = m$dtype)
+    expect_equal(f_jit(ti)$item(), f_plain(ti)$item(), tolerance = 1e-4)
+  }
+})
+
+# --- compile_to_stan emits a parseable program (was: zero coverage) ---------
+
+test_that("compile_to_stan emits a Stan program with the expected blocks", {
+  skip_if_not_installed("torch")
+  reset_gretaR_env()
+
+  y <- as_data(rnorm(20))
+  mu <- normal(0, 10)
+  sigma <- half_cauchy(2)
+  distribution(y) <- normal(mu, sigma)
+
+  code <- compile_to_stan(model(mu, sigma))
+  expect_type(code, "character")
+  expect_match(code, "parameters", fixed = TRUE)
+  expect_match(code, "model", fixed = TRUE)
+})

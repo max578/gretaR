@@ -392,7 +392,18 @@ UniformDistribution <- R6::R6Class(
     log_prob = function(x) {
       a <- resolve_param(self$parameters$lower)
       b <- resolve_param(self$parameters$upper)
-      torch_sum(-torch_log(b - a))
+      # Per-observation density -log(b - a) summed over x (cf. normal above);
+      # the old form ignored x and so under-counted vector data.
+      lp <- torch_sum(-torch_log(b - a) * torch_ones_like(x))
+      # Any observation outside [a, b] is impossible -> log-density -Inf
+      # (the old form returned a finite density everywhere). Same idiom as
+      # truncation_log_adjust(); torch_any() is not exposed by the R binding.
+      out_of_support <- (x < a) | (x > b)
+      n_oos <- torch_sum(out_of_support$to(dtype = torch_int64()))$item()
+      if (n_oos > 0) {
+        return(torch_tensor(-Inf, dtype = lp$dtype, device = lp$device))
+      }
+      lp
     },
 
     sample = function(n = 1L) {
