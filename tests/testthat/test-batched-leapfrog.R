@@ -4,16 +4,24 @@
 
 .glm_model <- function() {
   reset_gretaR_env()
-  set.seed(1); x <- rnorm(40); X <- as_data(cbind(1, x))
-  b <- normal(0, 5, dim = 2); s <- half_cauchy(2)
-  eta <- X %*% b; y <- as_data(1.5 - 0.8 * x + rnorm(40))
+  set.seed(1)
+  x <- rnorm(40)
+  X <- as_data(cbind(1, x))
+  b <- normal(0, 5, dim = 2)
+  s <- half_cauchy(2)
+  eta <- X %*% b
+  y <- as_data(1.5 - 0.8 * x + rnorm(40))
   distribution(y) <- normal(eta, s)
   model(b, s)
 }
 
 # single-chain reference leapfrog over compile_log_prob ([P] tensors)
 .sc_leapfrog <- function(f1, theta, mom, grad, eps, L, inv_mass) {
-  g <- function(th) { t <- th$clone()$detach()$requires_grad_(TRUE); o <- f1(t); torch::autograd_grad(o, t)[[1]]$detach() }
+  g <- function(th) {
+    t <- th$clone()$detach()$requires_grad_(TRUE)
+    o <- f1(t)
+    torch::autograd_grad(o, t)[[1]]$detach()
+  }
   for (s in seq_len(L)) {
     mom <- mom + 0.5 * eps * grad
     theta <- theta + eps * mom / inv_mass
@@ -25,15 +33,22 @@
 
 test_that("batched leapfrog equals looping single-chain leapfrog (theta + mom)", {
   skip_if_not(torch::torch_is_installed())
-  m <- .glm_model(); P <- 3L; C <- 5L
-  f1 <- compile_log_prob(m); bgrad <- batched_grad_fn(m)
+  m <- .glm_model()
+  P <- 3L
+  C <- 5L
+  f1 <- compile_log_prob(m)
+  bgrad <- batched_grad_fn(m)
 
   torch::torch_manual_seed(2)
-  theta0 <- torch::torch_randn(C, P) * 0.4; mom0 <- torch::torch_randn(C, P)
-  inv_mass <- torch::torch_tensor(c(1.3, 0.7, 2.1)); eps <- 0.02; L <- 25L
+  theta0 <- torch::torch_randn(C, P) * 0.4
+  mom0 <- torch::torch_randn(C, P)
+  inv_mass <- torch::torch_tensor(c(1.3, 0.7, 2.1))
+  eps <- 0.02
+  L <- 25L
 
   out <- batched_leapfrog(bgrad, theta0, mom0, bgrad(theta0)$grad, eps, L, inv_mass)
-  th_b <- as.matrix(as_array(out$theta$cpu())); mo_b <- as.matrix(as_array(out$mom$cpu()))
+  th_b <- as.matrix(as_array(out$theta$cpu()))
+  mo_b <- as.matrix(as_array(out$mom$cpu()))
   for (c in seq_len(C)) {
     g0 <- bgrad(theta0[c, ]$unsqueeze(1))$grad$squeeze(1)
     r <- .sc_leapfrog(f1, theta0[c, ], mom0[c, ], g0, eps, L, inv_mass)
@@ -44,11 +59,15 @@ test_that("batched leapfrog equals looping single-chain leapfrog (theta + mom)",
 
 test_that("batched leapfrog conserves energy and honours ragged step counts", {
   skip_if_not(torch::torch_is_installed())
-  m <- .glm_model(); P <- 3L; C <- 6L
-  f1 <- compile_log_prob(m); bgrad <- batched_grad_fn(m)
+  m <- .glm_model()
+  P <- 3L
+  C <- 6L
+  f1 <- compile_log_prob(m)
+  bgrad <- batched_grad_fn(m)
 
   torch::torch_manual_seed(3)
-  theta0 <- torch::torch_randn(C, P) * 0.4; mom0 <- torch::torch_randn(C, P)
+  theta0 <- torch::torch_randn(C, P) * 0.4
+  mom0 <- torch::torch_randn(C, P)
   inv_mass <- torch::torch_tensor(c(1.3, 0.7, 2.1))
 
   # energy conservation (small eps)

@@ -29,26 +29,39 @@ test_that("batched log-density matches stacked single-chain (lp + grad)", {
 
   # Conjugate Normal (normal density, identity transform).
   reset_gretaR_env()
-  y <- as_data(rnorm(8, 3, 2)); mu <- normal(0, 10); distribution(y) <- normal(mu, 2)
+  y <- as_data(rnorm(8, 3, 2))
+  mu <- normal(0, 10)
+  distribution(y) <- normal(mu, 2)
   d <- .batched_matches_stacked(model(mu), 1L)
-  expect_lt(d$dlp, 1e-4); expect_lt(d$dg, 1e-4)
+  expect_lt(d$dlp, 1e-4)
+  expect_lt(d$dg, 1e-4)
 
   # Gaussian GLM (matmul, log-transform jacobian on sigma, half-Cauchy prior).
   reset_gretaR_env()
-  set.seed(1); x <- rnorm(40); X <- as_data(cbind(1, x))
-  b <- normal(0, 5, dim = 2); s <- half_cauchy(2)
-  eta <- X %*% b; yv <- as_data(1.5 - 0.8 * x + rnorm(40))
+  set.seed(1)
+  x <- rnorm(40)
+  X <- as_data(cbind(1, x))
+  b <- normal(0, 5, dim = 2)
+  s <- half_cauchy(2)
+  eta <- X %*% b
+  yv <- as_data(1.5 - 0.8 * x + rnorm(40))
   distribution(yv) <- normal(eta, s)
   d <- .batched_matches_stacked(model(b, s), 3L)
-  expect_lt(d$dlp, 1e-4); expect_lt(d$dg, 1e-4)
+  expect_lt(d$dlp, 1e-4)
+  expect_lt(d$dg, 1e-4)
 
   # Hierarchical intercepts (index_select).
   reset_gretaR_env()
-  G <- 3L; n <- 30L; grp <- rep(1:G, each = n / G)
-  alpha <- normal(0, 2, dim = G); a_obs <- alpha[grp]
-  yh <- as_data(rnorm(n)); distribution(yh) <- normal(a_obs, 1)
+  G <- 3L
+  n <- 30L
+  grp <- rep(1:G, each = n / G)
+  alpha <- normal(0, 2, dim = G)
+  a_obs <- alpha[grp]
+  yh <- as_data(rnorm(n))
+  distribution(yh) <- normal(a_obs, 1)
   d <- .batched_matches_stacked(model(alpha), 3L)
-  expect_lt(d$dlp, 1e-4); expect_lt(d$dg, 1e-4)
+  expect_lt(d$dlp, 1e-4)
+  expect_lt(d$dg, 1e-4)
 })
 
 test_that("batched density covers the common univariate families", {
@@ -56,7 +69,10 @@ test_that("batched density covers the common univariate families", {
 
   mk <- function(prior) {
     reset_gretaR_env()
-    p <- prior(); y <- as_data(rnorm(5)); distribution(y) <- normal(0, 1); model(p)
+    p <- prior()
+    y <- as_data(rnorm(5))
+    distribution(y) <- normal(0, 1)
+    model(p)
   }
   priors <- list(
     half_normal = function() half_normal(2),

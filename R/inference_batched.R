@@ -105,7 +105,8 @@ batched_leapfrog <- function(bgrad, theta, mom, grad, eps, n_steps, inv_mass,
 }
 
 #' Constrain a batched unconstrained position to the model's parameter space
-#' @param model A `gretaR_model`; @param theta `[C, P]` unconstrained.
+#' @param model A `gretaR_model`.
+#' @param theta `[C, P]` unconstrained.
 #' @return `[C, P]` constrained (per-variable inverse transform applied).
 #' @noRd
 .batched_constrain <- function(model, theta) {
@@ -157,8 +158,12 @@ batched_hmc_sampler <- function(model, n_samples = 1000L, warmup = 1000L,
 
   # per-chain dual-averaging state
   eps <- rep(0.25, chains)
-  H_bar <- rep(0, chains); log_eps_bar <- log(eps); mu <- log(10 * eps)
-  gamma <- 0.05; t0 <- 10; kappa <- 0.75
+  H_bar <- rep(0, chains)
+  log_eps_bar <- log(eps)
+  mu <- log(10 * eps)
+  gamma <- 0.05
+  t0 <- 10
+  kappa <- 0.75
   phase2 <- max(1L, as.integer(warmup * 0.15))
   phase3 <- max(phase2 + 1L, as.integer(warmup * 0.9))
   warm_draws <- list()
@@ -184,7 +189,8 @@ batched_hmc_sampler <- function(model, n_samples = 1000L, warmup = 1000L,
     dH <- as.numeric(((lf$lp - Kp) - joint0)$cpu())                  # [C]
     a_stat <- as.numeric(lf$accept_stat$cpu())
     divergent <- is.nan(dH) | abs(dH) > 1000
-    a_prob <- pmin(1, exp(pmin(0, dH))); a_prob[divergent | is.nan(a_prob)] <- 0
+    a_prob <- pmin(1, exp(pmin(0, dH)))
+    a_prob[divergent | is.nan(a_prob)] <- 0
     a_stat[divergent] <- 0
 
     accepted <- (stats::runif(chains) < a_prob) & !divergent
@@ -205,9 +211,12 @@ batched_hmc_sampler <- function(model, n_samples = 1000L, warmup = 1000L,
       }
       if (iter == phase3 && length(warm_draws) > 2) {
         pooled <- do.call(rbind, warm_draws)            # [(nw*C), P]
-        v <- apply(pooled, 2, stats::var); v[v < 1e-3] <- 1e-3
+        v <- apply(pooled, 2, stats::var)
+        v[v < 1e-3] <- 1e-3
         inv_mass <- torch::torch_tensor(matrix(1 / v, 1L, P), dtype = dtype)$to(device = device)
-        mu <- log(10 * eps); log_eps_bar <- log(eps); H_bar <- rep(0, chains)
+        mu <- log(10 * eps)
+        log_eps_bar <- log(eps)
+        H_bar <- rep(0, chains)
       }
       if (iter == warmup) eps <- exp(log_eps_bar)
     } else {

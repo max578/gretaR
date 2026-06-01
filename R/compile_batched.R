@@ -25,12 +25,14 @@
 .bd <- new.env(parent = emptyenv())
 
 .bd$normal <- function(x, p) {
-  mu <- p$mean; sigma <- torch_clamp(p$sd, min = 1e-30)
+  mu <- p$mean
+  sigma <- torch_clamp(p$sd, min = 1e-30)
   z <- (x - mu) / sigma
   -0.9189385332046727 - torch_log(sigma) - 0.5 * z * z
 }
 .bd$lognormal <- function(x, p) {
-  xc <- torch_clamp(x, min = 1e-30); sigma <- torch_clamp(p$sd, min = 1e-30)
+  xc <- torch_clamp(x, min = 1e-30)
+  sigma <- torch_clamp(p$sd, min = 1e-30)
   z <- (torch_log(xc) - p$meanlog) / sigma
   -torch_log(xc) - torch_log(sigma) - 0.9189385332046727 - 0.5 * z * z
 }
@@ -44,7 +46,8 @@
   x * torch_log(pr) + (1 - x) * torch_log(1 - pr)
 }
 .bd$cauchy <- function(x, p) {
-  sc <- torch_clamp(p$scale, min = 1e-30); z <- (x - p$location) / sc
+  sc <- torch_clamp(p$scale, min = 1e-30)
+  z <- (x - p$location) / sc
   -1.1447298858494002 - torch_log(sc) - torch_log(1 + z * z)  # -log(pi) - ...
 }
 .bd$gamma <- function(x, p) {
@@ -61,7 +64,8 @@
 # half-normal / half-cauchy on the positive half-line (constants match the
 # single-chain log_prob in distributions.R exactly).
 .bd$half_normal <- function(x, p) {
-  sigma <- torch_clamp(p$sd, min = 1e-30); z <- x / sigma
+  sigma <- torch_clamp(p$sd, min = 1e-30)
+  z <- x / sigma
   -0.2257914 - torch_log(sigma) - 0.5 * z * z           # log(sqrt(2/pi)) - ...
 }
 .bd$half_cauchy <- function(x, p) {
@@ -78,9 +82,11 @@
   } else if (cls %in% c("LogTransform", "LowerBoundTransform")) {
     s_trailing(y)                                   # log|det J| = sum y
   } else if (cls == "LogitTransform") {
-    sg <- torch_sigmoid(y); s_trailing(torch_log(sg) + torch_log(1 - sg))
+    sg <- torch_sigmoid(y)
+    s_trailing(torch_log(sg) + torch_log(1 - sg))
   } else if (cls == "ScaledLogitTransform") {
-    sg <- torch_sigmoid(y); rng <- transform$upper - transform$lower
+    sg <- torch_sigmoid(y)
+    rng <- transform$upper - transform$lower
     s_trailing(log(rng) + torch_log(sg) + torch_log(1 - sg))
   } else if (cls == "SoftplusTransform") {
     s_trailing(torch_log(torch_sigmoid(y)))
@@ -198,7 +204,8 @@ compile_log_prob_batched <- function(model) {
   pv <- lapply(node$parents, bcompute)
   ot <- node$op_type %||% "unknown"
   if (length(pv) == 2L) {
-    a <- pv[[1]]; b <- pv[[2]]
+    a <- pv[[1]]
+    b <- pv[[2]]
     switch(ot,
       "binary_+" = a + b, "binary_-" = a - b,
       "binary_*" = a * b, "binary_/" = a / b,
