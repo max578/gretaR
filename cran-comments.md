@@ -69,6 +69,6 @@ No reverse dependencies on CRAN at this time (first submission).
   vignette and example uses of `cmdstanr` are guarded with
   `requireNamespace("cmdstanr", quietly = TRUE)`.
 
-* **Test surface.** 210 PASS / 0 FAIL / 1 WARN / 20 SKIP on CRAN. The
-  20 skips are slow MCMC integration tests guarded by
-  `skip_on_cran()`; they run in full CI on every push.
+* **Test surface.** 258 PASS / 0 FAIL / 0 WARN / 22 SKIP under
+  `R CMD check --as-cran`. The 22 skips are slow MCMC integration tests
+  guarded by `skip_on_cran()`; they run in full CI on every push.
