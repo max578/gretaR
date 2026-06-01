@@ -8,8 +8,8 @@ Authors@R:
 Description: A probabilistic programming package for Bayesian statistical
     modelling in R using native R syntax. Models are defined interactively
     with 'gretaR_array' objects, then compiled to 'torch' tensors for
-    GPU-accelerated Hamiltonian Monte Carlo and No-U-Turn Sampler inference.
-    No Python dependency required.
+    Hamiltonian Monte Carlo and No-U-Turn Sampler inference. Runs on a
+    native 'torch' (libtorch) backend with no Python dependency required.
 License: MIT + file LICENSE
 URL: https://github.com/max578/gretaR, https://max578.github.io/gretaR/
 BugReports: https://github.com/max578/gretaR/issues

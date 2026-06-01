@@ -26,7 +26,7 @@ No-U-Turn Sampler (NUTS).
 **Key features:**
 
 - Pure R — no Python or reticulate dependency
-- GPU-accelerated inference via torch
+- Native torch (libtorch) backend -- CPU today, GPU/MPS on the roadmap
 - Familiar R syntax: standard operators, functions, and assignment
 - Output compatible with `posterior`, `bayesplot`, and `loo`
 

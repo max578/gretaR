@@ -19,8 +19,8 @@ required.**
 
 gretaR is a probabilistic programming package that lets you define
 Bayesian models interactively using native R syntax, then compile them
-to torch tensors for GPU-accelerated inference via HMC, NUTS, ADVI, MAP,
-and Laplace approximation.
+to torch tensors and fit with HMC, NUTS, ADVI, MAP, and Laplace
+approximation — all on a native torch (libtorch) backend.
 
 ## Installation
 
@@ -96,8 +96,8 @@ summary(draws)
   core DSL
 - **Sparse matrix support** – efficient large design matrices via
   `as_data_sparse()` and `sparse_matmul()`
-- **Native R torch backend** – automatic differentiation, GPU
-  acceleration, zero Python dependency
+- **Native R torch backend** – automatic differentiation and zero
+  Python dependency (GPU/MPS acceleration is on the roadmap)
 - **Ecosystem integration** – posterior draws returned as
   `posterior::draws_array` for seamless use with bayesplot, loo, and
   other tidyverse-compatible tools
@@ -110,7 +110,7 @@ summary(draws)
 | **Python dependency** | None | Required | None | None |
 | **Installation** | Simple | Fragile (TF/Python) | Moderate | Moderate (C++ toolchain) |
 | **Syntax style** | Interactive R DSL | Interactive R DSL | Formula | Stan language |
-| **GPU support** | Yes (CUDA/MPS) | Yes (CUDA) | No | Limited (OpenCL) |
+| **GPU support** | Planned (MPS) | Yes (CUDA) | No | Limited (OpenCL) |
 | **Automatic differentiation** | torch autograd | TF autograd | Stan autodiff | Stan autodiff |
 | **HMC/NUTS** | Yes | Yes | Yes (via Stan) | Yes |
 | **Variational inference** | ADVI (MF + FR) | No | No | Yes |

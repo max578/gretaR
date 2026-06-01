@@ -655,7 +655,7 @@ coef(fit_stan_map)
 |---|---|---|
 | Production inference | `"stan"` | 30-150x faster for standard models |
 | Custom distributions | `"torch"` | Stan can't express arbitrary torch log_prob |
-| GPU models | `"torch"` | Stan has no GPU support |
+| Very large models (future) | `"torch"` | GPU/MPS is on the torch roadmap; Stan has no GPU path |
 | Quick prototyping | `"torch"` + `opt()` | No compilation wait |
 | Hierarchical models | `"stan"` | Massive speedup (100x+) |
 
