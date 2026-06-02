@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gretaR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,6 +41,14 @@
       <small>Source: <a href="https://github.com/max578/gretaR/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="development version" id="gretar-development-version">gretaR (development version)<a class="anchor" aria-label="anchor" href="#gretar-development-version"></a></h2>
+<div class="section level3">
+<h3 id="sampling-development-version">Sampling<a class="anchor" aria-label="anchor" href="#sampling-development-version"></a></h3>
+<ul><li>
+<strong>Optional dense mass-matrix metric</strong> for the single-chain HMC/NUTS samplers, via <code>mcmc(..., metric = "dense")</code>. The default stays <code>"diag"</code> (a diagonal metric, the inverse posterior variance) – robust and unchanged. A dense metric estimates the full inverse posterior covariance during warmup and captures linear parameter correlations a diagonal metric is blind to: on a regression with strongly correlated predictors it roughly tripled effective sample size per second in our tests. It is opt-in by design – it adds  cost and does <strong>not</strong> help (and can hurt) funnel-shaped posteriors such as hierarchical latent blocks, where the mixing bottleneck is non-Gaussian curvature rather than linear correlation. Falls back to a diagonal metric, with a message, when the dimension is too large or warmup draws too few. The momentum, velocity, and kinetic-energy operations are now routed through a small metric abstraction shared by HMC and NUTS, so the diagonal path is behaviourally identical to before (sampler oracle unchanged).</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.4.0" id="gretar-040">gretaR 0.4.0<a class="anchor" aria-label="anchor" href="#gretar-040"></a></h2>
 <p>The programmatic model-construction API that lets an embedding package (e.g. flexyBayes) drive gretaR from its own intermediate representation.</p>

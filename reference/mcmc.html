@@ -13,7 +13,7 @@ compatible with the posterior and bayesplot packages."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">gretaR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -68,6 +68,7 @@ compatible with the <code>posterior</code> and <code>bayesplot</code> packages.<
 <span>  max_treedepth <span class="op">=</span> <span class="fl">10L</span>,</span>
 <span>  n_leapfrog <span class="op">=</span> <span class="fl">25L</span>,</span>
 <span>  target_accept <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  metric <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"diag"</span>, <span class="st">"dense"</span><span class="op">)</span>,</span>
 <span>  init_values <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  seed <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  batched <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -124,6 +125,20 @@ takes \(\mathrm{round}(T/\epsilon)\) steps, capped at <code>10 *
 <dt id="arg-target-accept">target_accept<a class="anchor" aria-label="anchor" href="#arg-target-accept"></a></dt>
 <dd><p>Target average acceptance probability (default 0.8 for
 NUTS, 0.65 for HMC).</p></dd>
+
+
+<dt id="arg-metric">metric<a class="anchor" aria-label="anchor" href="#arg-metric"></a></dt>
+<dd><p>Mass-matrix metric for the single-chain samplers, estimated
+during warmup. <code>"diag"</code> (default) is a diagonal metric (inverse
+posterior variance) – the robust, Stan-default choice. <code>"dense"</code> is a
+dense metric (inverse posterior covariance) that captures linear parameter
+correlations a diagonal metric is blind to; it can substantially improve
+mixing on correlated posteriors (e.g. regression with correlated
+predictors), but it is opt-in because it does not help – and can hurt –
+funnel-shaped posteriors such as hierarchical latent blocks, and it adds
+\(O(P^2)\) cost. Falls back to diagonal (with a message) when the
+dimension is too large or warmup draws are too few to estimate a covariance.
+Ignored on the batched path.</p></dd>
 
 
 <dt id="arg-init-values">init_values<a class="anchor" aria-label="anchor" href="#arg-init-values"></a></dt>

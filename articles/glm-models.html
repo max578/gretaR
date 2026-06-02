@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gretaR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -137,11 +137,6 @@ specification for standard models</li>
 </h3>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/max578/gretaR" class="external-link">gretaR</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'gretaR'</span></span>
-<span><span class="co">#&gt; The following object is masked from 'package:base':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     %*%</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
 <span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">100</span></span>
@@ -160,14 +155,7 @@ specification for standard models</li>
 <span><span class="fu"><a href="../reference/distribution.html">distribution</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/normal.html">normal</a></span><span class="op">(</span><span class="va">mu</span>, <span class="va">sigma</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/model.html">model</a></span><span class="op">(</span><span class="va">alpha</span>, <span class="va">beta</span>, <span class="va">sigma</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span></span>
-<span><span class="co">#&gt; gretaR model</span></span>
-<span><span class="co">#&gt;   Free parameters: 3 (3 total elements)</span></span>
-<span><span class="co">#&gt;   Variables:</span></span>
-<span><span class="co">#&gt;     alpha ~ normal [1 x 1]</span></span>
-<span><span class="co">#&gt;     beta ~ normal [1 x 1]</span></span>
-<span><span class="co">#&gt;     sigma ~ half_cauchy [1 x 1]</span></span>
-<span><span class="co">#&gt;   Likelihood terms: 1</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="custom-priors">Custom Priors<a class="anchor" aria-label="anchor" href="#custom-priors"></a>
@@ -186,14 +174,7 @@ specification for standard models</li>
 <span><span class="fu"><a href="../reference/distribution.html">distribution</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/normal.html">normal</a></span><span class="op">(</span><span class="va">mu</span>, <span class="va">sigma</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/model.html">model</a></span><span class="op">(</span><span class="va">alpha</span>, <span class="va">beta</span>, <span class="va">sigma</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span></span>
-<span><span class="co">#&gt; gretaR model</span></span>
-<span><span class="co">#&gt;   Free parameters: 3 (3 total elements)</span></span>
-<span><span class="co">#&gt;   Variables:</span></span>
-<span><span class="co">#&gt;     alpha ~ student_t [1 x 1]</span></span>
-<span><span class="co">#&gt;     beta ~ normal [1 x 1]</span></span>
-<span><span class="co">#&gt;     sigma ~ exponential [1 x 1]</span></span>
-<span><span class="co">#&gt;   Likelihood terms: 1</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">

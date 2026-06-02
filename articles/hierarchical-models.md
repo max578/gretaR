@@ -22,11 +22,6 @@ y_{ij} = \alpha_j + \epsilon_{ij}, \quad \epsilon_{ij} \sim N(0, \sigma^2)
 ``` r
 
 library(gretaR)
-#> 
-#> Attaching package: 'gretaR'
-#> The following object is masked from 'package:base':
-#> 
-#>     %*%
 
 # Simulate grouped data
 set.seed(42)
@@ -53,14 +48,6 @@ distribution(y) <- normal(fitted_vals, sigma)
 
 m <- model(mu, tau, sigma, alpha)
 print(m)
-#> gretaR model
-#>   Free parameters: 4 (8 total elements)
-#>   Variables:
-#>     mu ~ normal [1 x 1]
-#>     tau ~ half_cauchy [1 x 1]
-#>     sigma ~ half_cauchy [1 x 1]
-#>     alpha ~ normal [5 x 1]
-#>   Likelihood terms: 1
 ```
 
 The `alpha[group_id]` syntax creates an operation node in the DAG that
@@ -122,17 +109,6 @@ distribution(y) <- normal(mu_y, sigma)
 
 m <- model(mu_a, mu_b, tau_a, tau_b, sigma, alpha, beta)
 print(m)
-#> gretaR model
-#>   Free parameters: 7 (21 total elements)
-#>   Variables:
-#>     mu_a ~ normal [1 x 1]
-#>     mu_b ~ normal [1 x 1]
-#>     tau_a ~ half_cauchy [1 x 1]
-#>     tau_b ~ half_cauchy [1 x 1]
-#>     sigma ~ half_cauchy [1 x 1]
-#>     alpha ~ normal [8 x 1]
-#>     beta ~ normal [8 x 1]
-#>   Likelihood terms: 1
 ```
 
 ## Using MAP for Quick Estimates
