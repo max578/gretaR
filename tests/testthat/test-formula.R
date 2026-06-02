@@ -60,3 +60,19 @@ test_that("print.gretaR_glm_fit works", {
   fit <- gretaR_glm(y ~ x, data = dat, sampler = "map", verbose = FALSE)
   expect_output(print(fit), "gretaR GLM fit")
 })
+
+test_that("gretaR_glm draws carry canonical names, not deparsed gretaR_arrays", {
+  # Regression guard: the formula interface used to build the model via the
+  # call-deparse model(), which labelled the draws with the deparsed coefficient
+  # object (e.g. "structure(list(.node = <environment>), ...)"). It now routes
+  # through model_from_arrays() with the design-matrix column names.
+  skip_if_not_installed("torch")
+  skip_on_cran()
+
+  set.seed(7)
+  dat <- data.frame(y = rnorm(40), x = rnorm(40))
+  fit <- gretaR_glm(y ~ x, data = dat, chains = 1L, iter = 300L, verbose = FALSE)
+  vars <- posterior::variables(fit$draws)
+  expect_setequal(vars, c("(Intercept)", "x", "sigma"))
+  expect_false(any(grepl("structure(list", vars, fixed = TRUE)))
+})

@@ -155,12 +155,19 @@ gretaR_glm <- function(formula, data, family = c("gaussian", "binomial", "poisso
   eta <- x %*% beta_prior
 
   # --- Link function and likelihood ---
-  target_vars <- list(beta = beta_prior)
+  # Targets + per-element canonical names. The coefficient vector's elements are
+  # labelled by the design-matrix columns ("(Intercept)" and the predictors);
+  # these flow straight to the draws via model_from_arrays(names = ...). Building
+  # with model_from_arrays() rather than model() avoids the call-deparse naming
+  # that otherwise labelled the draws with the deparsed gretaR_array object.
+  targets <- list(beta_prior)
+  names_list <- list(col_names)
 
   if (family == "gaussian") {
     sigma_prior <- prior$sigma %||% half_cauchy(2)
     distribution(y) <- normal(eta, sigma_prior)
-    target_vars$sigma <- sigma_prior
+    targets <- c(targets, list(sigma_prior))
+    names_list <- c(names_list, list("sigma"))
   } else if (family == "binomial") {
     # Logistic link: p = sigmoid(eta)
     prob <- logistic_link(eta)
@@ -171,8 +178,8 @@ gretaR_glm <- function(formula, data, family = c("gaussian", "binomial", "poisso
     distribution(y) <- poisson_dist(rate)
   }
 
-  # Compile model
-  m <- do.call(model, unname(target_vars))
+  # Compile model with explicit canonical names (no call deparse).
+  m <- model_from_arrays(targets = targets, likelihood = y, names = names_list)
 
   # --- Inference ---
   result <- if (sampler == "map") {
@@ -378,8 +385,13 @@ gretaR_glm <- function(formula, data, family = c("gaussian", "binomial", "poisso
     distribution(y) <- poisson_dist(rate)
   }
 
-  # --- Compile model ---
-  m <- do.call(model, unname(target_vars))
+  # --- Compile model (explicit canonical names; no call deparse) ---
+  # The named target_vars list carries the parameter names directly; the fixed
+  # coefficient vector is expanded to its design-matrix column labels.
+  names_list <- lapply(names(target_vars),
+                       function(nm) if (identical(nm, "beta")) col_names else nm)
+  m <- model_from_arrays(targets = unname(target_vars), likelihood = y,
+                         names = names_list)
 
   # --- Inference ---
   result <- if (sampler == "map") {
@@ -737,8 +749,11 @@ remove_re_bars <- function(formula) {
     distribution(y) <- poisson_dist(rate)
   }
 
-  # --- Compile and fit ---
-  m <- do.call(model, unname(target_vars))
+  # --- Compile and fit (explicit canonical names; no call deparse) ---
+  names_list <- lapply(names(target_vars),
+                       function(nm) if (identical(nm, "beta_fixed")) col_names else nm)
+  m <- model_from_arrays(targets = unname(target_vars), likelihood = y,
+                         names = names_list)
 
   result <- if (sampler == "map") {
     opt(m, verbose = verbose, ...)
