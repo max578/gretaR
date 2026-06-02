@@ -5,7 +5,7 @@
 hmc_sampler <- function(model, n_samples = 1000L, warmup = 500L,
                         chains = 4L, step_size = NULL,
                         n_leapfrog = 25L, target_accept = 0.65,
-                        compiled_fn = NULL,
+                        compiled_fn = NULL, metric = "diag",
                         init_values = NULL, verbose = TRUE) {
 
   n_params <- model$total_dim
@@ -42,13 +42,14 @@ hmc_sampler <- function(model, n_samples = 1000L, warmup = 500L,
       find_initial_values(model, n_params)
     }
 
-    inv_mass_vec <- rep(1.0, n_params)
+    # Metric (mass matrix): identity until warmup estimates it.
+    mtr <- metric_diag(rep(1.0, n_params))
 
     # Find reasonable step size if not provided
     eps <- if (!is.null(step_size)) {
       step_size
     } else {
-      find_reasonable_epsilon(model, theta_vec, inv_mass_vec)
+      find_reasonable_epsilon(model, theta_vec, mtr)
     }
 
     if (verbose) cli_alert_info("  Initial step size: {round(eps, 5)}")
@@ -66,11 +67,11 @@ hmc_sampler <- function(model, n_samples = 1000L, warmup = 500L,
     phase3_start <- max(phase2_start + 1L, as.integer(warmup * 0.9))
 
     for (iter in seq_len(total_iter)) {
-      mom_vec <- rnorm(n_params) * sqrt(inv_mass_vec)
+      mom_vec <- metric_draw_momentum(mtr, n_params)
 
       eg <- eval_grad(model, theta_vec)
       current_lp <- eg$lp
-      current_K <- 0.5 * sum(mom_vec^2 / inv_mass_vec)
+      current_K <- metric_kinetic(mtr, mom_vec)
 
       # Leapfrog trajectory
       joint0 <- current_lp - current_K
@@ -106,7 +107,7 @@ hmc_sampler <- function(model, n_samples = 1000L, warmup = 500L,
 
       for (step in seq_len(n_lf_iter)) {
         lf <- tryCatch(
-          leapfrog_vec(model, theta_prop, mom_prop, grad_prop, eps, inv_mass_vec),
+          leapfrog_vec(model, theta_prop, mom_prop, grad_prop, eps, mtr),
           error = function(e) NULL
         )
 
@@ -119,7 +120,7 @@ hmc_sampler <- function(model, n_samples = 1000L, warmup = 500L,
         mom_prop <- lf$momentum
         grad_prop <- lf$grad
 
-        joint_step <- lf$lp - 0.5 * sum(mom_prop^2 / inv_mass_vec)
+        joint_step <- lf$lp - metric_kinetic(mtr, mom_prop)
         a_step <- min(1, exp(min(0, joint_step - joint0)))
         if (is.nan(a_step)) a_step <- 0
         sum_accept <- sum_accept + a_step
@@ -131,7 +132,7 @@ hmc_sampler <- function(model, n_samples = 1000L, warmup = 500L,
 
       if (!divergent) {
         proposed_lp <- lf$lp
-        proposed_K <- 0.5 * sum(mom_prop^2 / inv_mass_vec)
+        proposed_K <- metric_kinetic(mtr, mom_prop)
         delta_H <- (proposed_lp - proposed_K) - joint0
 
         if (is.nan(delta_H) || abs(delta_H) > 1000) {
@@ -172,14 +173,9 @@ hmc_sampler <- function(model, n_samples = 1000L, warmup = 500L,
         if (iter == phase3_start) {
           if (length(warmup_thetas) > 2) {
             theta_mat <- do.call(rbind, warmup_thetas)
-            theta_var <- apply(theta_mat, 2, var)
-            theta_var[theta_var < 1e-3] <- 1e-3
-            # GS3: inv_mass_vec is consumed as the mass M in the dynamics
-            # (momentum ~ N(0, M); leapfrog step ~ M^-1 p). The efficient
-            # metric is the INVERSE posterior variance, so set M = 1 / Var.
-            inv_mass_vec <- 1 / theta_var
+            mtr <- estimate_metric(theta_mat, kind = metric)
           }
-          eps <- find_reasonable_epsilon(model, theta_vec, inv_mass_vec)
+          eps <- find_reasonable_epsilon(model, theta_vec, mtr)
           mu <- log(10 * eps)
           log_eps_bar <- log(eps)
           H_bar <- 0

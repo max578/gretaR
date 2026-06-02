@@ -5,7 +5,7 @@
 nuts_sampler <- function(model, n_samples = 1000L, warmup = 500L,
                          chains = 4L, step_size = NULL,
                          max_treedepth = 10L, target_accept = 0.8,
-                         compiled_fn = NULL,
+                         compiled_fn = NULL, metric = "diag",
                          init_values = NULL, verbose = TRUE) {
 
   n_params <- model$total_dim
@@ -43,13 +43,15 @@ nuts_sampler <- function(model, n_samples = 1000L, warmup = 500L,
       find_initial_values(model, n_params)
     }
 
-    inv_mass_vec <- rep(1.0, n_params)
+    # Metric (mass matrix): identity until warmup estimates it. `metric` selects
+    # diagonal (default) or dense; the object `mtr` carries the chosen metric.
+    mtr <- metric_diag(rep(1.0, n_params))
 
     # Find reasonable step size
     eps <- if (!is.null(step_size)) {
       step_size
     } else {
-      find_reasonable_epsilon(model, theta_vec, inv_mass_vec)
+      find_reasonable_epsilon(model, theta_vec, mtr)
     }
 
     if (verbose) cli_alert_info("  Initial step size: {round(eps, 5)}")
@@ -73,17 +75,17 @@ nuts_sampler <- function(model, n_samples = 1000L, warmup = 500L,
 
     for (iter in seq_len(total_iter)) {
       # Sample momentum
-      mom_vec <- rnorm(n_params) * sqrt(inv_mass_vec)
+      mom_vec <- metric_draw_momentum(mtr, n_params)
 
       # Current energy
       eg <- eval_grad(model, theta_vec)
-      current_K <- 0.5 * sum(mom_vec^2 / inv_mass_vec)
+      current_K <- metric_kinetic(mtr, mom_vec)
       joint0 <- eg$lp - current_K
 
       # Build NUTS tree
       tree <- build_nuts_tree_vec(
         model, theta_vec, mom_vec, eg$grad, eps,
-        max_treedepth, joint0, inv_mass_vec
+        max_treedepth, joint0, mtr
       )
 
       theta_vec <- tree$theta_new
@@ -107,19 +109,18 @@ nuts_sampler <- function(model, n_samples = 1000L, warmup = 500L,
           warmup_thetas[[length(warmup_thetas) + 1]] <- theta_vec
         }
 
-        # Transition to Phase 3: update mass matrix and re-init step-size
+        # Transition to Phase 3: estimate the mass matrix and re-init step-size.
+        # The metric is the inverse posterior (co)variance: a diagonal `1 / Var`
+        # (GS3) or, when warranted, a dense `Sigma^-1` that captures the
+        # off-diagonal correlations a diagonal metric is blind to (e.g. the
+        # intercept-vs-group-effect correlation in hierarchical models).
         if (iter == phase3_start) {
           if (length(warmup_thetas) > 2) {
             theta_mat <- do.call(rbind, warmup_thetas)
-            theta_var <- apply(theta_mat, 2, var)
-            theta_var[theta_var < 1e-3] <- 1e-3
-            # GS3: inv_mass_vec is consumed as the mass M in the dynamics
-            # (momentum ~ N(0, M); leapfrog step ~ M^-1 p). The efficient
-            # metric is the INVERSE posterior variance, so set M = 1 / Var.
-            inv_mass_vec <- 1 / theta_var
+            mtr <- estimate_metric(theta_mat, kind = metric)
           }
           # Re-find reasonable step size with new mass matrix
-          eps <- find_reasonable_epsilon(model, theta_vec, inv_mass_vec)
+          eps <- find_reasonable_epsilon(model, theta_vec, mtr)
           # Reset dual averaging for phase 3
           mu <- log(10 * eps)
           log_eps_bar <- log(eps)
@@ -185,7 +186,7 @@ nuts_sampler <- function(model, n_samples = 1000L, warmup = 500L,
 #' Build NUTS tree
 #' @noRd
 build_nuts_tree_vec <- function(model, theta, momentum, grad, epsilon,
-                                max_depth, joint0, inv_mass) {
+                                max_depth, joint0, mtr) {
 
   theta_minus <- theta
   theta_plus <- theta
@@ -209,7 +210,7 @@ build_nuts_tree_vec <- function(model, theta, momentum, grad, epsilon,
     if (direction == -1) {
       result <- build_subtree_vec(
         model, theta_minus, mom_minus, grad_minus,
-        epsilon * direction, j - 1L, joint0, inv_mass
+        epsilon * direction, j - 1L, joint0, mtr
       )
       theta_minus <- result$theta_minus
       mom_minus <- result$momentum_minus
@@ -217,7 +218,7 @@ build_nuts_tree_vec <- function(model, theta, momentum, grad, epsilon,
     } else {
       result <- build_subtree_vec(
         model, theta_plus, mom_plus, grad_plus,
-        epsilon * direction, j - 1L, joint0, inv_mass
+        epsilon * direction, j - 1L, joint0, mtr
       )
       theta_plus <- result$theta_plus
       mom_plus <- result$momentum_plus
@@ -243,10 +244,10 @@ build_nuts_tree_vec <- function(model, theta, momentum, grad, epsilon,
     n_accept <- n_accept + result$n_accept
 
     # U-turn criterion (GS4): dot the separation with the velocity M^-1 p
-    # (= mom / inv_mass for the diagonal metric), not the raw momentum.
+    # (metric-aware: `mom / M` diagonal, `Sigma %*% mom` dense), not raw momentum.
     delta_theta <- theta_plus - theta_minus
-    u_turn <- (sum(delta_theta * (mom_minus / inv_mass)) < 0) ||
-              (sum(delta_theta * (mom_plus / inv_mass)) < 0)
+    u_turn <- (sum(delta_theta * metric_velocity(mtr, mom_minus)) < 0) ||
+              (sum(delta_theta * metric_velocity(mtr, mom_plus)) < 0)
 
     if (u_turn) {
       depth <- j
@@ -269,13 +270,13 @@ build_nuts_tree_vec <- function(model, theta, momentum, grad, epsilon,
 #' Build subtree recursively
 #' @noRd
 build_subtree_vec <- function(model, theta, momentum, grad, epsilon,
-                              depth, joint0, inv_mass) {
+                              depth, joint0, mtr) {
 
   if (depth == 0L) {
     result <- tryCatch({
-      lf <- leapfrog_vec(model, theta, momentum, grad, epsilon, inv_mass)
+      lf <- leapfrog_vec(model, theta, momentum, grad, epsilon, mtr)
 
-      joint_new <- lf$lp - 0.5 * sum(lf$momentum^2 / inv_mass)
+      joint_new <- lf$lp - metric_kinetic(mtr, lf$momentum)
       delta <- joint_new - joint0
 
       # Divergence when the Hamiltonian error is large (Stan's Delta_max).
@@ -313,7 +314,7 @@ build_subtree_vec <- function(model, theta, momentum, grad, epsilon,
 
   # Build left subtree
   left <- build_subtree_vec(model, theta, momentum, grad, epsilon,
-                            depth - 1L, joint0, inv_mass)
+                            depth - 1L, joint0, mtr)
 
   if (!left$s_prime) return(left)
 
@@ -321,12 +322,12 @@ build_subtree_vec <- function(model, theta, momentum, grad, epsilon,
   if (epsilon > 0) {
     right <- build_subtree_vec(
       model, left$theta_plus, left$momentum_plus, left$grad_plus,
-      epsilon, depth - 1L, joint0, inv_mass
+      epsilon, depth - 1L, joint0, mtr
     )
   } else {
     right <- build_subtree_vec(
       model, left$theta_minus, left$momentum_minus, left$grad_minus,
-      epsilon, depth - 1L, joint0, inv_mass
+      epsilon, depth - 1L, joint0, mtr
     )
   }
 
@@ -355,11 +356,11 @@ build_subtree_vec <- function(model, theta, momentum, grad, epsilon,
     grad_plus <- left$grad_plus
   }
 
-  # U-turn check (GS4): velocity M^-1 p = mom / inv_mass for the diagonal metric.
+  # U-turn check (GS4): velocity M^-1 p (metric-aware via metric_velocity).
   delta_theta <- theta_plus - theta_minus
   s_prime <- left$s_prime && right$s_prime &&
-    (sum(delta_theta * (mom_minus / inv_mass)) >= 0) &&
-    (sum(delta_theta * (mom_plus / inv_mass)) >= 0)
+    (sum(delta_theta * metric_velocity(mtr, mom_minus)) >= 0) &&
+    (sum(delta_theta * metric_velocity(mtr, mom_plus)) >= 0)
 
   list(
     theta_minus = theta_minus, theta_plus = theta_plus,

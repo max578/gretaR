@@ -1,3 +1,22 @@
+# gretaR (development version)
+
+## Sampling
+
+* **Optional dense mass-matrix metric** for the single-chain HMC/NUTS samplers,
+  via `mcmc(..., metric = "dense")`. The default stays `"diag"` (a diagonal
+  metric, the inverse posterior variance) -- robust and unchanged. A dense
+  metric estimates the full inverse posterior covariance during warmup and
+  captures linear parameter correlations a diagonal metric is blind to: on a
+  regression with strongly correlated predictors it roughly tripled effective
+  sample size per second in our tests. It is opt-in by design -- it adds
+  \eqn{O(P^2)} cost and does **not** help (and can hurt) funnel-shaped
+  posteriors such as hierarchical latent blocks, where the mixing bottleneck is
+  non-Gaussian curvature rather than linear correlation. Falls back to a
+  diagonal metric, with a message, when the dimension is too large or warmup
+  draws too few. The momentum, velocity, and kinetic-energy operations are now
+  routed through a small metric abstraction shared by HMC and NUTS, so the
+  diagonal path is behaviourally identical to before (sampler oracle unchanged).
+
 # gretaR 0.4.0
 
 The programmatic model-construction API that lets an embedding package (e.g.

@@ -15,6 +15,7 @@ mcmc(
   max_treedepth = 10L,
   n_leapfrog = 25L,
   target_accept = NULL,
+  metric = c("diag", "dense"),
   init_values = NULL,
   seed = NULL,
   batched = FALSE,
@@ -48,6 +49,18 @@ takes \eqn{\mathrm{round}(T/\epsilon)} steps, capped at \code{10 *
 
 \item{target_accept}{Target average acceptance probability (default 0.8 for
 NUTS, 0.65 for HMC).}
+
+\item{metric}{Mass-matrix metric for the single-chain samplers, estimated
+during warmup. \code{"diag"} (default) is a diagonal metric (inverse
+posterior variance) -- the robust, Stan-default choice. \code{"dense"} is a
+dense metric (inverse posterior covariance) that captures linear parameter
+correlations a diagonal metric is blind to; it can substantially improve
+mixing on correlated posteriors (e.g. regression with correlated
+predictors), but it is opt-in because it does not help -- and can hurt --
+funnel-shaped posteriors such as hierarchical latent blocks, and it adds
+\eqn{O(P^2)} cost. Falls back to diagonal (with a message) when the
+dimension is too large or warmup draws are too few to estimate a covariance.
+Ignored on the batched path.}
 
 \item{init_values}{Optional list of initial parameter vectors (one per chain).}
 
