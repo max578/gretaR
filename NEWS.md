@@ -1,4 +1,7 @@
-# gretaR (development version)
+# gretaR 0.4.0
+
+The programmatic model-construction API that lets an embedding package (e.g.
+flexyBayes) drive gretaR from its own intermediate representation.
 
 ## Programmatic model construction
 
