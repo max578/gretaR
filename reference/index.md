@@ -16,6 +16,8 @@ Define data, variables, and models using the gretaR array DSL.
   : Extract elements from a gretaR_array
 - [`model()`](https://max578.github.io/gretaR/reference/model.md) :
   Create a gretaR Model
+- [`model_from_arrays()`](https://max578.github.io/gretaR/reference/model_from_arrays.md)
+  : Build a gretaR Model from Explicit Arrays (Programmatic Interface)
 - [`joint_density()`](https://max578.github.io/gretaR/reference/joint_density.md)
   : Get the Log Joint Density Function
 

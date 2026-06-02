@@ -11,12 +11,12 @@ Source:
 [`inst/CITATION`](https://github.com/max578/gretaR/blob/main/inst/CITATION)
 
 Moldovan, M. (2026). gretaR: Bayesian Statistical Modelling with Torch.
-R package version 0.3.0. https://github.com/max578/gretaR
+R package version 0.4.0. https://github.com/max578/gretaR
 
     @Manual{,
       title = {gretaR: Bayesian Statistical Modelling with Torch},
       author = {Max Moldovan},
       year = {2026},
-      note = {R package version 0.3.0},
+      note = {R package version 0.4.0},
       url = {https://github.com/max578/gretaR},
     }

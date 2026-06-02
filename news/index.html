@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gretaR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,6 +41,17 @@
       <small>Source: <a href="https://github.com/max578/gretaR/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.4.0" id="gretar-040">gretaR 0.4.0<a class="anchor" aria-label="anchor" href="#gretar-040"></a></h2>
+<p>The programmatic model-construction API that lets an embedding package (e.g. flexyBayes) drive gretaR from its own intermediate representation.</p>
+<div class="section level3">
+<h3 id="programmatic-model-construction-0-4-0">Programmatic model construction<a class="anchor" aria-label="anchor" href="#programmatic-model-construction-0-4-0"></a></h3>
+<ul><li>
+<strong>New <code><a href="../reference/model_from_arrays.html">model_from_arrays()</a></code></strong> – an explicit, re-entrant counterpart to <code><a href="../reference/model.html">model()</a></code>. Targets and their names are passed as ordinary arguments rather than recovered by deparsing the call, so models can be built programmatically (under <code><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call()</a></code>, from a code generator, or by a host package driving gretaR from its own representation) and the parameter names are caller-supplied – the hook an embedding package needs to map gretaR’s names onto its own scheme. The likelihood is scoped to the data nodes you name, so independent models can be compiled back to back in one session without <code><a href="../reference/reset_gretaR_env.html">reset_gretaR_env()</a></code> between them. <code><a href="../reference/model.html">model()</a></code> and <code><a href="../reference/model_from_arrays.html">model_from_arrays()</a></code> share a single compiler core, so the two paths produce identical model objects; <code><a href="../reference/model.html">model()</a></code> is unchanged.</li>
+<li>
+<strong>Per-element parameter names.</strong> <code>model_from_arrays(names = ...)</code> now accepts a list whose entries may be per-element name vectors, so a length-<code>p</code> coefficient vector can be labelled <code>c("(Intercept)", "x1", ...)</code> and those labels flow straight through to the posterior draws – a complete caller-supplied canonical-name contract, no relabel pass required.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.3.0" id="gretar-030">gretaR 0.3.0<a class="anchor" aria-label="anchor" href="#gretar-030"></a></h2>
 <p>Sampler correctness, a robustness fix, and native multi-chain batching. Both samplers are now verified against closed-form analytic posteriors.</p>

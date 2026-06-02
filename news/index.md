@@ -1,5 +1,40 @@
 # Changelog
 
+## gretaR 0.4.0
+
+The programmatic model-construction API that lets an embedding package
+(e.g. flexyBayes) drive gretaR from its own intermediate representation.
+
+### Programmatic model construction
+
+- **New
+  [`model_from_arrays()`](https://max578.github.io/gretaR/reference/model_from_arrays.md)**
+  – an explicit, re-entrant counterpart to
+  [`model()`](https://max578.github.io/gretaR/reference/model.md).
+  Targets and their names are passed as ordinary arguments rather than
+  recovered by deparsing the call, so models can be built
+  programmatically (under
+  [`do.call()`](https://rdrr.io/r/base/do.call.html), from a code
+  generator, or by a host package driving gretaR from its own
+  representation) and the parameter names are caller-supplied – the hook
+  an embedding package needs to map gretaR’s names onto its own scheme.
+  The likelihood is scoped to the data nodes you name, so independent
+  models can be compiled back to back in one session without
+  [`reset_gretaR_env()`](https://max578.github.io/gretaR/reference/reset_gretaR_env.md)
+  between them.
+  [`model()`](https://max578.github.io/gretaR/reference/model.md) and
+  [`model_from_arrays()`](https://max578.github.io/gretaR/reference/model_from_arrays.md)
+  share a single compiler core, so the two paths produce identical model
+  objects;
+  [`model()`](https://max578.github.io/gretaR/reference/model.md) is
+  unchanged.
+- **Per-element parameter names.** `model_from_arrays(names = ...)` now
+  accepts a list whose entries may be per-element name vectors, so a
+  length-`p` coefficient vector can be labelled
+  `c("(Intercept)", "x1", ...)` and those labels flow straight through
+  to the posterior draws – a complete caller-supplied canonical-name
+  contract, no relabel pass required.
+
 ## gretaR 0.3.0
 
 Sampler correctness, a robustness fix, and native multi-chain batching.
