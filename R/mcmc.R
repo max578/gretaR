@@ -45,6 +45,23 @@
 #'   then roughly flat in the number of chains, so many-chain runs are much
 #'   faster (e.g. ~2x at 8 chains, ~4x at 16 on CPU). Statistically equivalent to
 #'   the single-chain HMC. Batched NUTS is not yet supported.
+#' @param trajectory Trajectory-length rule for the batched path (\code{batched
+#'   = TRUE}). \code{"fixed"} (default) is integration-time HMC -- a random time
+#'   \eqn{T \sim U(0, 2\pi]} per iteration. \code{"chees"} is ChEES-HMC (Hoffman,
+#'   Radul & Sountsov 2021), which adapts the trajectory length during warmup
+#'   using a criterion computed across the chain ensemble, so it batches where
+#'   NUTS's per-chain tree recursion cannot. ChEES is opt-in and most useful in a
+#'   specific regime: it needs a reasonably large ensemble (use \strong{at least
+#'   ~8 chains}; below that its criterion is noisy and it can mix worse than NUTS)
+#'   and a well-conditioned posterior. On hierarchical models, pair it with a
+#'   near-centred \code{\link{random_effect}} -- in our tests ChEES on the
+#'   non-centred funnel was no better than NUTS, but ChEES on a near-centred
+#'   parameterisation gave several times the effective sample size per second of
+#'   the NUTS default, the two acting together (the centring conditions the
+#'   geometry, the adaptive trajectory then traverses it efficiently). Single-
+#'   chain NUTS remains the robust default; \code{"chees"} is ignored unless
+#'   \code{batched = TRUE}. Adaptive trajectory length means wall-clock is not
+#'   flat in chain count as it is for \code{"fixed"}.
 #' @param device Character device for the batched path: \code{"cpu"} (default),
 #'   \code{"mps"}, or \code{"cuda"}. The batched code is device-generic, but on
 #'   typical models CPU is fastest -- gretaR's log-density is many small ops, so
@@ -83,7 +100,8 @@ mcmc <- function(model, n_samples = 1000L, warmup = 1000L, chains = 4L,
                  n_leapfrog = 25L, target_accept = NULL,
                  metric = c("diag", "dense"),
                  init_values = NULL, seed = NULL,
-                 batched = FALSE, device = "cpu", verbose = TRUE) {
+                 batched = FALSE, trajectory = c("fixed", "chees"),
+                 device = "cpu", verbose = TRUE) {
 
   # Set seeds for reproducibility
   if (!is.null(seed)) {
@@ -96,6 +114,7 @@ mcmc <- function(model, n_samples = 1000L, warmup = 1000L, chains = 4L,
   sampler <- rlang::arg_match(sampler)
   backend <- rlang::arg_match(backend)
   metric <- rlang::arg_match(metric)
+  trajectory <- rlang::arg_match(trajectory)
 
   # --- Stan backend dispatch ---
   if (backend == "stan") {
@@ -137,11 +156,20 @@ mcmc <- function(model, n_samples = 1000L, warmup = 1000L, chains = 4L,
         "i" = "Single-chain NUTS stays the robust default; batched NUTS is deferred."
       ))
     }
-    batched_hmc_sampler(
-      model = model, n_samples = n_samples, warmup = warmup, chains = chains,
-      n_leapfrog = n_leapfrog, target_accept = target_accept, seed = seed,
-      device = device, verbose = verbose
-    )
+    if (trajectory == "chees") {
+      # ChEES-HMC: adaptive trajectory length tuned across the chain ensemble.
+      batched_chees_sampler(
+        model = model, n_samples = n_samples, warmup = warmup, chains = chains,
+        target_accept = target_accept, seed = seed, device = device,
+        verbose = verbose
+      )
+    } else {
+      batched_hmc_sampler(
+        model = model, n_samples = n_samples, warmup = warmup, chains = chains,
+        n_leapfrog = n_leapfrog, target_accept = target_accept, seed = seed,
+        device = device, verbose = verbose
+      )
+    }
   } else if (sampler == "nuts") {
     nuts_sampler(
       model = model,

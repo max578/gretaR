@@ -11,3 +11,12 @@ revdep/
 ~$*
 .DS_Store
 cran-comments.md
+
+# Working notes & decision companion — local parallel artefacts, not package content
+ledger/
+research_*.R
+audit_*.md
+greta_runs_*.md
+implementation_plan_*.md
+PROJECT_LOG.md
+PROJECT_LOG_ARCHIVE.md

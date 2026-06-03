@@ -8,6 +8,8 @@
 ^\.github$
 ^.*\.xlsx$
 ^r_code_.*\.R$
+^research_.*\.R$
+^greta_runs_.*\.md$
 \.DS_Store
 ^codecov\.yml$
 ^codemeta\.json$

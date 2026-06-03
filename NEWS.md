@@ -1,4 +1,4 @@
-# gretaR (development version)
+# gretaR 0.5.0
 
 ## Sampling
 
@@ -16,6 +16,43 @@
   draws too few. The momentum, velocity, and kinetic-energy operations are now
   routed through a small metric abstraction shared by HMC and NUTS, so the
   diagonal path is behaviourally identical to before (sampler oracle unchanged).
+
+* **ChEES-HMC -- a batchable adaptive-trajectory sampler**, via
+  `mcmc(..., batched = TRUE, sampler = "hmc", trajectory = "chees")`. Where the
+  No-U-Turn Sampler adapts trajectory length per chain with a recursion that
+  cannot be batched, ChEES-HMC (Hoffman, Radul & Sountsov 2021) adapts a single
+  trajectory length across the whole chain ensemble, so all chains advance
+  together as batched tensor operations. It is opt-in and most useful in a
+  specific regime: it needs a reasonably large ensemble (at least about eight
+  chains -- below that its criterion is noisy and it can mix worse than NUTS) and
+  a well-conditioned posterior. On hierarchical models it pairs with a
+  near-centred `random_effect()`: in our tests ChEES on the non-centred funnel
+  matched NUTS, but ChEES on a near-centred parameterisation gave several times
+  the effective sample size per second of the NUTS default, the centring and the
+  adaptive trajectory acting together. Single-chain NUTS remains the robust
+  default. The default `trajectory = "fixed"` keeps the integration-time HMC of
+  the batched path unchanged.
+
+## Hierarchical models
+
+* **New `random_effect()`** -- a grouped random-effect block with an explicit
+  centring weight that interpolates between the non-centred
+  (\eqn{u_j = \mathrm{mean} + \mathrm{sd}\,\xi_j}, \eqn{\xi_j \sim N(0, 1)}) and
+  centred (\eqn{u_j \sim N(\mathrm{mean}, \mathrm{sd}^2)}) parameterisations. The
+  weight is a single number or a per-group vector in \eqn{[0, 1]} and changes
+  only the sampling geometry: the implied prior on the group effects,
+  \eqn{u_j \sim N(\mathrm{mean}, \mathrm{sd}^2)}, is identical for every weight,
+  so it is a pure mixing control. This is the parameterisation lever the dense
+  metric cannot supply: where a dense metric corrects linear correlation, the
+  centring weight corrects the non-Gaussian funnel coupling between a group
+  scale and its latent effects. In our tests on an informative random-intercept
+  design (about 50 observations per group), a near-centred weight raised
+  effective sample size per second on the group-scale parameter by roughly a
+  factor of five over the non-centred default; on a sparse design (about two
+  observations per group) the non-centred end remained best -- the crossover
+  that makes a per-group, data-adaptive weight the principled choice. Supplying
+  the weight directly is the construction-time primitive; a warmup-adaptive
+  estimator that sets each weight from the data is planned.
 
 # gretaR 0.4.0
 

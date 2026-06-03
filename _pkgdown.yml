@@ -47,6 +47,7 @@ reference:
       - "`[.gretaR_array`"
       - model
       - model_from_arrays
+      - random_effect
       - joint_density
 
   - title: Distributions
