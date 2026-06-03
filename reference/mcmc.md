@@ -24,6 +24,7 @@ mcmc(
   init_values = NULL,
   seed = NULL,
   batched = FALSE,
+  trajectory = c("fixed", "chees"),
   device = "cpu",
   verbose = TRUE
 )
@@ -109,6 +110,28 @@ mcmc(
   in the number of chains, so many-chain runs are much faster (e.g. ~2x
   at 8 chains, ~4x at 16 on CPU). Statistically equivalent to the
   single-chain HMC. Batched NUTS is not yet supported.
+
+- trajectory:
+
+  Trajectory-length rule for the batched path (`batched = TRUE`).
+  `"fixed"` (default) is integration-time HMC – a random time \\T \sim
+  U(0, 2\pi\]\\ per iteration. `"chees"` is ChEES-HMC (Hoffman, Radul &
+  Sountsov 2021), which adapts the trajectory length during warmup using
+  a criterion computed across the chain ensemble, so it batches where
+  NUTS's per-chain tree recursion cannot. ChEES is opt-in and most
+  useful in a specific regime: it needs a reasonably large ensemble (use
+  **at least ~8 chains**; below that its criterion is noisy and it can
+  mix worse than NUTS) and a well-conditioned posterior. On hierarchical
+  models, pair it with a near-centred
+  [`random_effect`](https://max578.github.io/gretaR/reference/random_effect.md)
+  – in our tests ChEES on the non-centred funnel was no better than
+  NUTS, but ChEES on a near-centred parameterisation gave several times
+  the effective sample size per second of the NUTS default, the two
+  acting together (the centring conditions the geometry, the adaptive
+  trajectory then traverses it efficiently). Single- chain NUTS remains
+  the robust default; `"chees"` is ignored unless `batched = TRUE`.
+  Adaptive trajectory length means wall-clock is not flat in chain count
+  as it is for `"fixed"`.
 
 - device:
 

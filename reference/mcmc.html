@@ -13,7 +13,7 @@ compatible with the posterior and bayesplot packages."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">gretaR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -72,6 +72,7 @@ compatible with the <code>posterior</code> and <code>bayesplot</code> packages.<
 <span>  init_values <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  seed <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  batched <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  trajectory <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fixed"</span>, <span class="st">"chees"</span><span class="op">)</span>,</span>
 <span>  device <span class="op">=</span> <span class="st">"cpu"</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -157,6 +158,26 @@ random number generators.</p></dd>
 then roughly flat in the number of chains, so many-chain runs are much
 faster (e.g. ~2x at 8 chains, ~4x at 16 on CPU). Statistically equivalent to
 the single-chain HMC. Batched NUTS is not yet supported.</p></dd>
+
+
+<dt id="arg-trajectory">trajectory<a class="anchor" aria-label="anchor" href="#arg-trajectory"></a></dt>
+<dd><p>Trajectory-length rule for the batched path (<code>batched
+  = TRUE</code>). <code>"fixed"</code> (default) is integration-time HMC – a random time
+\(T \sim U(0, 2\pi]\) per iteration. <code>"chees"</code> is ChEES-HMC (Hoffman,
+Radul &amp; Sountsov 2021), which adapts the trajectory length during warmup
+using a criterion computed across the chain ensemble, so it batches where
+NUTS's per-chain tree recursion cannot. ChEES is opt-in and most useful in a
+specific regime: it needs a reasonably large ensemble (use <strong>at least
+~8 chains</strong>; below that its criterion is noisy and it can mix worse than NUTS)
+and a well-conditioned posterior. On hierarchical models, pair it with a
+near-centred <code><a href="random_effect.html">random_effect</a></code> – in our tests ChEES on the
+non-centred funnel was no better than NUTS, but ChEES on a near-centred
+parameterisation gave several times the effective sample size per second of
+the NUTS default, the two acting together (the centring conditions the
+geometry, the adaptive trajectory then traverses it efficiently). Single-
+chain NUTS remains the robust default; <code>"chees"</code> is ignored unless
+<code>batched = TRUE</code>. Adaptive trajectory length means wall-clock is not
+flat in chain count as it is for <code>"fixed"</code>.</p></dd>
 
 
 <dt id="arg-device">device<a class="anchor" aria-label="anchor" href="#arg-device"></a></dt>

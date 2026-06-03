@@ -18,6 +18,8 @@ Define data, variables, and models using the gretaR array DSL.
   Create a gretaR Model
 - [`model_from_arrays()`](https://max578.github.io/gretaR/reference/model_from_arrays.md)
   : Build a gretaR Model from Explicit Arrays (Programmatic Interface)
+- [`random_effect()`](https://max578.github.io/gretaR/reference/random_effect.md)
+  : Partially-Centred Random-Effect Block
 - [`joint_density()`](https://max578.github.io/gretaR/reference/joint_density.md)
   : Get the Log Joint Density Function
 
