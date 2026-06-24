@@ -803,10 +803,10 @@ MultivariateNormalDistribution <- R6::R6Class(
       sigma <- resolve_param(self$parameters$covariance)
       k <- mu$shape[1]
       # Cholesky for numerical stability
-      L <- torch_linalg_cholesky(sigma)
+      L <- linalg_cholesky(sigma)
       diff <- x - mu
       # solve L z = diff
-      z <- torch_linalg_solve_triangular(L, diff$unsqueeze(-1), upper = FALSE)
+      z <- linalg_solve_triangular(L, diff$unsqueeze(-1), upper = FALSE)
       log_det <- 2 * torch_sum(torch_log(torch_diag(L)))
       # -0.5 * (k*log(2*pi) + log|Sigma| + z^T z)
       -0.5 * (k * 1.8378771 + log_det + torch_sum(z * z))
