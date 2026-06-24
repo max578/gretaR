@@ -64,11 +64,6 @@ For maximum flexibility, use the gretaR DSL directly.
 ``` r
 
 library(gretaR)
-#> 
-#> Attaching package: 'gretaR'
-#> The following object is masked from 'package:base':
-#> 
-#>     %*%
 
 set.seed(123)
 n <- 100
@@ -88,13 +83,6 @@ distribution(y) <- normal(mu, sigma)
 
 m <- model(alpha, beta, sigma)
 print(m)
-#> gretaR model
-#>   Free parameters: 3 (3 total elements)
-#>   Variables:
-#>     alpha ~ normal [1 x 1]
-#>     beta ~ normal [1 x 1]
-#>     sigma ~ half_cauchy [1 x 1]
-#>   Likelihood terms: 1
 ```
 
 ### Custom Priors
@@ -115,13 +103,6 @@ distribution(y) <- normal(mu, sigma)
 
 m <- model(alpha, beta, sigma)
 print(m)
-#> gretaR model
-#>   Free parameters: 3 (3 total elements)
-#>   Variables:
-#>     alpha ~ student_t [1 x 1]
-#>     beta ~ normal [1 x 1]
-#>     sigma ~ exponential [1 x 1]
-#>   Likelihood terms: 1
 ```
 
 ## Inference Methods

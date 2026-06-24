@@ -1,5 +1,22 @@
 # Changelog
 
+## gretaR 0.5.1
+
+### Bug fixes
+
+- The multivariate-normal `log_prob` called two `torch` symbols that the
+  R `torch` package does not export – `torch_linalg_cholesky()` and
+  `torch_linalg_solve_triangular()` – so any model using a
+  [`multivariate_normal()`](https://max578.github.io/gretaR/reference/multivariate_normal.md)
+  variable (including a Gaussian-process prior built on one) errored the
+  moment its density was evaluated. The calls now use the real exported
+  symbols `linalg_cholesky()` and `linalg_solve_triangular()`. The
+  log-density is verified against an independent base-R (`chol` +
+  `backsolve`) reference to float precision, and a regression test
+  (`test-distributions-mvn.R`) now pins the multivariate-normal density
+  so the Cholesky path cannot silently regress again. The path had no
+  test before, which is how the dead symbols survived.
+
 ## gretaR 0.5.0
 
 ### Sampling

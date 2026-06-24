@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gretaR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,6 +41,13 @@
       <small>Source: <a href="https://github.com/max578/gretaR/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.5.1" id="gretar-051">gretaR 0.5.1<a class="anchor" aria-label="anchor" href="#gretar-051"></a></h2>
+<div class="section level3">
+<h3 id="bug-fixes-0-5-1">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-5-1"></a></h3>
+<ul><li>The multivariate-normal <code>log_prob</code> called two <code>torch</code> symbols that the R <code>torch</code> package does not export – <code>torch_linalg_cholesky()</code> and <code>torch_linalg_solve_triangular()</code> – so any model using a <code><a href="../reference/multivariate_normal.html">multivariate_normal()</a></code> variable (including a Gaussian-process prior built on one) errored the moment its density was evaluated. The calls now use the real exported symbols <code>linalg_cholesky()</code> and <code>linalg_solve_triangular()</code>. The log-density is verified against an independent base-R (<code>chol</code> + <code>backsolve</code>) reference to float precision, and a regression test (<code>test-distributions-mvn.R</code>) now pins the multivariate-normal density so the Cholesky path cannot silently regress again. The path had no test before, which is how the dead symbols survived.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.5.0" id="gretar-050">gretaR 0.5.0<a class="anchor" aria-label="anchor" href="#gretar-050"></a></h2>
 <div class="section level3">
