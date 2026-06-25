@@ -17,6 +17,53 @@
   so the Cholesky path cannot silently regress again. The path had no
   test before, which is how the dead symbols survived.
 
+- Every distribution constructor now validates its parameters at the
+  call boundary. A `NULL`, a missing required argument, a non-numeric
+  value, or a numeric carrying `NA` is rejected with a single
+  caller-facing message
+  (`` `prob` must be numeric or a <gretaR_array>. ``), mirroring the
+  existing
+  [`as_data()`](https://max578.github.io/gretaR/reference/as_data.md)
+  idiom. Previously nine constructors –
+  [`normal()`](https://max578.github.io/gretaR/reference/normal.md),
+  [`student_t()`](https://max578.github.io/gretaR/reference/student_t.md),
+  [`bernoulli()`](https://max578.github.io/gretaR/reference/bernoulli.md),
+  [`cauchy()`](https://max578.github.io/gretaR/reference/cauchy.md),
+  [`exponential()`](https://max578.github.io/gretaR/reference/exponential.md),
+  [`half_cauchy()`](https://max578.github.io/gretaR/reference/half_cauchy.md),
+  [`half_normal()`](https://max578.github.io/gretaR/reference/half_normal.md),
+  [`lognormal()`](https://max578.github.io/gretaR/reference/lognormal.md),
+  [`poisson_dist()`](https://max578.github.io/gretaR/reference/poisson_dist.md)
+  – accepted a `NULL` parameter silently and failed later with an
+  unrelated tensor error, while four –
+  [`beta_dist()`](https://max578.github.io/gretaR/reference/beta_dist.md),
+  [`binomial_dist()`](https://max578.github.io/gretaR/reference/binomial_dist.md),
+  [`gamma_dist()`](https://max578.github.io/gretaR/reference/gamma_dist.md),
+  [`negative_binomial()`](https://max578.github.io/gretaR/reference/negative_binomial.md)
+  – leaked R’s internal “argument is missing” message. A numeric or a
+  `gretaR_array` graph node (the hierarchical-prior case,
+  e.g. `bernoulli(beta_dist(2, 2))`) still passes untouched. Found by
+  the package’s two-sided conformance sweep;
+  `test-distributions-validation.R` pins the behaviour across all
+  eighteen distribution constructors.
+
+- Three model- and formula-consuming entry points –
+  [`joint_density()`](https://max578.github.io/gretaR/reference/joint_density.md),
+  [`compile_to_stan()`](https://max578.github.io/gretaR/reference/compile_to_stan.md),
+  and
+  [`remove_re_bars()`](https://max578.github.io/gretaR/reference/remove_re_bars.md)
+  – now reject a non-model or non-formula input (including `NULL`) at
+  the call boundary instead of accepting it silently.
+  [`joint_density()`](https://max578.github.io/gretaR/reference/joint_density.md)
+  had returned a closure that failed only when later called,
+  [`compile_to_stan()`](https://max578.github.io/gretaR/reference/compile_to_stan.md)
+  emitted an empty Stan program, and
+  [`remove_re_bars()`](https://max578.github.io/gretaR/reference/remove_re_bars.md)
+  passed `NULL` straight through
+  [`reformulas::nobars()`](https://rdrr.io/pkg/reformulas/man/nobars.html).
+  The two-sided conformance sweep, now covering 0.93 of the exported
+  surface, surfaced all three; `test-validation-guards.R` pins them.
+
 ## gretaR 0.5.0
 
 ### Sampling
