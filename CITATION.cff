@@ -2,7 +2,7 @@ cff-version: 1.2.0
 message: "If you use gretaR in your research, please cite it as below."
 title: "gretaR: Bayesian Statistical Modelling with Torch"
 type: software
-version: 0.2.0
+version: 0.5.1
 date-released: "2026-04-20"
 license: MIT
 repository-code: "https://github.com/max578/gretaR"
