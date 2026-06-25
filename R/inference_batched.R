@@ -12,6 +12,8 @@
 # half-kicks of adjacent steps combine into the full kicks of the bracketed
 # form). This file is build-beside: it does not touch the single-chain samplers.
 
+# Batched gradient and leapfrog primitives -----------------------------------
+
 #' Batched gradient function for a model
 #'
 #' @param model A `gretaR_model`.
@@ -121,6 +123,8 @@ batched_leapfrog <- function(bgrad, theta, mom, grad, eps, n_steps, inv_mass,
   torch::torch_cat(cols, dim = 2L)
 }
 
+# Batched integration-time HMC sampler ---------------------------------------
+
 #' Batched integration-time HMC sampler (all chains at once)
 #'
 #' Vectorises the single-chain integration-time HMC (the HB1 fix) over chains:
@@ -229,6 +233,8 @@ batched_hmc_sampler <- function(model, n_samples = 1000L, warmup = 1000L,
        warmup = warmup, n_samples = n_samples, chains = chains,
        sampler = "hmc_batched")
 }
+
+# Batched ChEES-HMC sampler and helpers --------------------------------------
 
 #' Batched Hamiltonian (per chain)
 #'

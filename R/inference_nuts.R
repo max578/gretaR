@@ -166,9 +166,7 @@ nuts_sampler <- function(model, n_samples = 1000L, warmup = 500L,
   )
 }
 
-# =============================================================================
-# NUTS tree building (numeric vectors, iterative doubling)
-# =============================================================================
+# NUTS tree building (numeric vectors, iterative doubling) -------------------
 
 # Numerically stable log(exp(a) + exp(b)) for combining multinomial subtree
 # weights; handles the -Inf weight carried by divergent leaves.

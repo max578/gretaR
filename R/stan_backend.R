@@ -3,9 +3,7 @@
 # Translates a compiled gretaR_model into Stan code, then uses cmdstanr
 # to compile and run inference. Returns gretaR_fit objects.
 
-# =============================================================================
-# Stan distribution name mapping
-# =============================================================================
+# Stan distribution name mapping ---------------------------------------------
 
 .stan_dist_map <- list(
   normal = list(stan = "normal", params = c("mean", "sd")),
@@ -27,9 +25,7 @@
   dirichlet = list(stan = "dirichlet", params = c("concentration"))
 )
 
-# =============================================================================
-# Main code generator
-# =============================================================================
+# Main code generator --------------------------------------------------------
 
 #' @title Generate Stan Code from a gretaR Model
 #'
@@ -217,9 +213,7 @@ compile_to_stan <- function(model) {
   code
 }
 
-# =============================================================================
-# Generate Stan prior statement
-# =============================================================================
+# Generate Stan prior statement ----------------------------------------------
 
 #' @noRd
 generate_stan_prior <- function(param_name, distribution, n_elem) {
@@ -277,9 +271,7 @@ generate_stan_prior <- function(param_name, distribution, n_elem) {
   }
 }
 
-# =============================================================================
-# Generate Stan likelihood statement
-# =============================================================================
+# Generate Stan likelihood statement -----------------------------------------
 
 #' @noRd
 generate_stan_likelihood <- function(data_name, distribution, dag_nodes, param_names, node_stan_names = list()) {
@@ -326,9 +318,7 @@ generate_stan_likelihood <- function(data_name, distribution, dag_nodes, param_n
   )
 }
 
-# =============================================================================
-# Convert a DAG node to a Stan expression string
-# =============================================================================
+# Convert a DAG node to a Stan expression string -----------------------------
 
 #' @noRd
 node_to_stan_expr <- function(node, dag_nodes, param_names, node_stan_names = list()) {
@@ -412,9 +402,7 @@ node_to_stan_expr <- function(node, dag_nodes, param_names, node_stan_names = li
   "0"
 }
 
-# =============================================================================
-# Stan sampling via cmdstanr
-# =============================================================================
+# Stan sampling via cmdstanr -------------------------------------------------
 
 #' @title Run Stan Backend for a gretaR Model
 #'
@@ -570,9 +558,7 @@ stan_optimize <- function(model, verbose = TRUE, ...) {
   )
 }
 
-# =============================================================================
-# Helpers
-# =============================================================================
+# Helpers --------------------------------------------------------------------
 
 #' @noRd
 format_stan_num <- function(x) {

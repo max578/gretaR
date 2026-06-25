@@ -139,6 +139,8 @@ model_from_arrays <- function(targets, likelihood = NULL, names = NULL,
   m
 }
 
+# Internal helpers: name and likelihood-term resolution ----------------------
+
 #' Resolve names without deparsing the call.
 #'
 #' Returns `list(display, elements)`: `display` is a length-n character vector

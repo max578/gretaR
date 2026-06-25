@@ -4,9 +4,7 @@
 # gretaR_arrays build the graph lazily; values are only computed at
 # model compilation time.
 
-# =============================================================================
-# gretaR_array R6 class
-# =============================================================================
+# gretaR_array R6 class ------------------------------------------------------
 
 #' @title gretaR_array
 #' @description The core object in gretaR representing a node in the Bayesian
@@ -98,9 +96,7 @@ GretaRArray <- R6::R6Class(
   )
 )
 
-# =============================================================================
-# Wrap as S3 for operator dispatch
-# =============================================================================
+# Wrap as S3 for operator dispatch -------------------------------------------
 
 #' Create a gretaR_array S3 wrapper around the R6 object
 #' @noRd
@@ -117,9 +113,7 @@ get_node <- function(x) {
   NULL
 }
 
-# =============================================================================
-# as_data() — wrap observed data
-# =============================================================================
+# as_data() — wrap observed data ---------------------------------------------
 
 #' @title Wrap Observed Data as a gretaR Array
 #'
@@ -172,9 +166,7 @@ as_data <- function(x) {
   wrap_gretaR_array(node)
 }
 
-# =============================================================================
-# variable() — create a free variable (no distribution)
-# =============================================================================
+# variable() — create a free variable (no distribution) ----------------------
 
 #' @title Create a Free Variable
 #'
@@ -217,9 +209,7 @@ variable <- function(lower = -Inf, upper = Inf, dim = NULL) {
   wrap_gretaR_array(node)
 }
 
-# =============================================================================
-# create_variable_node — internal helper for distribution constructors
-# =============================================================================
+# create_variable_node — internal helper for distribution constructors -------
 
 #' @noRd
 create_variable_node <- function(distribution, dim = NULL, is_discrete = FALSE) {
@@ -246,9 +236,7 @@ create_variable_node <- function(distribution, dim = NULL, is_discrete = FALSE) 
   wrap_gretaR_array(node)
 }
 
-# =============================================================================
-# distribution() / distribution<-() — assign likelihoods
-# =============================================================================
+# distribution() / distribution<-() — assign likelihoods ---------------------
 
 #' @title Get the Distribution of a gretaR Array
 #'
@@ -304,9 +292,7 @@ distribution <- function(x) {
   x
 }
 
-# =============================================================================
-# Indexing operator [.gretaR_array — critical for hierarchical models
-# =============================================================================
+# Indexing operator [.gretaR_array — critical for hierarchical models --------
 
 #' Extract elements from a gretaR_array
 #'
@@ -396,9 +382,7 @@ distribution <- function(x) {
   wrap_gretaR_array(result_node)
 }
 
-# =============================================================================
-# S3 methods: print, dim, length
-# =============================================================================
+# S3 methods: print, dim, length ---------------------------------------------
 
 #' @export
 print.gretaR_array <- function(x, ...) {
@@ -435,9 +419,7 @@ length.gretaR_array <- function(x) {
   prod(get_node(x)$dim_)
 }
 
-# =============================================================================
-# Operator overloading (Ops group generic)
-# =============================================================================
+# Operator overloading (Ops group generic) -----------------------------------
 
 #' @export
 Ops.gretaR_array <- function(e1, e2) {
@@ -506,9 +488,7 @@ Ops.gretaR_array <- function(e1, e2) {
   wrap_gretaR_array(result_node)
 }
 
-# =============================================================================
-# Math group generic (log, exp, sqrt, abs, etc.)
-# =============================================================================
+# Math group generic (log, exp, sqrt, abs, etc.) -----------------------------
 
 #' @export
 Math.gretaR_array <- function(x, ...) {
@@ -546,9 +526,7 @@ Math.gretaR_array <- function(x, ...) {
   wrap_gretaR_array(result_node)
 }
 
-# =============================================================================
-# Matrix operations
-# =============================================================================
+# Matrix operations ----------------------------------------------------------
 
 #' @export
 t.gretaR_array <- function(x) {
@@ -601,9 +579,7 @@ gretaR_matmul <- function(x, y) {
   base::`%*%`(x, y)
 }
 
-# =============================================================================
-# Reduction operations (sum, mean, etc.)
-# =============================================================================
+# Reduction operations (sum, mean, etc.) -------------------------------------
 
 #' Sum of a gretaR_array
 #'
@@ -648,9 +624,7 @@ mean.gretaR_array <- function(x, ...) {
   wrap_gretaR_array(result_node)
 }
 
-# =============================================================================
-# Utility: dimension broadcasting
-# =============================================================================
+# Utility: dimension broadcasting --------------------------------------------
 
 #' @noRd
 broadcast_dims <- function(dim1, dim2) {

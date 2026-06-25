@@ -92,9 +92,7 @@ build_convergence <- function(draws, raw_divergences = NULL) {
   )
 }
 
-# =============================================================================
-# S3 methods for gretaR_fit
-# =============================================================================
+# S3 methods for gretaR_fit --------------------------------------------------
 
 #' @title Print a gretaR Fit Object
 #'

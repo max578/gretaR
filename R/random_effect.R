@@ -155,6 +155,8 @@ print.gretaR_random_effect <- function(x, ...) {
   invisible(x)
 }
 
+# Internal helpers: centring resolution and validation -----------------------
+
 #' Human label for a centring weight.
 #' @noRd
 .centring_label <- function(w) {

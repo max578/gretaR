@@ -1,8 +1,6 @@
 # inference_utils.R — Shared utilities for HMC and NUTS samplers
 
-# =============================================================================
-# Mass-matrix metric abstraction (diagonal or dense)
-# =============================================================================
+# Mass-matrix metric abstraction (diagonal or dense) -------------------------
 #
 # The Hamiltonian dynamics need three operations on the momentum: draw it from
 # its kinetic distribution, form the velocity (the position update direction),

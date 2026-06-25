@@ -1,8 +1,6 @@
 # custom.R — Custom distributions and mixture model helpers
 
-# =============================================================================
-# Custom distribution (user-defined log_prob)
-# =============================================================================
+# Custom distribution (user-defined log_prob) --------------------------------
 
 CustomDistribution <- R6::R6Class(
   "CustomDistribution",
@@ -79,9 +77,7 @@ custom_distribution <- function(log_prob_fn, constraint = NULL, dim = NULL,
   create_variable_node(distribution = dist, dim = dim)
 }
 
-# =============================================================================
-# Mixture distribution (marginalising over discrete components)
-# =============================================================================
+# Mixture distribution (marginalising over discrete components) --------------
 
 MixtureDistribution <- R6::R6Class(
   "MixtureDistribution",

@@ -225,6 +225,8 @@ variational <- function(model, n_samples = 1L, max_iter = 5000L,
   )
 }
 
+# Variational-approximation helpers ------------------------------------------
+
 #' Build a lower-triangular matrix from a flat vector
 #' @noRd
 build_lower_triangular <- function(flat, d) {

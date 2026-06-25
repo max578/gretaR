@@ -204,9 +204,7 @@ gretaR_glm <- function(formula, data, family = c("gaussian", "binomial", "poisso
 }
 
 
-# =============================================================================
-# Internal: fit a mixed-effects model (lme4-style random effects)
-# =============================================================================
+# Internal: fit a mixed-effects model (lme4-style random effects) ------------
 
 #' Build and fit a mixed-effects gretaR model
 #'
@@ -523,9 +521,7 @@ summary.gretaR_glm_fit <- function(object, ...) {
 }
 
 
-# =============================================================================
-# Random effects formula parsing (regex-based, no lme4 dependency)
-# =============================================================================
+# Random effects formula parsing (regex-based, no lme4 dependency) -----------
 
 #' Parse random effects bar terms from an lme4-style formula
 #'
@@ -673,9 +669,7 @@ remove_re_bars <- function(formula) {
 }
 
 
-# =============================================================================
-# Internal: fit a GAM-style model (mgcv smooth terms)
-# =============================================================================
+# Internal: fit a GAM-style model (mgcv smooth terms) ------------------------
 
 #' Build and fit a model with mgcv-style smooth terms
 #'

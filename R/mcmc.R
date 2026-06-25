@@ -294,9 +294,7 @@ nuts <- function(model, n_samples = 1000L, warmup = 1000L, chains = 4L, ...) {
        sampler = "nuts", ...)
 }
 
-# =============================================================================
-# Format raw samples into posterior::draws_array
-# =============================================================================
+# Format raw samples into posterior::draws_array -----------------------------
 
 #' @noRd
 format_draws <- function(raw) {
@@ -324,9 +322,7 @@ format_draws <- function(raw) {
   draws
 }
 
-# =============================================================================
-# S3 methods for gretaR_draws
-# =============================================================================
+# S3 methods for gretaR_draws ------------------------------------------------
 
 #' @export
 print.gretaR_draws <- function(x, ...) {

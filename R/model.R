@@ -52,13 +52,11 @@ model <- function(..., precision = c("float32", "float64")) {
   )
 }
 
-# =============================================================================
-# Shared compiler core — the single source of truth for turning a set of
+# Shared compiler core — the single source of truth for turning a set of -----
 # target variables + likelihood terms into a `gretaR_model`. Both the
 # call-introspection front-end (`model()`) and the explicit, re-entrant
 # front-end (`model_from_arrays()`) delegate here, so the two paths produce
 # byte-identical model objects.
-# =============================================================================
 
 #' Compile target variables + likelihood terms into a `gretaR_model`
 #'
@@ -196,9 +194,7 @@ model <- function(..., precision = c("float32", "float64")) {
   structure(compiled, class = "gretaR_model")
 }
 
-# =============================================================================
-# log_prob and grad_log_prob for a compiled model
-# =============================================================================
+# log_prob and grad_log_prob for a compiled model ----------------------------
 
 #' Evaluate the log joint density at a point in unconstrained space
 #'
@@ -334,9 +330,7 @@ joint_density <- function(model) {
   function(theta) log_prob(model, theta)
 }
 
-# =============================================================================
-# Resolve distribution parameters through the DAG
-# =============================================================================
+# Resolve distribution parameters through the DAG ----------------------------
 
 #' @noRd
 resolve_distribution_params <- function(dist_obj, dag_nodes) {
@@ -369,10 +363,8 @@ resolve_distribution_params <- function(dist_obj, dag_nodes) {
   )
 }
 
-# =============================================================================
-# DAG reachability — used by model() to find only variables relevant to THIS
+# DAG reachability — used by model() to find only variables relevant to THIS ----
 # model's joint density, not every variable ever created in the session.
-# =============================================================================
 
 #' Walk parent links recursively from a seed set of node ids and return all
 #' node ids reachable along the parent chain (inclusive of seeds).
@@ -434,9 +426,7 @@ find_all_variables <- function() {
   var_ids
 }
 
-# =============================================================================
-# S3 methods for gretaR_model
-# =============================================================================
+# S3 methods for gretaR_model ------------------------------------------------
 
 #' @export
 print.gretaR_model <- function(x, ...) {

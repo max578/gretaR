@@ -13,7 +13,7 @@
 #' @noRd
 NULL
 
-# --- Identity transform (unconstrained parameters) ---
+# Identity transform (unconstrained parameters) ------------------------------
 
 IdentityTransform <- R6::R6Class(
 
@@ -27,7 +27,7 @@ IdentityTransform <- R6::R6Class(
   )
 )
 
-# --- Log transform (positive parameters: rate, sd, scale) ---
+# Log transform (positive parameters: rate, sd, scale) -----------------------
 
 LogTransform <- R6::R6Class(
   "LogTransform",
@@ -41,7 +41,7 @@ LogTransform <- R6::R6Class(
   )
 )
 
-# --- Logit transform (parameters in (0, 1)) ---
+# Logit transform (parameters in (0, 1)) -------------------------------------
 
 LogitTransform <- R6::R6Class(
   "LogitTransform",
@@ -57,7 +57,7 @@ LogitTransform <- R6::R6Class(
   )
 )
 
-# --- Scaled logit transform (parameters in (lower, upper)) ---
+# Scaled logit transform (parameters in (lower, upper)) ----------------------
 
 ScaledLogitTransform <- R6::R6Class(
   "ScaledLogitTransform",
@@ -93,7 +93,7 @@ ScaledLogitTransform <- R6::R6Class(
   )
 )
 
-# --- Softplus transform (positive, smoother than exp) ---
+# Softplus transform (positive, smoother than exp) ---------------------------
 
 SoftplusTransform <- R6::R6Class(
   "SoftplusTransform",
@@ -112,7 +112,7 @@ SoftplusTransform <- R6::R6Class(
   )
 )
 
-# --- Lower-bounded transform ---
+# Lower-bounded transform ----------------------------------------------------
 
 LowerBoundTransform <- R6::R6Class(
   "LowerBoundTransform",
@@ -134,7 +134,7 @@ LowerBoundTransform <- R6::R6Class(
   )
 )
 
-# --- Helper: select transform from constraints ---
+# Helper: select transform from constraints ----------------------------------
 
 #' Select an appropriate transform given constraints
 #' @param lower Lower bound (NULL or -Inf for unconstrained below)
