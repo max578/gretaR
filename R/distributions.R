@@ -8,9 +8,7 @@
 #
 # User-facing constructors return gretaR_array objects that are distribution nodes.
 
-# =============================================================================
-# Base distribution class
-# =============================================================================
+# Base distribution class ----------------------------------------------------
 
 GretaRDistribution <- R6::R6Class(
   "GretaRDistribution",
@@ -103,9 +101,7 @@ GretaRDistribution <- R6::R6Class(
   )
 )
 
-# =============================================================================
-# Helper: resolve parameter to torch tensor
-# =============================================================================
+# Helper: resolve parameter to torch tensor ----------------------------------
 
 #' Resolve a parameter (numeric or gretaR_array) to its value for log_prob
 #'
@@ -123,9 +119,50 @@ resolve_param <- function(x) {
   cli_abort("Cannot resolve parameter of class {class(x)}")
 }
 
-# =============================================================================
-# Normal distribution
-# =============================================================================
+# Helper: validate user-facing distribution parameters -----------------------
+
+#' Validate the parameters passed to a distribution constructor
+#'
+#' Every distribution parameter must be resolvable to a `torch` tensor when the
+#' log-density is evaluated, which means it has to be supplied either as a
+#' numeric value or as a `gretaR_array` graph node. A `NULL` (including a
+#' required argument left unsupplied and coalesced to `NULL` by the
+#' constructor), a non-numeric atomic vector, or a numeric carrying `NA` cannot
+#' be resolved. Such inputs previously slipped past the constructors and
+#' surfaced either as a silent acceptance that failed much later or as R's
+#' internal "argument is missing" message. This helper rejects them at the
+#' constructor boundary with a single caller-facing error, matching the
+#' `as_data()` validation idiom.
+#'
+#' @param parameters A named list of the distribution's parameters. The names
+#'   appear verbatim in the error message, so they must match the user-facing
+#'   argument names.
+#'
+#' @returns `parameters`, invisibly, when every entry is valid; otherwise it
+#'   aborts with a caller-facing error.
+#'
+#' @noRd
+#' @keywords internal
+.validate_dist_parameters <- function(parameters) {
+  for (arg in names(parameters)) {
+    value <- parameters[[arg]]
+    if (inherits(value, c("gretaR_array", "GretaRArray", "torch_tensor"))) {
+      next
+    }
+    if (!is.numeric(value)) {
+      cli_abort(c(
+        "{.arg {arg}} must be numeric or a {.cls gretaR_array}.",
+        i = "You supplied {.cls {class(value)}}."
+      ))
+    }
+    if (anyNA(value)) {
+      cli_abort("{.arg {arg}} must not contain missing values.")
+    }
+  }
+  invisible(parameters)
+}
+
+# Normal distribution --------------------------------------------------------
 
 NormalDistribution <- R6::R6Class(
   "NormalDistribution",
@@ -180,14 +217,13 @@ NormalDistribution <- R6::R6Class(
 #' x_pos <- normal(0, 1, truncation = c(0, Inf))
 #' }
 normal <- function(mean = 0, sd = 1, dim = NULL, truncation = NULL) {
+  .validate_dist_parameters(list(mean = mean, sd = sd))
   dist <- NormalDistribution$new(mean = mean, sd = sd, dim = dim,
                                   truncation = truncation)
   create_variable_node(distribution = dist, dim = dim)
 }
 
-# =============================================================================
-# Half-Normal distribution
-# =============================================================================
+# Half-Normal distribution ---------------------------------------------------
 
 HalfNormalDistribution <- R6::R6Class(
   "HalfNormalDistribution",
@@ -237,13 +273,12 @@ HalfNormalDistribution <- R6::R6Class(
 #' sigma <- half_normal(1)
 #' }
 half_normal <- function(sd = 1, dim = NULL, truncation = NULL) {
+  .validate_dist_parameters(list(sd = sd))
   dist <- HalfNormalDistribution$new(sd = sd, dim = dim, truncation = truncation)
   create_variable_node(distribution = dist, dim = dim)
 }
 
-# =============================================================================
-# Half-Cauchy distribution
-# =============================================================================
+# Half-Cauchy distribution ---------------------------------------------------
 
 HalfCauchyDistribution <- R6::R6Class(
   "HalfCauchyDistribution",
@@ -296,13 +331,12 @@ HalfCauchyDistribution <- R6::R6Class(
 #' tau <- half_cauchy(5)
 #' }
 half_cauchy <- function(scale = 1, dim = NULL, truncation = NULL) {
+  .validate_dist_parameters(list(scale = scale))
   dist <- HalfCauchyDistribution$new(scale = scale, dim = dim, truncation = truncation)
   create_variable_node(distribution = dist, dim = dim)
 }
 
-# =============================================================================
-# Student-t distribution
-# =============================================================================
+# Student-t distribution -----------------------------------------------------
 
 StudentTDistribution <- R6::R6Class(
   "StudentTDistribution",
@@ -366,14 +400,13 @@ StudentTDistribution <- R6::R6Class(
 #' x <- student_t(df = 3, mu = 0, sigma = 1)
 #' }
 student_t <- function(df = 3, mu = 0, sigma = 1, dim = NULL, truncation = NULL) {
+  .validate_dist_parameters(list(df = df, mu = mu, sigma = sigma))
   dist <- StudentTDistribution$new(df = df, mu = mu, sigma = sigma, dim = dim,
                                     truncation = truncation)
   create_variable_node(distribution = dist, dim = dim)
 }
 
-# =============================================================================
-# Uniform distribution
-# =============================================================================
+# Uniform distribution -------------------------------------------------------
 
 UniformDistribution <- R6::R6Class(
   "UniformDistribution",
@@ -429,13 +462,12 @@ UniformDistribution <- R6::R6Class(
 #' p <- uniform(0, 1)
 #' }
 uniform <- function(lower = 0, upper = 1, dim = NULL) {
+  .validate_dist_parameters(list(lower = lower, upper = upper))
   dist <- UniformDistribution$new(lower = lower, upper = upper, dim = dim)
   create_variable_node(distribution = dist, dim = dim)
 }
 
-# =============================================================================
-# Bernoulli distribution
-# =============================================================================
+# Bernoulli distribution -----------------------------------------------------
 
 BernoulliDistribution <- R6::R6Class(
   "BernoulliDistribution",
@@ -479,13 +511,13 @@ BernoulliDistribution <- R6::R6Class(
 #' z <- bernoulli(0.5)
 #' }
 bernoulli <- function(prob, dim = NULL) {
+  if (missing(prob)) prob <- NULL
+  .validate_dist_parameters(list(prob = prob))
   dist <- BernoulliDistribution$new(prob = prob, dim = dim)
   create_variable_node(distribution = dist, dim = dim, is_discrete = TRUE)
 }
 
-# =============================================================================
-# Binomial distribution
-# =============================================================================
+# Binomial distribution ------------------------------------------------------
 
 BinomialDistribution <- R6::R6Class(
   "BinomialDistribution",
@@ -538,13 +570,14 @@ BinomialDistribution <- R6::R6Class(
 #' y <- binomial_dist(size = 10, prob = 0.3)
 #' }
 binomial_dist <- function(size, prob, dim = NULL) {
+  if (missing(size)) size <- NULL
+  if (missing(prob)) prob <- NULL
+  .validate_dist_parameters(list(size = size, prob = prob))
   dist <- BinomialDistribution$new(size = size, prob = prob, dim = dim)
   create_variable_node(distribution = dist, dim = dim, is_discrete = TRUE)
 }
 
-# =============================================================================
-# Poisson distribution
-# =============================================================================
+# Poisson distribution -------------------------------------------------------
 
 PoissonDistribution <- R6::R6Class(
   "PoissonDistribution",
@@ -588,13 +621,13 @@ PoissonDistribution <- R6::R6Class(
 #' y <- poisson_dist(rate = 5)
 #' }
 poisson_dist <- function(rate, dim = NULL) {
+  if (missing(rate)) rate <- NULL
+  .validate_dist_parameters(list(rate = rate))
   dist <- PoissonDistribution$new(rate = rate, dim = dim)
   create_variable_node(distribution = dist, dim = dim, is_discrete = TRUE)
 }
 
-# =============================================================================
-# Gamma distribution
-# =============================================================================
+# Gamma distribution ---------------------------------------------------------
 
 GammaDistribution <- R6::R6Class(
   "GammaDistribution",
@@ -653,14 +686,15 @@ GammaDistribution <- R6::R6Class(
 #' tau <- gamma_dist(shape = 2, rate = 1)
 #' }
 gamma_dist <- function(shape, rate, dim = NULL, truncation = NULL) {
+  if (missing(shape)) shape <- NULL
+  if (missing(rate)) rate <- NULL
+  .validate_dist_parameters(list(shape = shape, rate = rate))
   dist <- GammaDistribution$new(shape = shape, rate = rate, dim = dim,
                                  truncation = truncation)
   create_variable_node(distribution = dist, dim = dim)
 }
 
-# =============================================================================
-# Beta distribution
-# =============================================================================
+# Beta distribution ----------------------------------------------------------
 
 BetaDistribution <- R6::R6Class(
   "BetaDistribution",
@@ -721,14 +755,15 @@ BetaDistribution <- R6::R6Class(
 #' p <- beta_dist(alpha = 2, beta = 5)
 #' }
 beta_dist <- function(alpha, beta, dim = NULL, truncation = NULL) {
+  if (missing(alpha)) alpha <- NULL
+  if (missing(beta)) beta <- NULL
+  .validate_dist_parameters(list(alpha = alpha, beta = beta))
   dist <- BetaDistribution$new(alpha = alpha, beta = beta, dim = dim,
                                 truncation = truncation)
   create_variable_node(distribution = dist, dim = dim)
 }
 
-# =============================================================================
-# Exponential distribution
-# =============================================================================
+# Exponential distribution ---------------------------------------------------
 
 ExponentialDistribution <- R6::R6Class(
   "ExponentialDistribution",
@@ -776,13 +811,12 @@ ExponentialDistribution <- R6::R6Class(
 #' lambda <- exponential(rate = 1)
 #' }
 exponential <- function(rate = 1, dim = NULL, truncation = NULL) {
+  .validate_dist_parameters(list(rate = rate))
   dist <- ExponentialDistribution$new(rate = rate, dim = dim, truncation = truncation)
   create_variable_node(distribution = dist, dim = dim)
 }
 
-# =============================================================================
-# Multivariate Normal distribution
-# =============================================================================
+# Multivariate Normal distribution -------------------------------------------
 
 MultivariateNormalDistribution <- R6::R6Class(
   "MultivariateNormalDistribution",
@@ -841,6 +875,9 @@ MultivariateNormalDistribution <- R6::R6Class(
 #' x <- multivariate_normal(mean = mu, covariance = Sigma)
 #' }
 multivariate_normal <- function(mean, covariance, dim = NULL) {
+  if (missing(mean)) mean <- NULL
+  if (missing(covariance)) covariance <- NULL
+  .validate_dist_parameters(list(mean = mean, covariance = covariance))
   dist <- MultivariateNormalDistribution$new(
     mean = mean, covariance = covariance, dim = dim
   )
@@ -850,9 +887,7 @@ multivariate_normal <- function(mean, covariance, dim = NULL) {
   create_variable_node(distribution = dist, dim = dim)
 }
 
-# =============================================================================
-# Dirichlet distribution
-# =============================================================================
+# Dirichlet distribution -----------------------------------------------------
 
 DirichletDistribution <- R6::R6Class(
   "DirichletDistribution",
@@ -928,6 +963,8 @@ DirichletDistribution <- R6::R6Class(
 #' theta <- dirichlet(c(2, 5, 1))
 #' }
 dirichlet <- function(concentration, dim = NULL) {
+  if (missing(concentration)) concentration <- NULL
+  .validate_dist_parameters(list(concentration = concentration))
   dist <- DirichletDistribution$new(concentration = concentration, dim = dim)
   if (is.null(dim) && is.numeric(concentration)) {
     dim <- c(length(concentration), 1L)
@@ -935,9 +972,7 @@ dirichlet <- function(concentration, dim = NULL) {
   create_variable_node(distribution = dist, dim = dim)
 }
 
-# =============================================================================
-# Negative Binomial distribution
-# =============================================================================
+# Negative Binomial distribution ---------------------------------------------
 
 NegativeBinomialDistribution <- R6::R6Class(
   "NegativeBinomialDistribution",
@@ -992,13 +1027,14 @@ NegativeBinomialDistribution <- R6::R6Class(
 #' y <- negative_binomial(size = 5, prob = 0.5)
 #' }
 negative_binomial <- function(size, prob, dim = NULL) {
+  if (missing(size)) size <- NULL
+  if (missing(prob)) prob <- NULL
+  .validate_dist_parameters(list(size = size, prob = prob))
   dist <- NegativeBinomialDistribution$new(size = size, prob = prob, dim = dim)
   create_variable_node(distribution = dist, dim = dim, is_discrete = TRUE)
 }
 
-# =============================================================================
-# LKJ Correlation distribution
-# =============================================================================
+# LKJ Correlation distribution -----------------------------------------------
 
 LKJDistribution <- R6::R6Class(
   "LKJDistribution",
@@ -1063,14 +1099,13 @@ LKJDistribution <- R6::R6Class(
 #' R <- lkj_correlation(eta = 2, dim = 3)
 #' }
 lkj_correlation <- function(eta = 1, dim = 2L) {
+  .validate_dist_parameters(list(eta = eta))
   if (dim < 2L) cli_abort("LKJ dimension must be >= 2.")
   dist <- LKJDistribution$new(eta = eta, dim_mat = as.integer(dim))
   create_variable_node(distribution = dist, dim = c(dim, dim))
 }
 
-# =============================================================================
-# Log-Normal distribution
-# =============================================================================
+# Log-Normal distribution ----------------------------------------------------
 
 LogNormalDistribution <- R6::R6Class(
   "LogNormalDistribution",
@@ -1121,14 +1156,13 @@ LogNormalDistribution <- R6::R6Class(
 #' x <- lognormal(0, 1)
 #' }
 lognormal <- function(meanlog = 0, sdlog = 1, dim = NULL, truncation = NULL) {
+  .validate_dist_parameters(list(meanlog = meanlog, sdlog = sdlog))
   dist <- LogNormalDistribution$new(meanlog = meanlog, sdlog = sdlog, dim = dim,
                                      truncation = truncation)
   create_variable_node(distribution = dist, dim = dim)
 }
 
-# =============================================================================
-# Cauchy distribution
-# =============================================================================
+# Cauchy distribution --------------------------------------------------------
 
 CauchyDistribution <- R6::R6Class(
   "CauchyDistribution",
@@ -1179,14 +1213,13 @@ CauchyDistribution <- R6::R6Class(
 #' x <- cauchy(0, 1)
 #' }
 cauchy <- function(location = 0, scale = 1, dim = NULL, truncation = NULL) {
+  .validate_dist_parameters(list(location = location, scale = scale))
   dist <- CauchyDistribution$new(location = location, scale = scale, dim = dim,
                                    truncation = truncation)
   create_variable_node(distribution = dist, dim = dim)
 }
 
-# =============================================================================
-# Wishart distribution
-# =============================================================================
+# Wishart distribution -------------------------------------------------------
 
 WishartDistribution <- R6::R6Class(
   "WishartDistribution",
@@ -1260,6 +1293,9 @@ WishartDistribution <- R6::R6Class(
 #' Sigma <- wishart(df = 5, scale_matrix = diag(3))
 #' }
 wishart <- function(df, scale_matrix) {
+  if (missing(df)) df <- NULL
+  if (missing(scale_matrix)) scale_matrix <- NULL
+  .validate_dist_parameters(list(df = df, scale_matrix = scale_matrix))
   dist <- WishartDistribution$new(df = df, scale_matrix = scale_matrix)
   p <- if (is.matrix(scale_matrix)) nrow(scale_matrix) else NULL
   dim <- if (!is.null(p)) c(p, p) else NULL

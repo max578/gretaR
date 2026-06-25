@@ -14,6 +14,21 @@
   Cholesky path cannot silently regress again. The path had no test before,
   which is how the dead symbols survived.
 
+* Every distribution constructor now validates its parameters at the call
+  boundary. A `NULL`, a missing required argument, a non-numeric value, or a
+  numeric carrying `NA` is rejected with a single caller-facing message
+  (`` `prob` must be numeric or a <gretaR_array>. ``), mirroring the existing
+  `as_data()` idiom. Previously nine constructors -- `normal()`, `student_t()`,
+  `bernoulli()`, `cauchy()`, `exponential()`, `half_cauchy()`, `half_normal()`,
+  `lognormal()`, `poisson_dist()` -- accepted a `NULL` parameter silently and
+  failed later with an unrelated tensor error, while four -- `beta_dist()`,
+  `binomial_dist()`, `gamma_dist()`, `negative_binomial()` -- leaked R's
+  internal "argument is missing" message. A numeric or a `gretaR_array` graph
+  node (the hierarchical-prior case, e.g. `bernoulli(beta_dist(2, 2))`) still
+  passes untouched. Found by the package's two-sided conformance sweep;
+  `test-distributions-validation.R` pins the behaviour across all eighteen
+  distribution constructors.
+
 # gretaR 0.5.0
 
 ## Sampling
