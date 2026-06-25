@@ -636,6 +636,12 @@ parse_re_bars <- function(formula) {
 #'
 #' @export
 remove_re_bars <- function(formula) {
+  if (!inherits(formula, "formula")) {
+    cli_abort(c(
+      "{.arg formula} must be a {.cls formula}.",
+      i = "You supplied {.cls {class(formula)}}."
+    ))
+  }
   # reformulas is the canonical home for nobars() (lme4 v1.1-36+ deprecated its copy)
   if (requireNamespace("reformulas", quietly = TRUE)) {
     nb <- reformulas::nobars(formula)

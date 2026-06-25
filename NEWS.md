@@ -29,6 +29,15 @@
   `test-distributions-validation.R` pins the behaviour across all eighteen
   distribution constructors.
 
+* Three model- and formula-consuming entry points -- `joint_density()`,
+  `compile_to_stan()`, and `remove_re_bars()` -- now reject a non-model or
+  non-formula input (including `NULL`) at the call boundary instead of
+  accepting it silently. `joint_density()` had returned a closure that failed
+  only when later called, `compile_to_stan()` emitted an empty Stan program, and
+  `remove_re_bars()` passed `NULL` straight through `reformulas::nobars()`. The
+  two-sided conformance sweep, now covering 0.93 of the exported surface,
+  surfaced all three; `test-validation-guards.R` pins them.
+
 # gretaR 0.5.0
 
 ## Sampling

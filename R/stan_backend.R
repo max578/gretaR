@@ -47,6 +47,12 @@
 #' cat(compile_to_stan(m))
 #' }
 compile_to_stan <- function(model) {
+  if (!inherits(model, "gretaR_model")) {
+    cli_abort(c(
+      "{.arg model} must be a {.cls gretaR_model}.",
+      i = "You supplied {.cls {class(model)}}."
+    ))
+  }
 
   # Collect information from the model
   data_block <- list()

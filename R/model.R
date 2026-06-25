@@ -327,6 +327,12 @@ grad_log_prob <- function(model, theta_free) {
 #' ld(torch::torch_zeros(1))
 #' }
 joint_density <- function(model) {
+  if (!inherits(model, "gretaR_model")) {
+    cli_abort(c(
+      "{.arg model} must be a {.cls gretaR_model}.",
+      i = "You supplied {.cls {class(model)}}."
+    ))
+  }
   function(theta) log_prob(model, theta)
 }
 
