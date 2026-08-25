@@ -1,3 +1,20 @@
+# gretaR (development version)
+
+## Bug fixes
+
+* Every decline (an unresolvable parameter, an untranslatable Stan target, a
+  missing optional backend, an unconverged fit's unavailable diagnostic, or a
+  boundary-validation failure) now raises a classed condition instead of a
+  bare error. `R/conditions.R` adds `gretaR_abort()`, which every existing
+  `cli_abort()` call site in `R/` now goes through; the condition's class
+  vector carries a reason-specific tag (`gretaR_<reason_code>_refusal`, one of
+  `unsupported_distribution` / `untransformable_constraint` /
+  `backend_unavailable` / `nonconvergence` / `invalid_input`), the package-wide
+  `gretaR_refusal`, and the federation-shared `orchestra_refusal` marker, ahead
+  of the usual `rlang_error`/`error`/`condition` classes. An orchestra leader
+  can now route on a gretaR decline by class rather than by parsing the
+  message text.
+
 # gretaR 0.5.1
 
 ## Bug fixes

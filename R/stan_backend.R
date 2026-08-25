@@ -48,10 +48,10 @@
 #' }
 compile_to_stan <- function(model) {
   if (!inherits(model, "gretaR_model")) {
-    cli_abort(c(
+    gretaR_abort(c(
       "{.arg model} must be a {.cls gretaR_model}.",
       i = "You supplied {.cls {class(model)}}."
-    ))
+    ), reason_code = "invalid_input")
   }
 
   # Collect information from the model
@@ -366,9 +366,9 @@ node_to_stan_expr <- function(node, dag_nodes, param_names, node_stan_names = li
         "matmul"    = sprintf("(%s * %s)", a, b),
         "index_select" = sprintf("%s[%s]", a, b),
         # No silent fallback: an unhandled binary op would emit wrong Stan code.
-        cli_abort(
+        gretaR_abort(
           "Cannot translate binary operation {.val {ot}} to Stan code."
-        )
+        , reason_code = "unsupported_distribution")
       )
       return(stan_expr)
     }
@@ -395,9 +395,9 @@ node_to_stan_expr <- function(node, dag_nodes, param_names, node_stan_names = li
         "mean"         = sprintf("mean(%s)", a),
         # No silent pass-through: an unhandled unary op would drop a
         # transform (e.g. floor, tanh) and emit the identity by mistake.
-        cli_abort(
+        gretaR_abort(
           "Cannot translate unary operation {.val {ot}} to Stan code."
-        )
+        , reason_code = "unsupported_distribution")
       )
       return(stan_expr)
     }
@@ -428,7 +428,7 @@ stan_sample <- function(model, n_samples = 1000L, warmup = 1000L,
                         chains = 4L, verbose = TRUE, ...) {
 
   if (!requireNamespace("cmdstanr", quietly = TRUE)) {
-    cli_abort("Package {.pkg cmdstanr} is required for the Stan backend. Install from https://mc-stan.org/cmdstanr/")
+    gretaR_abort("Package {.pkg cmdstanr} is required for the Stan backend. Install from https://mc-stan.org/cmdstanr/", reason_code = "backend_unavailable")
   }
 
   # Generate Stan code
@@ -521,7 +521,7 @@ stan_sample <- function(model, n_samples = 1000L, warmup = 1000L,
 stan_optimize <- function(model, verbose = TRUE, ...) {
 
   if (!requireNamespace("cmdstanr", quietly = TRUE)) {
-    cli_abort("Package {.pkg cmdstanr} is required for the Stan backend.")
+    gretaR_abort("Package {.pkg cmdstanr} is required for the Stan backend.", reason_code = "backend_unavailable")
   }
 
   stan_code <- compile_to_stan(model)

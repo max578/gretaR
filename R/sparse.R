@@ -13,7 +13,7 @@
 #' @noRd
 sparse_to_torch <- function(x, dtype = torch_float32()) {
   if (!requireNamespace("Matrix", quietly = TRUE)) {
-    cli_abort("Package {.pkg Matrix} is required for sparse matrix support.")
+    gretaR_abort("Package {.pkg Matrix} is required for sparse matrix support.", reason_code = "backend_unavailable")
   }
 
   # Convert to triplet (COO) format
@@ -45,10 +45,10 @@ sparse_to_torch <- function(x, dtype = torch_float32()) {
 #' @noRd
 as_data_sparse <- function(x) {
   if (anyNA(x@x)) {
-    cli_abort(c(
+    gretaR_abort(c(
       "Missing values ({.val NA}) detected in sparse data passed to {.fn as_data}.",
       "i" = "gretaR requires complete data. Preprocess with {.pkg mice}, {.pkg missRanger}, or {.fn tidyr::drop_na}."
-    ))
+    ), reason_code = "invalid_input")
   }
 
   tensor <- sparse_to_torch(x)

@@ -151,10 +151,10 @@ mcmc <- function(model, n_samples = 1000L, warmup = 1000L, chains = 4L,
     # Batched multi-chain HMC: all chains advance in one set of tensor ops.
     # Big win as chains grow (wall-clock ~flat in chain count); device-generic.
     if (sampler != "hmc") {
-      cli_abort(c(
+      gretaR_abort(c(
         "Batched sampling currently supports only {.code sampler = \"hmc\"}.",
         "i" = "Single-chain NUTS stays the robust default; batched NUTS is deferred."
-      ))
+      ), reason_code = "invalid_input")
     }
     if (trajectory == "chees") {
       # ChEES-HMC: adaptive trajectory length tuned across the chain ensemble.
@@ -358,7 +358,7 @@ plot.gretaR_draws <- function(x, type = c("trace", "density", "pairs"), ...) {
   type <- rlang::arg_match(type)
 
   if (!requireNamespace("bayesplot", quietly = TRUE)) {
-    cli_abort("Package {.pkg bayesplot} is required for plotting. Install with {.code install.packages('bayesplot')}.")
+    gretaR_abort("Package {.pkg bayesplot} is required for plotting. Install with {.code install.packages('bayesplot')}.", reason_code = "backend_unavailable")
   }
 
   switch(type,

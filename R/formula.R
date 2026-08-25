@@ -247,10 +247,10 @@ gretaR_glm <- function(formula, data, family = c("gaussian", "binomial", "poisso
   # --- Validate grouping variables exist in data ---
   for (rt in re_terms) {
     if (!rt$group %in% names(data)) {
-      cli_abort(c(
+      gretaR_abort(c(
         "Grouping variable {.var {rt$group}} not found in {.arg data}.",
         "i" = "Available columns: {paste(names(data), collapse = ', ')}"
-      ))
+      ), reason_code = "invalid_input")
     }
   }
 
@@ -329,7 +329,7 @@ gretaR_glm <- function(formula, data, family = c("gaussian", "binomial", "poisso
         # For now, use separate tau/z_raw per coefficient to keep it simple.
         # This is handled below in the restructured approach.
         slopes_txt <- paste(rt$slope_vars, collapse = " + ")
-        cli_abort(c(
+        gretaR_abort(c(
           "Correlated random intercept + slope terms are not yet supported.",
           "x" = paste(
             "{.code ({rt$lhs} | {rt$group})} requires a correlation",
@@ -340,7 +340,7 @@ gretaR_glm <- function(formula, data, family = c("gaussian", "binomial", "poisso
             "{.code (1|{rt$group}) + (0 + {slopes_txt}|{rt$group})},",
             "which fits intercept and slope as independent random effects."
           )
-        ))
+        ), reason_code = "invalid_input")
       }
 
       # Build the contribution to eta from this random effect
@@ -350,7 +350,7 @@ gretaR_glm <- function(formula, data, family = c("gaussian", "binomial", "poisso
       } else {
         # Random slope: alpha[group_id] * x_var
         if (!coef_name %in% names(data)) {
-          cli_abort("Slope variable {.var {coef_name}} not found in {.arg data}.")
+          gretaR_abort("Slope variable {.var {coef_name}} not found in {.arg data}.", reason_code = "invalid_input")
         }
         slope_vals <- as_data(as.numeric(data[[coef_name]]))
         re_contribution <- alpha_j[group_id] * slope_vals
@@ -554,7 +554,7 @@ parse_re_bars <- function(formula) {
   matched_texts <- regmatches(formula_str, matches)[[1]]
 
   if (length(matched_texts) == 0) {
-    cli_abort("No random effect terms (expr|group) found in formula.")
+    gretaR_abort("No random effect terms (expr|group) found in formula.", reason_code = "invalid_input")
   }
 
   lapply(matched_texts, function(mt) {
@@ -562,7 +562,7 @@ parse_re_bars <- function(formula) {
     inner <- sub("^\\((.*)\\)$", "\\1", mt)
     parts <- strsplit(inner, "\\|")[[1]]
     if (length(parts) != 2) {
-      cli_abort("Cannot parse random effect term: {.code {mt}}")
+      gretaR_abort("Cannot parse random effect term: {.code {mt}}", reason_code = "invalid_input")
     }
     lhs <- trimws(parts[1])
     group <- trimws(parts[2])
@@ -637,10 +637,10 @@ parse_re_bars <- function(formula) {
 #' @export
 remove_re_bars <- function(formula) {
   if (!inherits(formula, "formula")) {
-    cli_abort(c(
+    gretaR_abort(c(
       "{.arg formula} must be a {.cls formula}.",
       i = "You supplied {.cls {class(formula)}}."
-    ))
+    ), reason_code = "invalid_input")
   }
   # reformulas is the canonical home for nobars() (lme4 v1.1-36+ deprecated its copy)
   if (requireNamespace("reformulas", quietly = TRUE)) {

@@ -47,7 +47,7 @@ GretaRDistribution <- R6::R6Class(
     },
 
     log_prob = function(x) {
-      cli_abort("log_prob() not implemented for base distribution.")
+      gretaR_abort("log_prob() not implemented for base distribution.", reason_code = "unsupported_distribution")
     },
 
     #' Apply support-enforcement for truncation.
@@ -92,7 +92,7 @@ GretaRDistribution <- R6::R6Class(
     },
 
     sample = function(n = 1L) {
-      cli_abort("sample() not implemented for base distribution.")
+      gretaR_abort("sample() not implemented for base distribution.", reason_code = "unsupported_distribution")
     },
 
     get_transform = function() {
@@ -116,7 +116,7 @@ resolve_param <- function(x) {
   }
   if (inherits(x, "GretaRArray")) return(x$compute())
   if (is.numeric(x)) return(torch_tensor(x, dtype = torch_float32()))
-  cli_abort("Cannot resolve parameter of class {class(x)}")
+  gretaR_abort("Cannot resolve parameter of class {class(x)}", reason_code = "untransformable_constraint")
 }
 
 # Helper: validate user-facing distribution parameters -----------------------
@@ -150,13 +150,13 @@ resolve_param <- function(x) {
       next
     }
     if (!is.numeric(value)) {
-      cli_abort(c(
+      gretaR_abort(c(
         "{.arg {arg}} must be numeric or a {.cls gretaR_array}.",
         i = "You supplied {.cls {class(value)}}."
-      ))
+      ), reason_code = "invalid_input")
     }
     if (anyNA(value)) {
-      cli_abort("{.arg {arg}} must not contain missing values.")
+      gretaR_abort("{.arg {arg}} must not contain missing values.", reason_code = "invalid_input")
     }
   }
   invisible(parameters)
@@ -1100,7 +1100,7 @@ LKJDistribution <- R6::R6Class(
 #' }
 lkj_correlation <- function(eta = 1, dim = 2L) {
   .validate_dist_parameters(list(eta = eta))
-  if (dim < 2L) cli_abort("LKJ dimension must be >= 2.")
+  if (dim < 2L) gretaR_abort("LKJ dimension must be >= 2.", reason_code = "invalid_input")
   dist <- LKJDistribution$new(eta = eta, dim_mat = as.integer(dim))
   create_variable_node(distribution = dist, dim = c(dim, dim))
 }

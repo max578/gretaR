@@ -91,7 +91,7 @@
   } else if (cls == "SoftplusTransform") {
     s_trailing(torch_log(torch_sigmoid(y)))
   } else {
-    cli_abort("Batched jacobian not implemented for {.cls {cls}}.")
+    gretaR_abort("Batched jacobian not implemented for {.cls {cls}}.", reason_code = "unsupported_distribution")
   }
 }
 
@@ -105,7 +105,7 @@
   } else if (is.numeric(param)) {
     torch_tensor(param, dtype = torch_float32())$reshape(c(1L, -1L, 1L))$to(device = dev)
   } else {
-    cli_abort("Cannot batch-resolve a parameter of class {.cls {class(param)}}.")
+    gretaR_abort("Cannot batch-resolve a parameter of class {.cls {class(param)}}.", reason_code = "untransformable_constraint")
   }
 }
 
@@ -113,8 +113,8 @@
   nm <- dist$name
   fn <- .bd[[nm]]
   if (is.null(fn)) {
-    cli_abort(c("Batched density not implemented for distribution {.val {nm}}.",
-                "i" = "Multivariate / gated families are the M0b follow-on."))
+    gretaR_abort(c("Batched density not implemented for distribution {.val {nm}}.",
+                "i" = "Multivariate / gated families are the M0b follow-on."), reason_code = "unsupported_distribution")
   }
   # Resolve each named parameter to a batched tensor (on the input's device).
   p <- lapply(dist$parameters, .batched_resolve, bcompute = bcompute, dev = dev)
@@ -165,7 +165,7 @@ compile_log_prob_batched <- function(model) {
         },
         variable = cache[[nid]],
         operation = .batched_op(node, bcompute, C),
-        cli_abort("Batched eval: unsupported node type {.val {node$node_type}}.")
+        gretaR_abort("Batched eval: unsupported node type {.val {node$node_type}}.", reason_code = "unsupported_distribution")
       )
       cache[[nid]] <- val
       val
@@ -216,7 +216,7 @@ compile_log_prob_batched <- function(model) {
         idx <- b$reshape(c(-1L))$to(dtype = torch_long())
         a$index_select(2L, idx)
       },
-      cli_abort("Batched op not implemented: {.val {ot}}.")
+      gretaR_abort("Batched op not implemented: {.val {ot}}.", reason_code = "unsupported_distribution")
     )
   } else if (length(pv) == 1L) {
     a <- pv[[1]]
@@ -224,9 +224,9 @@ compile_log_prob_batched <- function(model) {
       "math_exp" = torch_exp(a), "math_log" = torch_log(a),
       "math_sqrt" = torch_sqrt(a), "sigmoid" = torch_sigmoid(a),
       "transpose" = a$transpose(2L, 3L),
-      cli_abort("Batched unary op not implemented: {.val {ot}}.")
+      gretaR_abort("Batched unary op not implemented: {.val {ot}}.", reason_code = "unsupported_distribution")
     )
   } else {
-    cli_abort("Batched op with {length(pv)} parents not supported.")
+    gretaR_abort("Batched op with {length(pv)} parents not supported.", reason_code = "unsupported_distribution")
   }
 }

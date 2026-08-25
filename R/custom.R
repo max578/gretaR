@@ -26,7 +26,7 @@ CustomDistribution <- R6::R6Class(
     },
 
     sample = function(n = 1L) {
-      cli_abort("Sampling not available for custom distributions.")
+      gretaR_abort("Sampling not available for custom distributions.", reason_code = "unsupported_distribution")
     }
   )
 )
@@ -66,7 +66,7 @@ CustomDistribution <- R6::R6Class(
 custom_distribution <- function(log_prob_fn, constraint = NULL, dim = NULL,
                                 name = "custom") {
   if (!is.function(log_prob_fn)) {
-    cli_abort("{.arg log_prob_fn} must be a function.")
+    gretaR_abort("{.arg log_prob_fn} must be a function.", reason_code = "invalid_input")
   }
   dist <- CustomDistribution$new(
     log_prob_fn = log_prob_fn,
@@ -114,7 +114,7 @@ MixtureDistribution <- R6::R6Class(
     },
 
     sample = function(n = 1L) {
-      cli_abort("Sampling from mixture distributions not yet implemented.")
+      gretaR_abort("Sampling from mixture distributions not yet implemented.", reason_code = "unsupported_distribution")
     }
   )
 )
@@ -150,14 +150,14 @@ MixtureDistribution <- R6::R6Class(
 #' }
 mixture <- function(distributions, weights) {
   if (!is.list(distributions) || length(distributions) < 2) {
-    cli_abort("{.arg distributions} must be a list of at least 2 distributions.")
+    gretaR_abort("{.arg distributions} must be a list of at least 2 distributions.", reason_code = "invalid_input")
   }
 
   # Extract distribution objects from gretaR_arrays
   dist_objs <- lapply(distributions, function(d) {
     node <- get_node(d)
     if (is.null(node) || is.null(node$distribution)) {
-      cli_abort("Each element of {.arg distributions} must be a gretaR distribution.")
+      gretaR_abort("Each element of {.arg distributions} must be a gretaR distribution.", reason_code = "invalid_input")
     }
     node$distribution
   })

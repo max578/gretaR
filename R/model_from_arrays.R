@@ -98,10 +98,10 @@ model_from_arrays <- function(targets, likelihood = NULL, names = NULL,
     targets <- list(targets)
   }
   if (!is.list(targets) || length(targets) == 0L) {
-    cli_abort(c(
+    gretaR_abort(c(
       "{.arg targets} must be a non-empty list of {.cls gretaR_array} variables.",
       "i" = "Pass e.g. {.code targets = list(mu, sigma)} or a single array."
-    ))
+    ), reason_code = "invalid_input")
   }
 
   # Resolve names with no call introspection. `display` is one node label per
@@ -128,10 +128,10 @@ model_from_arrays <- function(targets, likelihood = NULL, names = NULL,
     vid <- get_node(targets[[i]])$id
     n_elem <- m$param_info[[vid]]$n_elem
     if (length(el) != n_elem) {
-      cli_abort(paste(
+      gretaR_abort(paste(
         "Target {i} has {n_elem} element{?s} but {length(el)} element name{?s}",
         "were supplied. Provide one name per element, or a single node name."
-      ))
+      ), reason_code = "invalid_input")
     }
     m$param_info[[vid]]$element_names <- el
   }
@@ -154,7 +154,7 @@ model_from_arrays <- function(targets, likelihood = NULL, names = NULL,
   node_id <- function(a) {
     node <- get_node(a)
     if (is.null(node)) {
-      cli_abort("Every element of {.arg targets} must be a {.cls gretaR_array}.")
+      gretaR_abort("Every element of {.arg targets} must be a {.cls gretaR_array}.", reason_code = "invalid_input")
     }
     node$id
   }
@@ -163,7 +163,7 @@ model_from_arrays <- function(targets, likelihood = NULL, names = NULL,
 
   check_str <- function(v, what) {
     if (anyNA(v) || any(!nzchar(v))) {
-      cli_abort("{.arg names} must contain no missing or empty strings ({what}).")
+      gretaR_abort("{.arg names} must contain no missing or empty strings ({what}).", reason_code = "invalid_input")
     }
   }
 
@@ -178,10 +178,10 @@ model_from_arrays <- function(targets, likelihood = NULL, names = NULL,
   }
 
   if (length(names) != n) {
-    cli_abort(paste(
+    gretaR_abort(paste(
       "{.arg names} has length {length(names)} but there are {n} target{?s}.",
       "Supply exactly one entry per target."
-    ))
+    ), reason_code = "invalid_input")
   }
 
   # List form allows a per-element name vector per target.
@@ -220,24 +220,24 @@ model_from_arrays <- function(targets, likelihood = NULL, names = NULL,
     likelihood <- list(likelihood)
   }
   if (!is.list(likelihood)) {
-    cli_abort(paste(
+    gretaR_abort(paste(
       "{.arg likelihood} must be a data {.cls gretaR_array} or a list of them."
-    ))
+    ), reason_code = "invalid_input")
   }
 
   terms <- list()
   for (d in likelihood) {
     dn <- get_node(d)
     if (is.null(dn)) {
-      cli_abort("Each {.arg likelihood} element must be a {.cls gretaR_array}.")
+      gretaR_abort("Each {.arg likelihood} element must be a {.cls gretaR_array}.", reason_code = "invalid_input")
     }
     reg <- .gretaR_env$distributions[[dn$id]]
     if (is.null(reg)) {
-      cli_abort(c(
+      gretaR_abort(c(
         "No likelihood is attached to one of the supplied data nodes.",
         "x" = "Data node {.val {dn$id}} has no {.code distribution(y) <- ...}.",
         "i" = "Assign a distribution to it before building the model."
-      ))
+      ), reason_code = "invalid_input")
     }
     terms[[dn$id]] <- reg
   }

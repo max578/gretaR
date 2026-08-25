@@ -233,11 +233,11 @@ plot.gretaR_fit <- function(x, type = c("trace", "density", "pairs",
   type <- rlang::arg_match(type)
 
   if (is.null(x$draws)) {
-    cli_abort("No posterior draws available for plotting.")
+    gretaR_abort("No posterior draws available for plotting.", reason_code = "invalid_input")
   }
 
   if (!requireNamespace("bayesplot", quietly = TRUE)) {
-    cli_abort("Package {.pkg bayesplot} required for plotting.")
+    gretaR_abort("Package {.pkg bayesplot} required for plotting.", reason_code = "backend_unavailable")
   }
 
   switch(type,
@@ -248,7 +248,7 @@ plot.gretaR_fit <- function(x, type = c("trace", "density", "pairs",
       if (!is.null(x$convergence$rhat)) {
         bayesplot::mcmc_rhat(x$convergence$rhat, ...)
       } else {
-        cli_abort("R-hat not available.")
+        gretaR_abort("R-hat not available.", reason_code = "nonconvergence")
       }
     },
     neff = {
@@ -256,7 +256,7 @@ plot.gretaR_fit <- function(x, type = c("trace", "density", "pairs",
         ratios <- x$convergence$n_eff / (dim(x$draws)[1] * dim(x$draws)[2])
         bayesplot::mcmc_neff(ratios, ...)
       } else {
-        cli_abort("ESS not available.")
+        gretaR_abort("ESS not available.", reason_code = "nonconvergence")
       }
     }
   )

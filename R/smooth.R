@@ -48,10 +48,10 @@
 process_smooths <- function(formula, data, knots = NULL) {
 
   if (!requireNamespace("mgcv", quietly = TRUE)) {
-    cli_abort(c(
+    gretaR_abort(c(
       "Package {.pkg mgcv} is required for smooth terms (s, te, ti, t2).",
       "i" = "Install with {.code install.packages('mgcv')}."
-    ))
+    ), reason_code = "invalid_input")
   }
 
   # --- Parse the formula to extract smooth specs ---
@@ -59,7 +59,7 @@ process_smooths <- function(formula, data, knots = NULL) {
   gp <- mgcv::interpret.gam(formula)
 
   if (length(gp$smooth.spec) == 0) {
-    cli_abort("No smooth terms found in formula. Use s(), te(), ti(), or t2().")
+    gretaR_abort("No smooth terms found in formula. Use s(), te(), ti(), or t2().", reason_code = "invalid_input")
   }
 
   # --- Build the parametric (fixed) part of the formula ---
