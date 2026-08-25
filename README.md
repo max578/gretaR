@@ -14,13 +14,13 @@ experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](h
 coverage](https://codecov.io/gh/max578/gretaR/branch/main/graph/badge.svg)](https://app.codecov.io/gh/max578/gretaR?branch=main)
 <!-- badges: end -->
 
-**Bayesian statistical modelling in R, powered by torch – no Python
+**Bayesian statistical modelling in R, powered by torch -- no Python
 required.**
 
 gretaR is a probabilistic programming package that lets you define
 Bayesian models interactively using native R syntax, then compile them
 to torch tensors and fit with HMC, NUTS, ADVI, MAP, and Laplace
-approximation — all on a native torch (libtorch) backend.
+approximation -- all on a native torch (libtorch) backend.
 
 ## Installation
 
@@ -84,24 +84,25 @@ summary(draws)
 
 ## Feature Highlights
 
-- **18 distributions** – Normal, HalfNormal, HalfCauchy, StudentT,
+- **18 distributions** -- Normal, HalfNormal, HalfCauchy, StudentT,
   Uniform, Bernoulli, Binomial, Poisson, Gamma, Beta, Exponential,
   MultivariateNormal, Dirichlet, NegativeBinomial, LKJ, LogNormal,
   Cauchy, Wishart
-- **5 inference methods** – HMC, NUTS, ADVI (mean-field and full-rank),
+- **5 inference methods** -- HMC, NUTS, ADVI (mean-field and full-rank),
   MAP, Laplace approximation
-- **Formula interface** – `gretaR_glm()` for specifying GLMs with
+- **Formula interface** -- `gretaR_glm()` for specifying GLMs with
   standard R formula syntax (Gaussian, Binomial, Poisson families)
-- **Hierarchical models** – nested and crossed random effects via the
-  core DSL
-- **Sparse matrix support** – efficient large design matrices via
+- **Hierarchical models** -- single-grouping-factor random effects via
+  `random_effect()`, with a continuous centring weight that interpolates
+  between the non-centred and centred parameterisations
+- **Sparse matrix support** -- efficient large design matrices via
   `as_data_sparse()` and `sparse_matmul()`
-- **Native R torch backend** – automatic differentiation and zero
+- **Native R torch backend** -- automatic differentiation and zero
   Python dependency (GPU/MPS acceleration is on the roadmap)
-- **Multi-chain batching** – `mcmc(..., sampler = "hmc", batched = TRUE)`
+- **Multi-chain batching** -- `mcmc(..., sampler = "hmc", batched = TRUE)`
   advances all chains as one batched torch computation; wall-clock stays
   roughly flat in the number of chains (~2x at 8 chains, ~4x at 16 on CPU)
-- **Ecosystem integration** – posterior draws returned as
+- **Ecosystem integration** -- posterior draws returned as
   `posterior::draws_array` for seamless use with bayesplot, loo, and
   other tidyverse-compatible tools
 
@@ -133,11 +134,11 @@ summary(draws)
 
 ## Vignettes
 
-- [Getting Started](vignettes/getting-started.Rmd) – core DSL
+- [Getting Started](vignettes/getting-started.Rmd) -- core DSL
   walkthrough with a complete linear regression example
-- [Hierarchical Models](vignettes/hierarchical-models.Rmd) – random
+- [Hierarchical Models](vignettes/hierarchical-models.Rmd) -- random
   effects, partial pooling, and nested structures
-- [GLM Models](vignettes/glm-models.Rmd) – formula interface for
+- [GLM Models](vignettes/glm-models.Rmd) -- formula interface for
   Gaussian, logistic, and Poisson regression
 
 After installation, browse vignettes with:

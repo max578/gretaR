@@ -105,10 +105,10 @@
 #' }
 random_effect <- function(group, n_groups, sd, centring = 0, mean = 0) {
   if (!inherits(sd, "gretaR_array")) {
-    cli_abort(c(
+    gretaR_abort(c(
       "{.arg sd} must be a scalar {.cls gretaR_array} (the group-scale parameter).",
       "i" = "Pass e.g. {.code sd = half_normal(2)}, not a plain number."
-    ))
+    ), reason_code = "invalid_input")
   }
 
   n_groups <- .as_count(n_groups, "n_groups")
@@ -174,7 +174,7 @@ print.gretaR_random_effect <- function(x, ...) {
 .as_count <- function(x, arg) {
   if (length(x) != 1L || !is.finite(x) || x < 1 ||
     abs(x - round(x)) > .Machine$double.eps^0.5) {
-    cli_abort("{.arg {arg}} must be a single positive integer.")
+    gretaR_abort("{.arg {arg}} must be a single positive integer.", reason_code = "invalid_input")
   }
   as.integer(round(x))
 }
@@ -183,23 +183,23 @@ print.gretaR_random_effect <- function(x, ...) {
 #' @noRd
 .resolve_centring <- function(centring, n_groups) {
   if (!is.numeric(centring) || anyNA(centring)) {
-    cli_abort("{.arg centring} must be a numeric weight, with no missing values.")
+    gretaR_abort("{.arg centring} must be a numeric weight, with no missing values.", reason_code = "invalid_input")
   }
   if (any(centring < 0 | centring > 1)) {
-    cli_abort(c(
+    gretaR_abort(c(
       "{.arg centring} must lie in {.val [0, 1]}.",
       "x" = "Got value{?s} outside the unit interval: {.val {centring[centring < 0 | centring > 1]}}.",
       "i" = "0 is non-centred, 1 is centred; intermediate values partially centre."
-    ))
+    ), reason_code = "invalid_input")
   }
   if (length(centring) == 1L) {
     return(rep(centring, n_groups))
   }
   if (length(centring) != n_groups) {
-    cli_abort(paste(
+    gretaR_abort(paste(
       "{.arg centring} must have length 1 or {n_groups} (one weight per group),",
       "but has length {length(centring)}."
-    ))
+    ), reason_code = "invalid_input")
   }
   centring
 }
@@ -211,15 +211,15 @@ print.gretaR_random_effect <- function(x, ...) {
     return(group)
   }
   if (!is.numeric(group) || anyNA(group)) {
-    cli_abort("{.arg group} must be an integer vector with no missing values.")
+    gretaR_abort("{.arg group} must be an integer vector with no missing values.", reason_code = "invalid_input")
   }
   bad <- group[group < 1 | group > n_groups |
     abs(group - round(group)) > .Machine$double.eps^0.5]
   if (length(bad) > 0L) {
-    cli_abort(c(
+    gretaR_abort(c(
       "{.arg group} must hold integer group ids in the range 1 to {n_groups}.",
       "x" = "Found {length(bad)} id{?s} outside that range: {.val {unique(bad)}}."
-    ))
+    ), reason_code = "invalid_input")
   }
   as_data(matrix(as.numeric(round(group)), ncol = 1L))
 }

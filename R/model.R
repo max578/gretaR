@@ -30,7 +30,7 @@ model <- function(..., precision = c("float32", "float64")) {
 
   # Validate inputs
   if (length(targets) == 0L) {
-    cli_abort("At least one target variable must be provided to {.fn model}.")
+    gretaR_abort("At least one target variable must be provided to {.fn model}.", reason_code = "invalid_input")
   }
 
   # Extract target names from the call. This `deparse` is the ONLY
@@ -72,10 +72,10 @@ model <- function(..., precision = c("float32", "float64")) {
 .compile_gretaR_model <- function(targets, target_names, likelihood_terms,
                                   dtype) {
   if (length(targets) != length(target_names)) {
-    cli_abort(paste(
+    gretaR_abort(paste(
       "Internal: {length(targets)} targets but {length(target_names)} names.",
       "These must be equal."
-    ))
+    ), reason_code = "invalid_input")
   }
 
   free_vars <- list()
@@ -84,11 +84,11 @@ model <- function(..., precision = c("float32", "float64")) {
   for (i in seq_along(targets)) {
     arr <- targets[[i]]
     if (!inherits(arr, "gretaR_array")) {
-      cli_abort("Argument {i} is not a gretaR_array.")
+      gretaR_abort("Argument {i} is not a gretaR_array.", reason_code = "invalid_input")
     }
     node <- get_node(arr)
     if (node$node_type != "variable") {
-      cli_abort("Argument {target_names[i]} is not a variable node (it is '{node$node_type}').")
+      gretaR_abort("Argument {target_names[i]} is not a variable node (it is '{node$node_type}').", reason_code = "invalid_input")
     }
     node$node_name <- target_names[i]
     free_vars[[node$id]] <- node
@@ -127,11 +127,11 @@ model <- function(..., precision = c("float32", "float64")) {
   for (vid in names(free_vars)) {
     vnode <- free_vars[[vid]]
     if (isTRUE(vnode$is_discrete)) {
-      cli_abort(c(
+      gretaR_abort(c(
         "Discrete latent variables cannot be sampled by HMC/NUTS.",
         "x" = "{.field {vnode$node_name}} is a discrete free variable.",
         "i" = "Use discrete variables only as observed data, or marginalise them out."
-      ))
+      ), reason_code = "invalid_input")
     }
   }
 
@@ -141,7 +141,7 @@ model <- function(..., precision = c("float32", "float64")) {
     vnode <- free_vars[[vid]]
     dist <- vnode$distribution
     if (!is.null(dist) && isFALSE(dist$samplable)) {
-      cli_abort(c(
+      gretaR_abort(c(
         "{.fn {dist$name}} cannot yet be sampled as a latent variable.",
         "x" = paste(
           "Its constrained support (simplex / correlation matrix / SPD)",
@@ -153,7 +153,7 @@ model <- function(..., precision = c("float32", "float64")) {
           "fixed-value computation, or as part of a likelihood. Latent",
           "sampling is planned for v0.3."
         )
-      ))
+      ), reason_code = "invalid_input")
     }
   }
 
@@ -262,7 +262,7 @@ log_prob <- function(model, theta_free) {
 
     data_node <- model$dag_nodes[[data_id]]
     if (is.null(data_node)) {
-      cli_abort("Data node {data_id} not found in DAG.")
+      gretaR_abort("Data node {data_id} not found in DAG.", reason_code = "untransformable_constraint")
     }
 
     # Evaluate log_prob of the likelihood distribution at the observed data
@@ -328,10 +328,10 @@ grad_log_prob <- function(model, theta_free) {
 #' }
 joint_density <- function(model) {
   if (!inherits(model, "gretaR_model")) {
-    cli_abort(c(
+    gretaR_abort(c(
       "{.arg model} must be a {.cls gretaR_model}.",
       i = "You supplied {.cls {class(model)}}."
-    ))
+    ), reason_code = "invalid_input")
   }
   function(theta) log_prob(model, theta)
 }

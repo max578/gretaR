@@ -138,14 +138,14 @@ as_data <- function(x) {
   }
 
   if (!is.numeric(x)) {
-    cli_abort("{.arg x} must be numeric, not {.cls {class(x)}}.")
+    gretaR_abort("{.arg x} must be numeric, not {.cls {class(x)}}.", reason_code = "invalid_input")
   }
 
   if (anyNA(x)) {
-    cli_abort(c(
+    gretaR_abort(c(
       "Missing values ({.val NA}) detected in data passed to {.fn as_data}.",
       "i" = "gretaR requires complete data. Preprocess with {.pkg mice}, {.pkg missRanger}, or {.fn tidyr::drop_na}."
-    ))
+    ), reason_code = "invalid_input")
   }
 
   # Convert to matrix
@@ -279,10 +279,10 @@ distribution <- function(x) {
   dist_node <- get_node(value)
 
   if (is.null(data_node)) {
-    cli_abort("Left-hand side of {.code distribution(x) <- ...} must be a gretaR_array.")
+    gretaR_abort("Left-hand side of {.code distribution(x) <- ...} must be a gretaR_array.", reason_code = "invalid_input")
   }
   if (is.null(dist_node) || is.null(dist_node$distribution)) {
-    cli_abort("Right-hand side must be a distribution (e.g., {.code normal(mu, sigma)}).")
+    gretaR_abort("Right-hand side must be a distribution (e.g., {.code normal(mu, sigma)}).", reason_code = "invalid_input")
   }
 
   # Register this as a likelihood term:
@@ -314,11 +314,11 @@ distribution <- function(x) {
   # implemented. A second index would previously be ignored, silently
   # row-selecting instead of returning element [i, j] -- fail loud instead.
   if (!missing(j)) {
-    cli_abort(c(
+    gretaR_abort(c(
       "Column indexing of a {.cls gretaR_array} is not supported.",
       "i" = "Only single-index selection is implemented (e.g. {.code alpha[group_id]}).",
       "i" = "Two-dimensional {.code [i, j]} selection is planned for a future release."
-    ))
+    ), reason_code = "invalid_input")
   }
 
   # --- Determine the index vector and create an index data node ---
@@ -347,7 +347,7 @@ distribution <- function(x) {
     )
     idx_node <- idx_r6
   } else {
-    cli_abort("Index for {.cls gretaR_array} must be integer, logical, or a gretaR_array.")
+    gretaR_abort("Index for {.cls gretaR_array} must be integer, logical, or a gretaR_array.", reason_code = "invalid_input")
   }
 
   # --- Infer output dimensions ---
@@ -431,7 +431,7 @@ Ops.gretaR_array <- function(e1, e2) {
     op_fn <- switch(generic,
       "-" = function(parents) -parents[[1]]$compute(),
       "+" = function(parents) parents[[1]]$compute(),
-      cli_abort("Unsupported unary operation: {generic}")
+      gretaR_abort("Unsupported unary operation: {generic}", reason_code = "untransformable_constraint")
     )
     result_node <- GretaRArray$new(
       node_type = "operation",
@@ -478,7 +478,7 @@ Ops.gretaR_array <- function(e1, e2) {
         "<=" = (a <= b)$to(dtype = torch_float32()),
         "==" = (a == b)$to(dtype = torch_float32()),
         "!=" = (a != b)$to(dtype = torch_float32()),
-        cli_abort("Unsupported operation: {op}")
+        gretaR_abort("Unsupported operation: {op}", reason_code = "untransformable_constraint")
       )
     },
     parents = c(node1$id, node2$id),
@@ -516,7 +516,7 @@ Math.gretaR_array <- function(x, ...) {
         "atan" = torch_atan(val),
         "lgamma" = torch_lgamma(val),
         "digamma" = torch_digamma(val),
-        cli_abort("Unsupported math function: {generic}")
+        gretaR_abort("Unsupported math function: {generic}", reason_code = "untransformable_constraint")
       )
     },
     parents = node$id,
@@ -641,7 +641,7 @@ broadcast_dims <- function(dim1, dim2) {
     } else if (d2[i] == 1L) {
       out[i] <- d1[i]
     } else {
-      cli_abort("Incompatible dimensions for broadcasting: {dim1} vs {dim2}")
+      gretaR_abort("Incompatible dimensions for broadcasting: {dim1} vs {dim2}", reason_code = "untransformable_constraint")
     }
   }
   rev(out)

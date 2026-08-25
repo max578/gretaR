@@ -156,7 +156,7 @@ select_transform <- function(lower = NULL, upper = NULL) {
   } else if (!has_lower && has_upper) {
     # Reflect: upper-bounded → lower-bounded via negation
     # Not common, but handle it
-    cli_abort("Upper-bounded-only transforms not yet implemented.")
+    gretaR_abort("Upper-bounded-only transforms not yet implemented.", reason_code = "unsupported_distribution")
   } else {
     # Both bounded
     if (lower == 0 && upper == 1) {
