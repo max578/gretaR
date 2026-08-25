@@ -5,8 +5,14 @@
 **gretaR** is a ground-up reimplementation of the
 [greta](https://github.com/greta-dev/greta) probabilistic programming
 interface for R. It preserves the elegant, intuitive API that made greta
-popular while removing its most significant pain point — the
-Python/TensorFlow dependency — and adding modern inference capabilities.
+popular while removing its most significant pain point – the
+Python/TensorFlow dependency – and adding modern inference capabilities.
+
+The comparisons below describe greta’s API and dependencies as of
+gretaR’s own development; they are not re-verified against greta’s
+current release on every gretaR update and should be treated as
+`[unverified]` for any greta version you have not checked directly
+against [the greta repository](https://github.com/greta-dev/greta).
 
 Three reasons to migrate:
 
@@ -62,14 +68,14 @@ changes at all.
 gretaR provides several additional distribution constructors not
 available in greta:
 
-- `half_normal(sd)` — half-normal distribution on the positive reals
-- `half_cauchy(scale)` — first-class constructor (no truncation
+- `half_normal(sd)` – half-normal distribution on the positive reals
+- `half_cauchy(scale)` – first-class constructor (no truncation
   workaround)
-- `negative_binomial(size, prob)` — negative binomial for overdispersed
+- `negative_binomial(size, prob)` – negative binomial for overdispersed
   counts
-- `lognormal(meanlog, sdlog)` — log-normal distribution
-- `cauchy(location, scale)` — full (two-sided) Cauchy distribution
-- `wishart(df, scale_matrix)` — Wishart distribution for covariance
+- `lognormal(meanlog, sdlog)` – log-normal distribution
+- `cauchy(location, scale)` – full (two-sided) Cauchy distribution
+- `wishart(df, scale_matrix)` – Wishart distribution for covariance
   matrices
 
 ## Key differences
@@ -84,11 +90,11 @@ with pre-built binaries for macOS, Linux, and Windows.
 
 ``` r
 
-# greta — requires Python + TensorFlow
+# greta -- requires Python + TensorFlow
 # install.packages("greta")
 # greta::install_greta_deps()  # can fail in many creative ways
 
-# gretaR — pure R + torch
+# gretaR -- pure R + torch
 install.packages("gretaR")
 # That's it. No Python, no conda, no reticulate.
 ```
@@ -99,7 +105,7 @@ Under the hood, gretaR builds a computation graph using torch tensors.
 The automatic differentiation engine is torch’s autograd, which provides
 exact gradients for HMC/NUTS without finite-difference approximations.
 
-For most users this is invisible — the user-facing API is the same. But
+For most users this is invisible – the user-facing API is the same. But
 if you wrote custom greta operations using `tensorflow` directly, those
 will need to be rewritten using `torch`.
 
@@ -113,23 +119,23 @@ greta provides only
 
 m <- model(mu, sigma)
 
-# MCMC (HMC or NUTS) — same as greta
+# MCMC (HMC or NUTS) -- same as greta
 draws <- mcmc(m, n_samples = 1000, warmup = 1000, chains = 4)
 
 # Convenience wrappers
 draws <- nuts(m, n_samples = 1000)
 draws <- hmc(m, n_samples = 1000)
 
-# MAP optimisation — find the posterior mode
+# MAP optimisation -- find the posterior mode
 fit <- opt(m)
 fit$par
 
-# Laplace approximation — Gaussian centred at MAP
+# Laplace approximation -- Gaussian centred at MAP
 la <- laplace(m)
 la$mean
 la$sd
 
-# Variational inference (ADVI) — mean-field or full-rank Gaussian
+# Variational inference (ADVI) -- mean-field or full-rank Gaussian
 vi_fit <- variational(m, method = "meanfield")
 vi_fit$mean
 vi_fit$draws  # samples from the variational posterior
@@ -164,7 +170,7 @@ fit <- gretaR_glm(
 )
 ```
 
-There is no equivalent in greta — all models must be built from the DSL.
+There is no equivalent in greta – all models must be built from the DSL.
 
 ### 5. Renamed distribution constructors
 
@@ -314,7 +320,7 @@ distribution(y) <- normal(mu, sigma)
 m <- model(alpha, beta, sigma)
 draws <- mcmc(m, n_samples = 1000, warmup = 1000, chains = 4)
 
-# Summarise — uses posterior package
+# Summarise -- uses posterior package
 posterior::summarise_draws(draws)
 
 # Or use the formula interface for the same model in one call:
@@ -327,22 +333,22 @@ fit <- gretaR_glm(y_obs ~ x_obs,
 
 Only two lines differ:
 
-1.  [`library(greta)`](https://rdrr.io/r/base/library.html) becomes
+1.  [`library(greta)`](https://greta-dev.github.io/greta/) becomes
     [`library(gretaR)`](https://github.com/max578/gretaR).
 2.  `cauchy(0, 3, truncation = c(0, Inf))` becomes `half_cauchy(3)`.
 
-Everything else —
+Everything else –
 [`as_data()`](https://max578.github.io/gretaR/reference/as_data.md),
 [`normal()`](https://max578.github.io/gretaR/reference/normal.md),
 [`variable()`](https://max578.github.io/gretaR/reference/variable.md),
 `distribution<-()`,
 [`model()`](https://max578.github.io/gretaR/reference/model.md),
-[`mcmc()`](https://max578.github.io/gretaR/reference/mcmc.md) — works
+[`mcmc()`](https://max578.github.io/gretaR/reference/mcmc.md) – works
 identically.
 
 ## Quick migration checklist
 
-Replace [`library(greta)`](https://rdrr.io/r/base/library.html) with
+Replace [`library(greta)`](https://greta-dev.github.io/greta/) with
 [`library(gretaR)`](https://github.com/max578/gretaR)
 
 Replace `gamma(...)` with `gamma_dist(...)`

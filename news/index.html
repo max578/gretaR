@@ -42,6 +42,25 @@
     </div>
 
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="development version" id="gretar-development-version">gretaR (development version)<a class="anchor" aria-label="anchor" href="#gretar-development-version"></a></h2>
+<div class="section level3">
+<h3 id="documentation-development-version">Documentation<a class="anchor" aria-label="anchor" href="#documentation-development-version"></a></h3>
+<ul><li>All three package vignettes now evaluate their MCMC chunks (previously <code>eval = FALSE</code> in two of them) and each includes at least one captioned convergence plot (trace or density) with a sentence interpreting it. The <em>Hierarchical Models</em> vignette adds a worked <code><a href="../reference/random_effect.html">random_effect()</a></code> example and reconciles its centring advice with that verb; its <code><a href="https://rdrr.io/r/utils/edit.html" class="external-link">vi()</a></code> typo is corrected to <code><a href="../reference/variational.html">variational()</a></code>; a resolvable citation is added for the Gelman (2006) reference on variance-component priors.</li>
+<li>
+<em>Complete Guide to gretaR</em> now evaluates every chunk except the <code>remotes::install_github()</code>/<code><a href="https://torch.mlverse.org/docs/reference/install_torch.html" class="external-link">torch::install_torch()</a></code> installation snippet and the <code>loo</code> section (<code><a href="https://mc-stan.org/loo/reference/loo.html" class="external-link">loo::loo()</a></code> needs a pointwise log-likelihood matrix gretaR does not compute, so there is no runnable gretaR-native example). The unsourced “30-150x”/“100x+” Stan-backend speedup claims and the “always prefer <code>backend = \"stan\"</code> for production” recommendation are removed; the Stan section now states plainly which distribution families the Stan code emitter currently supports and points to <code>NEWS.md</code> for the current status. The non-centred-parameterisation example is reconciled with <code><a href="../reference/random_effect.html">random_effect()</a></code>. Stale “coming in v0.2” / “coming in Phase 3” / “future: … coming in next release” forward-references are removed or resolved across the vignette set.</li>
+<li>
+<em>GLMs with gretaR</em> now lists all five inference methods (previously omitted <code><a href="../reference/laplace.html">laplace()</a></code>) and describes NUTS/HMC as “asymptotically exact” rather than “exact”, since any finite MCMC run carries Monte Carlo error.</li>
+<li>The vignette install line and 35 Unicode em/en dashes across the vignette set and <code>README.md</code> are corrected to the house <code>--</code> convention and the correct <code>max578/gretaR</code> repository.</li>
+<li>
+<code>README.md</code>/<code>README.Rmd</code> no longer claim nested/crossed random effects; the shipped <code><a href="../reference/random_effect.html">random_effect()</a></code> verb supports a single grouping factor.</li>
+<li>Rendering <em>Complete Guide to gretaR</em> for the first time (it had never been evaluated before this release) surfaced two genuine, previously undocumented limitations, now stated in the vignette rather than shown as working: a smooth term (<code><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s()</a></code>) combined with an <code>(1 | group)</code> random-effect term in the same <code><a href="../reference/gretaR_glm.html">gretaR_glm()</a></code> formula is not supported (<code>.gretaR_glm_mixed()</code> does not preprocess <code><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s()</a></code> terms before building the model frame); and <code><a href="../reference/dirichlet.html">dirichlet()</a></code> mixture weights cannot be sampled as a latent variable (no simplex transform is implemented yet, matching the package’s own <code><a href="../reference/model.html">model()</a></code> refusal message), so the mixture-models example now fixes the weights at known values and estimates only the component parameters. The smooth-terms example was also missing <code><a href="https://rdrr.io/r/base/library.html" class="external-link">library(mgcv)</a></code>.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
+<ul><li>Every decline (an unresolvable parameter, an untranslatable Stan target, a missing optional backend, an unconverged fit’s unavailable diagnostic, or a boundary-validation failure) now raises a classed condition instead of a bare error. <code>R/conditions.R</code> adds <code><a href="../reference/gretaR_abort.html">gretaR_abort()</a></code>, which every existing <code>cli_abort()</code> call site in <code>R/</code> now goes through; the condition’s class vector carries a reason-specific tag (<code>gretaR_&lt;reason_code&gt;_refusal</code>, one of <code>unsupported_distribution</code> / <code>untransformable_constraint</code> / <code>backend_unavailable</code> / <code>nonconvergence</code> / <code>invalid_input</code>), the package-wide <code>gretaR_refusal</code>, and the federation-shared <code>orchestra_refusal</code> marker, ahead of the usual <code>rlang_error</code>/<code>error</code>/<code>condition</code> classes. An orchestra leader can now route on a gretaR decline by class rather than by parsing the message text.</li>
+</ul></div>
+</div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.5.1" id="gretar-051">gretaR 0.5.1<a class="anchor" aria-label="anchor" href="#gretar-051"></a></h2>
 <div class="section level3">
 <h3 id="bug-fixes-0-5-1">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-5-1"></a></h3>
@@ -251,7 +270,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>

@@ -107,26 +107,42 @@ print(m)
 
 ## Inference Methods
 
-gretaR offers four inference methods:
+gretaR offers five inference methods:
 
 | Method | Function | Speed | Accuracy | Best for |
 |----|----|----|----|----|
-| **NUTS** | `mcmc(sampler="nuts")` | Slow | Exact | Final analysis |
-| **HMC** | `mcmc(sampler="hmc")` | Slow | Exact | Debugging |
+| **NUTS** | `mcmc(sampler="nuts")` | Slow | Asymptotically exact | Final analysis |
+| **HMC** | `mcmc(sampler="hmc")` | Slow | Asymptotically exact | Debugging |
 | **ADVI** | [`variational()`](https://max578.github.io/gretaR/reference/variational.md) | Fast | Approximate | Quick checks, large data |
 | **MAP** | [`opt()`](https://max578.github.io/gretaR/reference/opt.md) | Very fast | Point estimate | Model verification |
+| **Laplace** | [`laplace()`](https://max578.github.io/gretaR/reference/laplace.md) | Very fast | Gaussian approximation | Quick uncertainty around a mode |
 
 ``` r
 
 # MAP (seconds)
 map_fit <- opt(m)
+coef(map_fit)
 
-# Variational inference (seconds to minutes)
+# Laplace approximation around the MAP (seconds)
+laplace_fit <- laplace(m)
+
+# Variational inference (seconds)
 vi_fit <- variational(m, method = "meanfield")
 
-# NUTS (minutes)
-mcmc_draws <- mcmc(m, n_samples = 1000, warmup = 1000)
+# NUTS (seconds on this small model)
+mcmc_fit <- mcmc(m, n_samples = 500, warmup = 500, chains = 2)
 ```
+
+``` r
+
+plot(mcmc_fit, type = "density")
+```
+
+NUTS gives the reference posterior here: MAP and the Laplace
+approximation report a point estimate and a local Gaussian curvature
+around it, and ADVI reports a factorised approximate posterior, so the
+three faster methods are used to sanity-check a model quickly before
+committing to the full NUTS run.
 
 ## Model Comparison with loo
 
@@ -134,6 +150,9 @@ mcmc_draws <- mcmc(m, n_samples = 1000, warmup = 1000)
 
 # Requires the loo package
 library(loo)
-# Use posterior draws for LOO-CV
-# (full implementation coming in Phase 3)
+
+# loo::loo() takes a pointwise log-likelihood matrix, which gretaR does
+# not currently compute internally -- it must be supplied by the caller
+# from the fitted model's likelihood terms. There is no gretaR-native
+# LOO-CV verb yet.
 ```

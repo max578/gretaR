@@ -23,3 +23,16 @@ coef(object, ...)
 ## Value
 
 A named numeric vector of point estimates.
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+mu <- normal(0, 10)
+y <- as_data(rnorm(50, 3, 1))
+distribution(y) <- normal(mu, 1)
+m <- model(mu)
+fit <- opt(m)
+coef(fit)
+} # }
+```

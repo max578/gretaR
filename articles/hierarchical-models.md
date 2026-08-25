@@ -135,6 +135,70 @@ fit$sd
 summary(fit$draws)
 ```
 
+## Partially-Centred Random Effects with `random_effect()`
+
+The centred and non-centred parameterisations above are the two ends of
+a continuum:
+[`random_effect()`](https://max578.github.io/gretaR/reference/random_effect.md)
+builds the same group-level prior,
+$`u_j \sim N(\mathrm{mean}, \mathrm{sd}^2)`$, through a `centring`
+weight $`w \in [0, 1]`$ that interpolates the sampling geometry (`0`
+non-centred, `1` centred, anything between is a partial
+reparameterisation) without changing what is being estimated. It returns
+a `$latent` block, which must be passed to
+[`model()`](https://max578.github.io/gretaR/reference/model.md), and a
+`$effect`, the per-observation value that enters the linear predictor.
+
+``` r
+
+reset_gretaR_env()
+set.seed(42)
+
+n_groups <- 5
+n_per_group <- 20
+n <- n_groups * n_per_group
+group_id <- rep(1:n_groups, each = n_per_group)
+
+true_mu <- 5
+true_tau <- 2
+true_sigma <- 1
+true_alpha <- rnorm(n_groups, true_mu, true_tau)
+y_obs <- rnorm(n, true_alpha[group_id], true_sigma)
+
+mu <- normal(0, 10)
+tau <- half_cauchy(5)
+sigma <- half_cauchy(5)
+
+# A centring weight of 0.5 is a reasonable starting point when groups have
+# a moderate amount of data each, as here (n_per_group = 20).
+re <- random_effect(group_id, n_groups, sd = tau, centring = 0.5, mean = mu)
+
+y <- as_data(y_obs)
+distribution(y) <- normal(re$effect, sigma)
+
+m <- model(mu, tau, sigma, re$latent)
+print(m)
+```
+
+``` r
+
+fit_re <- mcmc(m, n_samples = 300, warmup = 300, chains = 2)
+summary(fit_re)
+```
+
+``` r
+
+plot(fit_re, type = "trace")
+```
+
+The hyper-parameters `mu` and `tau` and all five latent group terms mix
+without the funnel-shaped stickiness a badly-matched centring weight
+produces; `centring` is a construction-time choice here, not something
+[`random_effect()`](https://max578.github.io/gretaR/reference/random_effect.md)
+tunes automatically – a group with very few observations relative to
+`tau` mixes better closer to `w = 0`, and a richly-informed group closer
+to `w = 1`.
+
 ## Formula Interface for Simple Models
 
 For standard GLMs, use the formula interface:
@@ -149,8 +213,13 @@ print(fit)
 
 ## Tips for Hierarchical Models
 
-1.  **Parameterisation**: Use non-centred parameterisation for better
-    sampling when data are sparse within groups.
+1.  **Parameterisation**: Use
+    [`random_effect()`](https://max578.github.io/gretaR/reference/random_effect.md)
+    with a low `centring` weight (closer to non-centred) for better
+    sampling when data are sparse within groups, and a higher weight
+    (closer to centred) when groups are richly informed; hand-rolling
+    the non-centred form directly is equivalent to `centring = 0` but
+    loses the ability to move along the continuum.
 2.  **Priors on variance components**:
     [`half_cauchy()`](https://max578.github.io/gretaR/reference/half_cauchy.md)
     is a sensible default for group-level standard deviations (Gelman
@@ -159,5 +228,11 @@ print(fit)
     longer warmup periods.
 4.  **Quick checks**: Use
     [`opt()`](https://max578.github.io/gretaR/reference/opt.md) or
-    [`vi()`](https://rdrr.io/r/utils/edit.html) to verify the model
-    before running full MCMC.
+    [`variational()`](https://max578.github.io/gretaR/reference/variational.md)
+    to verify the model before running full MCMC.
+
+## References
+
+Gelman, A. (2006). Prior distributions for variance parameters in
+hierarchical models (comment on article by Browne and Draper). *Bayesian
+Analysis*, 1(3), 515–534. `doi:10.1214/06-BA117A`

@@ -1,5 +1,83 @@
 # Changelog
 
+## gretaR (development version)
+
+### Documentation
+
+- All three package vignettes now evaluate their MCMC chunks (previously
+  `eval = FALSE` in two of them) and each includes at least one
+  captioned convergence plot (trace or density) with a sentence
+  interpreting it. The *Hierarchical Models* vignette adds a worked
+  [`random_effect()`](https://max578.github.io/gretaR/reference/random_effect.md)
+  example and reconciles its centring advice with that verb; its
+  [`vi()`](https://rdrr.io/r/utils/edit.html) typo is corrected to
+  [`variational()`](https://max578.github.io/gretaR/reference/variational.md);
+  a resolvable citation is added for the Gelman (2006) reference on
+  variance-component priors.
+- *Complete Guide to gretaR* now evaluates every chunk except the
+  `remotes::install_github()`/[`torch::install_torch()`](https://torch.mlverse.org/docs/reference/install_torch.html)
+  installation snippet and the `loo` section
+  ([`loo::loo()`](https://mc-stan.org/loo/reference/loo.html) needs a
+  pointwise log-likelihood matrix gretaR does not compute, so there is
+  no runnable gretaR-native example). The unsourced “30-150x”/“100x+”
+  Stan-backend speedup claims and the “always prefer
+  `backend = \"stan\"` for production” recommendation are removed; the
+  Stan section now states plainly which distribution families the Stan
+  code emitter currently supports and points to `NEWS.md` for the
+  current status. The non-centred-parameterisation example is reconciled
+  with
+  [`random_effect()`](https://max578.github.io/gretaR/reference/random_effect.md).
+  Stale “coming in v0.2” / “coming in Phase 3” / “future: … coming in
+  next release” forward-references are removed or resolved across the
+  vignette set.
+- *GLMs with gretaR* now lists all five inference methods (previously
+  omitted
+  [`laplace()`](https://max578.github.io/gretaR/reference/laplace.md))
+  and describes NUTS/HMC as “asymptotically exact” rather than “exact”,
+  since any finite MCMC run carries Monte Carlo error.
+- The vignette install line and 35 Unicode em/en dashes across the
+  vignette set and `README.md` are corrected to the house `--`
+  convention and the correct `max578/gretaR` repository.
+- `README.md`/`README.Rmd` no longer claim nested/crossed random
+  effects; the shipped
+  [`random_effect()`](https://max578.github.io/gretaR/reference/random_effect.md)
+  verb supports a single grouping factor.
+- Rendering *Complete Guide to gretaR* for the first time (it had never
+  been evaluated before this release) surfaced two genuine, previously
+  undocumented limitations, now stated in the vignette rather than shown
+  as working: a smooth term
+  ([`s()`](https://rdrr.io/pkg/mgcv/man/s.html)) combined with an
+  `(1 | group)` random-effect term in the same
+  [`gretaR_glm()`](https://max578.github.io/gretaR/reference/gretaR_glm.md)
+  formula is not supported (`.gretaR_glm_mixed()` does not preprocess
+  [`s()`](https://rdrr.io/pkg/mgcv/man/s.html) terms before building the
+  model frame); and
+  [`dirichlet()`](https://max578.github.io/gretaR/reference/dirichlet.md)
+  mixture weights cannot be sampled as a latent variable (no simplex
+  transform is implemented yet, matching the package’s own
+  [`model()`](https://max578.github.io/gretaR/reference/model.md)
+  refusal message), so the mixture-models example now fixes the weights
+  at known values and estimates only the component parameters. The
+  smooth-terms example was also missing
+  [`library(mgcv)`](https://rdrr.io/r/base/library.html).
+
+### Bug fixes
+
+- Every decline (an unresolvable parameter, an untranslatable Stan
+  target, a missing optional backend, an unconverged fit’s unavailable
+  diagnostic, or a boundary-validation failure) now raises a classed
+  condition instead of a bare error. `R/conditions.R` adds
+  [`gretaR_abort()`](https://max578.github.io/gretaR/reference/gretaR_abort.md),
+  which every existing `cli_abort()` call site in `R/` now goes through;
+  the condition’s class vector carries a reason-specific tag
+  (`gretaR_<reason_code>_refusal`, one of `unsupported_distribution` /
+  `untransformable_constraint` / `backend_unavailable` /
+  `nonconvergence` / `invalid_input`), the package-wide
+  `gretaR_refusal`, and the federation-shared `orchestra_refusal`
+  marker, ahead of the usual `rlang_error`/`error`/`condition` classes.
+  An orchestra leader can now route on a gretaR decline by class rather
+  than by parsing the message text.
+
 ## gretaR 0.5.1
 
 ### Bug fixes

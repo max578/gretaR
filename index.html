@@ -62,7 +62,7 @@
 <!-- badges: start -->
 
 <p><strong>Bayesian statistical modelling in R, powered by torch – no Python required.</strong></p>
-<p>gretaR is a probabilistic programming package that lets you define Bayesian models interactively using native R syntax, then compile them to torch tensors and fit with HMC, NUTS, ADVI, MAP, and Laplace approximation — all on a native torch (libtorch) backend.</p>
+<p>gretaR is a probabilistic programming package that lets you define Bayesian models interactively using native R syntax, then compile them to torch tensors and fit with HMC, NUTS, ADVI, MAP, and Laplace approximation – all on a native torch (libtorch) backend.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
@@ -120,7 +120,7 @@
 <li>
 <strong>Formula interface</strong> – <code><a href="reference/gretaR_glm.html">gretaR_glm()</a></code> for specifying GLMs with standard R formula syntax (Gaussian, Binomial, Poisson families)</li>
 <li>
-<strong>Hierarchical models</strong> – nested and crossed random effects via the core DSL</li>
+<strong>Hierarchical models</strong> – single-grouping-factor random effects via <code><a href="reference/random_effect.html">random_effect()</a></code>, with a continuous centring weight that interpolates between the non-centred and centred parameterisations</li>
 <li>
 <strong>Sparse matrix support</strong> – efficient large design matrices via <code>as_data_sparse()</code> and <code>sparse_matmul()</code>
 </li>
@@ -360,7 +360,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>

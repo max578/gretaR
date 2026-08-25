@@ -106,9 +106,9 @@ Approximation</a></li>
 <span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"max578/gretaR"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Install the torch backend (one-time, downloads ~60 MB)</span></span>
-<span><span class="fu">torch</span><span class="fu">::</span><span class="fu"><a href="https://torch.mlverse.org/docs/reference/install_torch.html" class="external-link">install_torch</a></span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Load</span></span>
+<span><span class="fu">torch</span><span class="fu">::</span><span class="fu"><a href="https://torch.mlverse.org/docs/reference/install_torch.html" class="external-link">install_torch</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Load</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/max578/gretaR" class="external-link">gretaR</a></span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -116,9 +116,9 @@ Approximation</a></li>
 </h2>
 <p>gretaR models are built from three types of objects:</p>
 <div class="section level3">
-<h3 id="data-nodes-fixed-observations">Data nodes — fixed observations<a class="anchor" aria-label="anchor" href="#data-nodes-fixed-observations"></a>
+<h3 id="data-nodes-fixed-observations">Data nodes – fixed observations<a class="anchor" aria-label="anchor" href="#data-nodes-fixed-observations"></a>
 </h3>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/max578/gretaR" class="external-link">gretaR</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Vectors become n x 1 matrices</span></span>
@@ -136,9 +136,9 @@ Approximation</a></li>
 <span><span class="co"># tidyr::drop_na().</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="variable-nodes-parameters-to-estimate">Variable nodes — parameters to estimate<a class="anchor" aria-label="anchor" href="#variable-nodes-parameters-to-estimate"></a>
+<h3 id="variable-nodes-parameters-to-estimate">Variable nodes – parameters to estimate<a class="anchor" aria-label="anchor" href="#variable-nodes-parameters-to-estimate"></a>
 </h3>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Unconstrained variable</span></span>
 <span><span class="va">v</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/variable.html">variable</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
@@ -152,9 +152,9 @@ Approximation</a></li>
 <span><span class="va">v_vec</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/variable.html">variable</a></span><span class="op">(</span>dim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="distribution-nodes-priors-and-likelihoods">Distribution nodes — priors and likelihoods<a class="anchor" aria-label="anchor" href="#distribution-nodes-priors-and-likelihoods"></a>
+<h3 id="distribution-nodes-priors-and-likelihoods">Distribution nodes – priors and likelihoods<a class="anchor" aria-label="anchor" href="#distribution-nodes-priors-and-likelihoods"></a>
 </h3>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Priors: create variable nodes with distributions</span></span>
 <span><span class="va">mu</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/normal.html">normal</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">10</span><span class="op">)</span>          <span class="co"># mu ~ N(0, 10)</span></span>
 <span><span class="va">sigma</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/half_cauchy.html">half_cauchy</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span>      <span class="co"># sigma ~ HalfCauchy(2), constrained &gt; 0</span></span>
@@ -169,9 +169,9 @@ Approximation</a></li>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="operations-build-the-computation-graph">Operations — build the computation graph<a class="anchor" aria-label="anchor" href="#operations-build-the-computation-graph"></a>
+<h3 id="operations-build-the-computation-graph">Operations – build the computation graph<a class="anchor" aria-label="anchor" href="#operations-build-the-computation-graph"></a>
 </h3>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/reset_gretaR_env.html">reset_gretaR_env</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Arithmetic</span></span>
@@ -199,7 +199,7 @@ Approximation</a></li>
 <div class="section level3">
 <h3 id="linear-regression">Linear regression<a class="anchor" aria-label="anchor" href="#linear-regression"></a>
 </h3>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/reset_gretaR_env.html">reset_gretaR_env</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span></span>
 <span></span>
@@ -232,7 +232,7 @@ Approximation</a></li>
 <div class="section level3">
 <h3 id="accessing-results">Accessing results<a class="anchor" aria-label="anchor" href="#accessing-results"></a>
 </h3>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Posterior summary table</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span>
 <span></span>
@@ -253,7 +253,7 @@ constraint and transform for unconstrained sampling.</p>
 <div class="section level3">
 <h3 id="continuous-distributions">Continuous distributions<a class="anchor" aria-label="anchor" href="#continuous-distributions"></a>
 </h3>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/reset_gretaR_env.html">reset_gretaR_env</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Unbounded (identity transform)</span></span>
@@ -293,7 +293,7 @@ constraint and transform for unconstrained sampling.</p>
 <div class="section level3">
 <h3 id="discrete-distributions-used-as-likelihoods">Discrete distributions (used as likelihoods)<a class="anchor" aria-label="anchor" href="#discrete-distributions-used-as-likelihoods"></a>
 </h3>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/reset_gretaR_env.html">reset_gretaR_env</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/beta_dist.html">beta_dist</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">5</span><span class="op">)</span></span>
@@ -322,7 +322,7 @@ constraint and transform for unconstrained sampling.</p>
 <p>gretaR automatically applies the correct transform so that HMC/NUTS
 samples in unconstrained space. You never need to think about this
 unless debugging.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/reset_gretaR_env.html">reset_gretaR_env</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Positive parameter → LogTransform (samples on log scale)</span></span>
@@ -345,9 +345,9 @@ unless debugging.</p>
 <h2 id="map-laplace">6. MAP Estimation and Laplace Approximation<a class="anchor" aria-label="anchor" href="#map-laplace"></a>
 </h2>
 <div class="section level3">
-<h3 id="map-fast-point-estimates">MAP — fast point estimates<a class="anchor" aria-label="anchor" href="#map-fast-point-estimates"></a>
+<h3 id="map-fast-point-estimates">MAP – fast point estimates<a class="anchor" aria-label="anchor" href="#map-fast-point-estimates"></a>
 </h3>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/reset_gretaR_env.html">reset_gretaR_env</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span></span>
 <span><span class="va">y_obs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">200</span>, <span class="fl">5</span>, <span class="fl">2</span><span class="op">)</span></span>
@@ -365,9 +365,9 @@ unless debugging.</p>
 <span><span class="co"># mu = 5.01, sigma = 1.98</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="laplace-approximate-posterior-with-covariance">Laplace — approximate posterior with covariance<a class="anchor" aria-label="anchor" href="#laplace-approximate-posterior-with-covariance"></a>
+<h3 id="laplace-approximate-posterior-with-covariance">Laplace – approximate posterior with covariance<a class="anchor" aria-label="anchor" href="#laplace-approximate-posterior-with-covariance"></a>
 </h3>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Laplace approximation (uses MAP + Hessian)</span></span>
 <span><span class="va">fit_lap</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/laplace.html">laplace</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span></span>
 <span><span class="va">fit_lap</span><span class="op">$</span><span class="va">par</span>         <span class="co"># posterior means</span></span>
@@ -379,7 +379,7 @@ unless debugging.</p>
 <div class="section level2">
 <h2 id="advi">7. Variational Inference (ADVI)<a class="anchor" aria-label="anchor" href="#advi"></a>
 </h2>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/reset_gretaR_env.html">reset_gretaR_env</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span></span>
 <span></span>
@@ -407,7 +407,7 @@ unless debugging.</p>
 <div class="section level3">
 <h3 id="random-intercepts">Random intercepts<a class="anchor" aria-label="anchor" href="#random-intercepts"></a>
 </h3>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/reset_gretaR_env.html">reset_gretaR_env</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span></span>
 <span></span>
@@ -439,7 +439,7 @@ unless debugging.</p>
 <div class="section level3">
 <h3 id="random-intercepts-slopes">Random intercepts + slopes<a class="anchor" aria-label="anchor" href="#random-intercepts-slopes"></a>
 </h3>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/reset_gretaR_env.html">reset_gretaR_env</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span></span>
 <span></span>
@@ -474,7 +474,7 @@ standard R formulas.</p>
 <div class="section level3">
 <h3 id="gaussian-linear-model">Gaussian linear model<a class="anchor" aria-label="anchor" href="#gaussian-linear-model"></a>
 </h3>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/gretaR_glm.html">gretaR_glm</a></span><span class="op">(</span></span>
 <span>  <span class="va">Sepal.Length</span> <span class="op">~</span> <span class="va">Sepal.Width</span> <span class="op">+</span> <span class="va">Petal.Length</span>,</span>
 <span>  data <span class="op">=</span> <span class="va">iris</span>,</span>
@@ -487,7 +487,7 @@ standard R formulas.</p>
 <div class="section level3">
 <h3 id="logistic-regression">Logistic regression<a class="anchor" aria-label="anchor" href="#logistic-regression"></a>
 </h3>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span></span>
 <span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>  x1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">200</span><span class="op">)</span>, x2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">200</span><span class="op">)</span></span>
@@ -501,7 +501,7 @@ standard R formulas.</p>
 <div class="section level3">
 <h3 id="poisson-regression">Poisson regression<a class="anchor" aria-label="anchor" href="#poisson-regression"></a>
 </h3>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">150</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">dat</span><span class="op">$</span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html" class="external-link">rpois</a></span><span class="op">(</span><span class="fl">150</span>, <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fl">0.5</span> <span class="op">*</span> <span class="va">dat</span><span class="op">$</span><span class="va">x</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
@@ -512,7 +512,7 @@ standard R formulas.</p>
 <div class="section level3">
 <h3 id="custom-priors">Custom priors<a class="anchor" aria-label="anchor" href="#custom-priors"></a>
 </h3>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/gretaR_glm.html">gretaR_glm</a></span><span class="op">(</span></span>
 <span>  <span class="va">Sepal.Length</span> <span class="op">~</span> <span class="va">Sepal.Width</span>,</span>
 <span>  data <span class="op">=</span> <span class="va">iris</span>,</span>
@@ -530,7 +530,7 @@ standard R formulas.</p>
 </h2>
 <p>lme4-style random effects are parsed via regex (lme4 not
 required).</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span></span>
 <span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>  y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">120</span><span class="op">)</span>,</span>
@@ -554,53 +554,61 @@ required).</p>
 </h2>
 <p>Full mgcv spline syntax is supported via the
 <code>smooth2random</code> decomposition.</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">mgcv</span><span class="op">)</span> <span class="co"># for the s()/te()/ti() smooth-term constructors used below</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span></span>
 <span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">200</span></span>
-<span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">n</span>, <span class="fl">0</span>, <span class="fl">2</span> <span class="op">*</span> <span class="va">pi</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">dat</span><span class="op">$</span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="va">dat</span><span class="op">$</span><span class="va">x</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span>, <span class="fl">0</span>, <span class="fl">0.3</span><span class="op">)</span></span>
+<span><span class="co"># Named sx/sx2 rather than x/x2, which the DSL sections above already bind</span></span>
+<span><span class="co"># in this environment as gretaR_array objects -- a formula-interface smooth</span></span>
+<span><span class="co"># term must resolve its variable from the supplied data.frame, not from a</span></span>
+<span><span class="co"># same-named DSL object earlier in the session.</span></span>
+<span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>sx <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">n</span>, <span class="fl">0</span>, <span class="fl">2</span> <span class="op">*</span> <span class="va">pi</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">dat</span><span class="op">$</span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="va">dat</span><span class="op">$</span><span class="va">sx</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span>, <span class="fl">0</span>, <span class="fl">0.3</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Thin plate regression spline</span></span>
-<span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/gretaR_glm.html">gretaR_glm</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x</span>, k <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">dat</span>, sampler <span class="op">=</span> <span class="st">"map"</span><span class="op">)</span></span>
+<span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/gretaR_glm.html">gretaR_glm</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">sx</span>, k <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">dat</span>, sampler <span class="op">=</span> <span class="st">"map"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Cubic regression spline</span></span>
-<span><span class="va">fit_cr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/gretaR_glm.html">gretaR_glm</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x</span>, bs <span class="op">=</span> <span class="st">"cr"</span>, k <span class="op">=</span> <span class="fl">12</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">dat</span>,</span>
+<span><span class="va">fit_cr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/gretaR_glm.html">gretaR_glm</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">sx</span>, bs <span class="op">=</span> <span class="st">"cr"</span>, k <span class="op">=</span> <span class="fl">12</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">dat</span>,</span>
 <span>                      sampler <span class="op">=</span> <span class="st">"map"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Multiple smooths</span></span>
-<span><span class="va">dat</span><span class="op">$</span><span class="va">x2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span></span>
-<span><span class="va">dat</span><span class="op">$</span><span class="va">y2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="va">dat</span><span class="op">$</span><span class="va">x</span><span class="op">)</span> <span class="op">+</span> <span class="fl">0.5</span> <span class="op">*</span> <span class="va">dat</span><span class="op">$</span><span class="va">x2</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span>, <span class="fl">0</span>, <span class="fl">0.3</span><span class="op">)</span></span>
-<span><span class="va">fit_multi</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/gretaR_glm.html">gretaR_glm</a></span><span class="op">(</span><span class="va">y2</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x</span>, k <span class="op">=</span> <span class="fl">8</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x2</span>, k <span class="op">=</span> <span class="fl">5</span><span class="op">)</span>,</span>
-<span>                         data <span class="op">=</span> <span class="va">dat</span>, sampler <span class="op">=</span> <span class="st">"map"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Smooth + linear + random effects</span></span>
-<span><span class="va">dat</span><span class="op">$</span><span class="va">group</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span>, <span class="va">n</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">fit_gam_re</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/gretaR_glm.html">gretaR_glm</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x</span>, k <span class="op">=</span> <span class="fl">8</span><span class="op">)</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span> <span class="op">|</span> <span class="va">group</span><span class="op">)</span>,</span>
-<span>                          data <span class="op">=</span> <span class="va">dat</span>, sampler <span class="op">=</span> <span class="st">"map"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">dat</span><span class="op">$</span><span class="va">sx2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span></span>
+<span><span class="va">dat</span><span class="op">$</span><span class="va">y2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="va">dat</span><span class="op">$</span><span class="va">sx</span><span class="op">)</span> <span class="op">+</span> <span class="fl">0.5</span> <span class="op">*</span> <span class="va">dat</span><span class="op">$</span><span class="va">sx2</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span>, <span class="fl">0</span>, <span class="fl">0.3</span><span class="op">)</span></span>
+<span><span class="va">fit_multi</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/gretaR_glm.html">gretaR_glm</a></span><span class="op">(</span><span class="va">y2</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">sx</span>, k <span class="op">=</span> <span class="fl">8</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">sx2</span>, k <span class="op">=</span> <span class="fl">5</span><span class="op">)</span>,</span>
+<span>                         data <span class="op">=</span> <span class="va">dat</span>, sampler <span class="op">=</span> <span class="st">"map"</span><span class="op">)</span></span></code></pre></div>
+<p>A smooth term combined with an <code>(1 | group)</code> random-effect
+term in the same formula (<code>y ~ s(sx, k = 8) + (1 | group)</code>)
+is not currently supported – <code>.gretaR_glm_mixed()</code>’s
+fixed-effects parsing does not preprocess <code><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s()</a></code> terms before
+building the model frame, and the call errors with
+<code>invalid type (list) for variable</code>. Fit the smooth and the
+group effect as two separate formula-interface or DSL models until that
+combination is supported.</p>
 <div class="section level4">
 <h4 id="supported-smooth-types">Supported smooth types<a class="anchor" aria-label="anchor" href="#supported-smooth-types"></a>
 </h4>
 <p>All 21 mgcv basis types work, including:</p>
 <ul>
 <li>
-<code>s(x, bs = "tp")</code> — thin plate regression spline
+<code>s(x, bs = "tp")</code> – thin plate regression spline
 (default)</li>
 <li>
-<code>s(x, bs = "cr")</code> — cubic regression spline</li>
+<code>s(x, bs = "cr")</code> – cubic regression spline</li>
 <li>
-<code>s(x, bs = "ps")</code> — P-spline</li>
+<code>s(x, bs = "ps")</code> – P-spline</li>
 <li>
-<code>s(x, bs = "cc")</code> — cyclic cubic</li>
+<code>s(x, bs = "cc")</code> – cyclic cubic</li>
 <li>
-<code>s(x, bs = "re")</code> — random effect</li>
+<code>s(x, bs = "re")</code> – random effect</li>
 <li>
-<code>te(x1, x2)</code> — tensor product</li>
+<code>te(x1, x2)</code> – tensor product</li>
 <li>
-<code>ti(x1, x2)</code> — tensor interaction (ANOVA
+<code>ti(x1, x2)</code> – tensor interaction (ANOVA
 decomposition)</li>
 <li>
-<code>s(x, by = fac)</code> — factor-by smooth</li>
+<code>s(x, by = fac)</code> – factor-by smooth</li>
 </ul>
 </div>
 </div>
@@ -609,7 +617,7 @@ decomposition)</li>
 </h2>
 <p>Define distributions with any torch-differentiable
 log-probability.</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/reset_gretaR_env.html">reset_gretaR_env</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Laplace distribution (not built in)</span></span>
@@ -640,8 +648,16 @@ log-probability.</p>
 <h2 id="mixtures">13. Mixture Models<a class="anchor" aria-label="anchor" href="#mixtures"></a>
 </h2>
 <p>Finite mixtures use log-sum-exp marginalisation over discrete
-components.</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+components. <code><a href="../reference/mixture.html">mixture()</a></code> accepts a <code>weights</code>
+argument built from <code><a href="../reference/dirichlet.html">dirichlet()</a></code>, but
+<code><a href="../reference/dirichlet.html">dirichlet()</a></code> cannot currently be sampled as a latent
+variable – its simplex-constrained support has no bijective transform
+implemented yet (planned for v0.3; see <code><a href="../reference/dirichlet.html">?dirichlet</a></code>), and
+<code><a href="../reference/model.html">model()</a></code> refuses any attempt to treat it as a free
+parameter. Until that lands, mixture weights must be supplied as fixed
+values (a plain numeric vector), with only the component parameters
+estimated.</p>
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/reset_gretaR_env.html">reset_gretaR_env</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span></span>
 <span></span>
@@ -650,8 +666,9 @@ components.</p>
 <span><span class="va">z</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, <span class="va">n</span>, replace <span class="op">=</span> <span class="cn">TRUE</span>, prob <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.4</span>, <span class="fl">0.6</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">y_obs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">z</span> <span class="op">==</span> <span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span>, <span class="op">-</span><span class="fl">2</span>, <span class="fl">0.5</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span>, <span class="fl">3</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Model</span></span>
-<span><span class="va">w</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dirichlet.html">dirichlet</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span>               <span class="co"># mixture weights</span></span>
+<span><span class="co"># Model: weights fixed at their true values (dirichlet() latent sampling</span></span>
+<span><span class="co"># is not yet supported -- see the note above); means and scales estimated</span></span>
+<span><span class="va">w_fixed</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.4</span>, <span class="fl">0.6</span><span class="op">)</span></span>
 <span><span class="va">mu1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/normal.html">normal</a></span><span class="op">(</span><span class="op">-</span><span class="fl">5</span>, <span class="fl">5</span><span class="op">)</span>; <span class="va">mu2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/normal.html">normal</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">5</span><span class="op">)</span>  <span class="co"># component means</span></span>
 <span><span class="va">sigma1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/half_cauchy.html">half_cauchy</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span>; <span class="va">sigma2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/half_cauchy.html">half_cauchy</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span></span>
 <span></span>
@@ -660,12 +677,12 @@ components.</p>
 <span>    <span class="fu"><a href="../reference/normal.html">normal</a></span><span class="op">(</span><span class="va">mu1</span>, <span class="va">sigma1</span><span class="op">)</span>,</span>
 <span>    <span class="fu"><a href="../reference/normal.html">normal</a></span><span class="op">(</span><span class="va">mu2</span>, <span class="va">sigma2</span><span class="op">)</span></span>
 <span>  <span class="op">)</span>,</span>
-<span>  weights <span class="op">=</span> <span class="va">w</span></span>
+<span>  weights <span class="op">=</span> <span class="va">w_fixed</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_data.html">as_data</a></span><span class="op">(</span><span class="va">y_obs</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/distribution.html">distribution</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">mix</span></span>
-<span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/model.html">model</a></span><span class="op">(</span><span class="va">w</span>, <span class="va">mu1</span>, <span class="va">mu2</span>, <span class="va">sigma1</span>, <span class="va">sigma2</span><span class="op">)</span></span>
+<span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/model.html">model</a></span><span class="op">(</span><span class="va">mu1</span>, <span class="va">mu2</span>, <span class="va">sigma1</span>, <span class="va">sigma2</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># MAP for quick check</span></span>
 <span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/opt.html">opt</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span></span>
@@ -676,7 +693,7 @@ components.</p>
 <h2 id="sparse">14. Sparse Matrices<a class="anchor" aria-label="anchor" href="#sparse"></a>
 </h2>
 <p>Large, sparse design matrices are handled efficiently.</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://Matrix.R-forge.R-project.org" class="external-link">Matrix</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/reset_gretaR_env.html">reset_gretaR_env</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
@@ -699,9 +716,17 @@ components.</p>
 <div class="section level2">
 <h2 id="stan-backend">15. Stan Backend<a class="anchor" aria-label="anchor" href="#stan-backend"></a>
 </h2>
-<p>Use Stan’s compiled C++ sampler for 30-150x faster inference on
-standard models.</p>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<p><code>backend = "stan"</code> routes sampling through Stan’s compiled
+C++ engine instead of gretaR’s own torch-based NUTS. <strong>This is an
+experimental path with known gaps, not a drop-in faster
+replacement</strong>: the Stan code emitter currently supports only the
+normal, bernoulli, poisson, gamma, student-t and beta families, and a
+likelihood or prior outside that list is not translated to Stan – see
+<code>NEWS.md</code> for the current status before relying on it for any
+model whose distributions are not all in that list. No timing claim is
+made here; benchmark your own model on both backends before choosing one
+for production.</p>
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/reset_gretaR_env.html">reset_gretaR_env</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span></span>
 <span></span>
@@ -719,7 +744,7 @@ standard models.</p>
 <span><span class="va">fit_stan</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mcmc.html">mcmc</a></span><span class="op">(</span><span class="va">m</span>, n_samples <span class="op">=</span> <span class="fl">500</span>, warmup <span class="op">=</span> <span class="fl">500</span>,</span>
 <span>                  chains <span class="op">=</span> <span class="fl">2</span>, backend <span class="op">=</span> <span class="st">"stan"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Same output structure — same API</span></span>
+<span><span class="co"># Same output structure -- same API</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">fit_torch</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">fit_stan</span><span class="op">)</span></span>
 <span></span>
@@ -745,31 +770,33 @@ standard models.</p>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td>Production inference</td>
+<td>Model uses only normal/bernoulli/poisson/gamma/student-t/beta
+throughout</td>
 <td><code>"stan"</code></td>
-<td>30-150x faster for standard models</td>
+<td>Within the emitter’s current supported set</td>
 </tr>
 <tr class="even">
+<td>Any other distribution, or you are unsure</td>
+<td><code>"torch"</code></td>
+<td>The default backend; every distribution gretaR exposes is
+supported</td>
+</tr>
+<tr class="odd">
 <td>Custom distributions</td>
 <td><code>"torch"</code></td>
 <td>Stan can’t express arbitrary torch log_prob</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Very large models (future)</td>
 <td><code>"torch"</code></td>
 <td>GPU/MPS is on the torch roadmap; Stan has no GPU path</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Quick prototyping</td>
 <td>
 <code>"torch"</code> + <code><a href="../reference/opt.html">opt()</a></code>
 </td>
 <td>No compilation wait</td>
-</tr>
-<tr class="odd">
-<td>Hierarchical models</td>
-<td><code>"stan"</code></td>
-<td>Massive speedup (100x+)</td>
 </tr>
 </tbody>
 </table>
@@ -779,7 +806,7 @@ standard models.</p>
 <h2 id="output">16. The Unified Output Object<a class="anchor" aria-label="anchor" href="#output"></a>
 </h2>
 <p>All inference functions return a <code>gretaR_fit</code> object.</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Same structure regardless of method</span></span>
 <span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mcmc.html">mcmc</a></span><span class="op">(</span><span class="va">m</span>, backend <span class="op">=</span> <span class="st">"torch"</span><span class="op">)</span>  <span class="co"># or "stan", opt(), variational(), laplace()</span></span>
 <span></span>
@@ -796,34 +823,48 @@ standard models.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>        <span class="co"># concise summary</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>      <span class="co"># full posterior table</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>         <span class="co"># named point estimates</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span>, <span class="st">"trace"</span><span class="op">)</span>    <span class="co"># trace plots (requires bayesplot)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span>, <span class="st">"density"</span><span class="op">)</span>  <span class="co"># density overlays</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span>, <span class="st">"rhat"</span><span class="op">)</span>     <span class="co"># R-hat diagnostic</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span>, <span class="st">"neff"</span><span class="op">)</span>     <span class="co"># ESS ratio plot</span></span></code></pre></div>
+<span></span>
+<span><span class="co"># plot(fit, "trace")    # trace plots -- see Section 17 for a captioned example</span></span>
+<span><span class="co"># plot(fit, "density")  # density overlays -- see Section 17</span></span>
+<span><span class="co"># plot(fit, "rhat")     # R-hat diagnostic -- see Section 17</span></span>
+<span><span class="co"># plot(fit, "neff")     # ESS ratio plot (not otherwise demonstrated in this guide)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="diagnostics">17. Diagnostics and Plotting<a class="anchor" aria-label="anchor" href="#diagnostics"></a>
 </h2>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Check convergence</span></span>
 <span><span class="va">fit</span><span class="op">$</span><span class="va">convergence</span><span class="op">$</span><span class="va">max_rhat</span>       <span class="co"># &lt; 1.05 is good</span></span>
 <span><span class="va">fit</span><span class="op">$</span><span class="va">convergence</span><span class="op">$</span><span class="va">min_ess</span>        <span class="co"># &gt; 400 is adequate</span></span>
-<span><span class="va">fit</span><span class="op">$</span><span class="va">convergence</span><span class="op">$</span><span class="va">n_divergences</span>  <span class="co"># 0 is ideal</span></span>
-<span></span>
-<span><span class="co"># Visual diagnostics (requires bayesplot)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mc-stan.org/bayesplot/" class="external-link">bayesplot</a></span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span>, type <span class="op">=</span> <span class="st">"trace"</span><span class="op">)</span>     <span class="co"># should show mixing chains</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span>, type <span class="op">=</span> <span class="st">"density"</span><span class="op">)</span>   <span class="co"># posterior density overlays</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span>, type <span class="op">=</span> <span class="st">"pairs"</span><span class="op">)</span>     <span class="co"># bivariate posterior</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span>, type <span class="op">=</span> <span class="st">"rhat"</span><span class="op">)</span>      <span class="co"># R-hat bar chart</span></span>
-<span></span>
-<span><span class="co"># Use posterior package directly</span></span>
+<span><span class="va">fit</span><span class="op">$</span><span class="va">convergence</span><span class="op">$</span><span class="va">n_divergences</span>  <span class="co"># 0 is ideal</span></span></code></pre></div>
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mc-stan.org/bayesplot/" class="external-link">bayesplot</a></span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span>, type <span class="op">=</span> <span class="st">"trace"</span><span class="op">)</span></span></code></pre></div>
+<p>The two chains overlap for the full length of the chain with no
+visible trend, the signature of a well-mixed run.</p>
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span>, type <span class="op">=</span> <span class="st">"density"</span><span class="op">)</span></span></code></pre></div>
+<p>Each parameter’s per-chain density curves sit on top of one another,
+giving the same convergence signal as the trace plot from a different
+angle.</p>
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span>, type <span class="op">=</span> <span class="st">"pairs"</span><span class="op">)</span></span></code></pre></div>
+<p>A single elliptical scatter with no funnel or secondary mode confirms
+the two parameters are jointly identified by this likelihood.</p>
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span>, type <span class="op">=</span> <span class="st">"rhat"</span><span class="op">)</span></span></code></pre></div>
+<p>Both bars clear the 1.05 threshold quoted above, agreeing numerically
+with what the trace and density plots show visually.</p>
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Use posterior package directly</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mc-stan.org/posterior/" class="external-link">posterior</a></span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>  <span class="co"># delegates to summarise_draws()</span></span>
-<span></span>
-<span><span class="co"># Use loo for model comparison</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mc-stan.org/loo/" class="external-link">loo</a></span><span class="op">)</span></span>
-<span><span class="co"># (future: loo integration coming in next release)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>  <span class="co"># delegates to summarise_draws()</span></span></code></pre></div>
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># loo for model comparison: loo::loo() takes a pointwise log-likelihood</span></span>
+<span><span class="co"># matrix, which gretaR does not compute internally -- it must be built by</span></span>
+<span><span class="co"># the caller from the fitted model's likelihood terms. There is no</span></span>
+<span><span class="co"># gretaR-native LOO-CV verb.</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mc-stan.org/loo/" class="external-link">loo</a></span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="performance">18. Performance Tips<a class="anchor" aria-label="anchor" href="#performance"></a>
@@ -831,43 +872,46 @@ standard models.</p>
 <div class="section level3">
 <h3 id="choose-the-right-inference-method">Choose the right inference method<a class="anchor" aria-label="anchor" href="#choose-the-right-inference-method"></a>
 </h3>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Fastest to slowest:</span></span>
-<span><span class="co"># 1. MAP: opt(m)                    ~seconds</span></span>
-<span><span class="co"># 2. Laplace: laplace(m)            ~seconds</span></span>
-<span><span class="co"># 3. ADVI: variational(m)           ~seconds to minutes</span></span>
-<span><span class="co"># 4. MCMC (Stan): mcmc(m, backend="stan")  ~seconds to minutes</span></span>
-<span><span class="co"># 5. MCMC (torch): mcmc(m, backend="torch") ~minutes to hours</span></span>
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Roughly fastest to slowest, on a small model:</span></span>
+<span><span class="co"># 1. MAP: opt(m)                             ~seconds</span></span>
+<span><span class="co"># 2. Laplace: laplace(m)                     ~seconds</span></span>
+<span><span class="co"># 3. ADVI: variational(m)                    ~seconds</span></span>
+<span><span class="co"># 4. MCMC (torch, the default backend):</span></span>
+<span><span class="co">#      mcmc(m, backend = "torch")            ~seconds to minutes</span></span>
+<span><span class="co"># 5. MCMC (Stan, experimental -- see Section 15 for its current</span></span>
+<span><span class="co">#    distribution-support limits before using it):</span></span>
+<span><span class="co">#      mcmc(m, backend = "stan")</span></span>
 <span></span>
 <span><span class="co"># Recommended workflow:</span></span>
 <span><span class="co"># 1. Start with MAP to verify the model compiles and estimates are sensible</span></span>
-<span><span class="co"># 2. Try ADVI for approximate posteriors</span></span>
-<span><span class="co"># 3. Run MCMC (Stan) for final inference</span></span></code></pre></div>
+<span><span class="co"># 2. Try ADVI for a quick approximate posterior</span></span>
+<span><span class="co"># 3. Run MCMC (torch) for final inference</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="non-centred-parameterisation-for-hierarchical-models">Non-centred parameterisation for hierarchical models<a class="anchor" aria-label="anchor" href="#non-centred-parameterisation-for-hierarchical-models"></a>
+<h3 id="partially-centred-parameterisation-for-hierarchical-models">Partially-centred parameterisation for hierarchical models<a class="anchor" aria-label="anchor" href="#partially-centred-parameterisation-for-hierarchical-models"></a>
 </h3>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># BAD: centred parameterisation (funnel geometry)</span></span>
-<span><span class="co"># alpha &lt;- normal(mu, tau, dim = c(J, 1))</span></span>
+<p><code><a href="../reference/random_effect.html">random_effect()</a></code> (see the <em>Hierarchical Models</em>
+vignette) builds the same group-level prior on a continuum between the
+non-centred and centred forms via its <code>centring</code> argument,
+and is the recommended way to write a group-level term – hand-rolling
+either endpoint below is equivalent to <code>centring = 0</code> or
+<code>centring = 1</code> but loses the ability to move between
+them.</p>
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Non-centred by hand (funnel-resistant when groups are data-poor):</span></span>
+<span><span class="co"># z_raw &lt;- normal(0, 1, dim = c(J, 1))</span></span>
+<span><span class="co"># alpha &lt;- mu + tau * z_raw</span></span>
 <span></span>
-<span><span class="co"># GOOD: non-centred (better HMC geometry)</span></span>
-<span><span class="va">z_raw</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/normal.html">normal</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, dim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">J</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">alpha</span> <span class="op">&lt;-</span> <span class="va">mu</span> <span class="op">+</span> <span class="va">tau</span> <span class="op">*</span> <span class="va">z_raw</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="use-stan-backend-for-hierarchical-models">Use Stan backend for hierarchical models<a class="anchor" aria-label="anchor" href="#use-stan-backend-for-hierarchical-models"></a>
-</h3>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># The Stan backend is 30-150x faster for standard models.</span></span>
-<span><span class="co"># Always prefer backend = "stan" for production runs on</span></span>
-<span><span class="co"># models that use standard distributions.</span></span>
-<span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mcmc.html">mcmc</a></span><span class="op">(</span><span class="va">m</span>, backend <span class="op">=</span> <span class="st">"stan"</span>, n_samples <span class="op">=</span> <span class="fl">2000</span>, warmup <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></span></code></pre></div>
+<span><span class="co"># Equivalent, via random_effect() (also gives the centred end and every</span></span>
+<span><span class="co"># partial weight in between):</span></span>
+<span><span class="co"># re &lt;- random_effect(group_id, J, sd = tau, centring = 0, mean = mu)</span></span>
+<span><span class="co"># alpha &lt;- re$effect  # and pass re$latent, not alpha, to model()</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="reset-the-environment-between-models">Reset the environment between models<a class="anchor" aria-label="anchor" href="#reset-the-environment-between-models"></a>
 </h3>
-<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Always call reset_gretaR_env() before defining a new model.</span></span>
 <span><span class="co"># This clears the global DAG and prevents node ID collisions.</span></span>
 <span><span class="fu"><a href="../reference/reset_gretaR_env.html">reset_gretaR_env</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
@@ -884,7 +928,7 @@ standard models.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>

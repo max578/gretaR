@@ -34,6 +34,9 @@ remotes::install_github("max578/gretaR")
 
 # Install the torch backend (one-time, downloads ~60 MB)
 torch::install_torch()
+```
+
+``` r
 
 # Load
 library(gretaR)
@@ -43,7 +46,7 @@ library(gretaR)
 
 gretaR models are built from three types of objects:
 
-### Data nodes — fixed observations
+### Data nodes – fixed observations
 
 ``` r
 
@@ -64,7 +67,7 @@ try(as_data(c(1, NA, 3)))
 # tidyr::drop_na().
 ```
 
-### Variable nodes — parameters to estimate
+### Variable nodes – parameters to estimate
 
 ``` r
 
@@ -81,7 +84,7 @@ v_bound <- variable(lower = 0, upper = 1)
 v_vec <- variable(dim = c(5, 1))
 ```
 
-### Distribution nodes — priors and likelihoods
+### Distribution nodes – priors and likelihoods
 
 ``` r
 
@@ -99,7 +102,7 @@ m <- model(mu, sigma)
 print(m)
 ```
 
-### Operations — build the computation graph
+### Operations – build the computation graph
 
 ``` r
 
@@ -277,7 +280,7 @@ mu <- normal(0, 10)     # no constraint
 
 ## 6. MAP Estimation and Laplace Approximation
 
-### MAP — fast point estimates
+### MAP – fast point estimates
 
 ``` r
 
@@ -298,7 +301,7 @@ coef(fit_map)
 # mu = 5.01, sigma = 1.98
 ```
 
-### Laplace — approximate posterior with covariance
+### Laplace – approximate posterior with covariance
 
 ``` r
 
@@ -496,43 +499,52 @@ decomposition.
 
 ``` r
 
+library(mgcv) # for the s()/te()/ti() smooth-term constructors used below
 set.seed(42)
 n <- 200
-dat <- data.frame(x = runif(n, 0, 2 * pi))
-dat$y <- sin(dat$x) + rnorm(n, 0, 0.3)
+# Named sx/sx2 rather than x/x2, which the DSL sections above already bind
+# in this environment as gretaR_array objects -- a formula-interface smooth
+# term must resolve its variable from the supplied data.frame, not from a
+# same-named DSL object earlier in the session.
+dat <- data.frame(sx = runif(n, 0, 2 * pi))
+dat$y <- sin(dat$sx) + rnorm(n, 0, 0.3)
 
 # Thin plate regression spline
-fit <- gretaR_glm(y ~ s(x, k = 10), data = dat, sampler = "map")
+fit <- gretaR_glm(y ~ s(sx, k = 10), data = dat, sampler = "map")
 coef(fit)
 
 # Cubic regression spline
-fit_cr <- gretaR_glm(y ~ s(x, bs = "cr", k = 12), data = dat,
+fit_cr <- gretaR_glm(y ~ s(sx, bs = "cr", k = 12), data = dat,
                       sampler = "map")
 
 # Multiple smooths
-dat$x2 <- rnorm(n)
-dat$y2 <- sin(dat$x) + 0.5 * dat$x2 + rnorm(n, 0, 0.3)
-fit_multi <- gretaR_glm(y2 ~ s(x, k = 8) + s(x2, k = 5),
+dat$sx2 <- rnorm(n)
+dat$y2 <- sin(dat$sx) + 0.5 * dat$sx2 + rnorm(n, 0, 0.3)
+fit_multi <- gretaR_glm(y2 ~ s(sx, k = 8) + s(sx2, k = 5),
                          data = dat, sampler = "map")
-
-# Smooth + linear + random effects
-dat$group <- factor(sample(1:4, n, replace = TRUE))
-fit_gam_re <- gretaR_glm(y ~ s(x, k = 8) + (1 | group),
-                          data = dat, sampler = "map")
 ```
+
+A smooth term combined with an `(1 | group)` random-effect term in the
+same formula (`y ~ s(sx, k = 8) + (1 | group)`) is not currently
+supported – `.gretaR_glm_mixed()`’s fixed-effects parsing does not
+preprocess [`s()`](https://rdrr.io/pkg/mgcv/man/s.html) terms before
+building the model frame, and the call errors with
+`invalid type (list) for variable`. Fit the smooth and the group effect
+as two separate formula-interface or DSL models until that combination
+is supported.
 
 #### Supported smooth types
 
 All 21 mgcv basis types work, including:
 
-- `s(x, bs = "tp")` — thin plate regression spline (default)
-- `s(x, bs = "cr")` — cubic regression spline
-- `s(x, bs = "ps")` — P-spline
-- `s(x, bs = "cc")` — cyclic cubic
-- `s(x, bs = "re")` — random effect
-- `te(x1, x2)` — tensor product
-- `ti(x1, x2)` — tensor interaction (ANOVA decomposition)
-- `s(x, by = fac)` — factor-by smooth
+- `s(x, bs = "tp")` – thin plate regression spline (default)
+- `s(x, bs = "cr")` – cubic regression spline
+- `s(x, bs = "ps")` – P-spline
+- `s(x, bs = "cc")` – cyclic cubic
+- `s(x, bs = "re")` – random effect
+- `te(x1, x2)` – tensor product
+- `ti(x1, x2)` – tensor interaction (ANOVA decomposition)
+- `s(x, by = fac)` – factor-by smooth
 
 ## 12. Custom Distributions
 
@@ -571,6 +583,19 @@ coef(fit)  # should be near 2
 
 Finite mixtures use log-sum-exp marginalisation over discrete
 components.
+[`mixture()`](https://max578.github.io/gretaR/reference/mixture.md)
+accepts a `weights` argument built from
+[`dirichlet()`](https://max578.github.io/gretaR/reference/dirichlet.md),
+but
+[`dirichlet()`](https://max578.github.io/gretaR/reference/dirichlet.md)
+cannot currently be sampled as a latent variable – its
+simplex-constrained support has no bijective transform implemented yet
+(planned for v0.3; see
+[`?dirichlet`](https://max578.github.io/gretaR/reference/dirichlet.md)),
+and [`model()`](https://max578.github.io/gretaR/reference/model.md)
+refuses any attempt to treat it as a free parameter. Until that lands,
+mixture weights must be supplied as fixed values (a plain numeric
+vector), with only the component parameters estimated.
 
 ``` r
 
@@ -582,8 +607,9 @@ n <- 200
 z <- sample(1:2, n, replace = TRUE, prob = c(0.4, 0.6))
 y_obs <- ifelse(z == 1, rnorm(n, -2, 0.5), rnorm(n, 3, 1))
 
-# Model
-w <- dirichlet(c(1, 1))               # mixture weights
+# Model: weights fixed at their true values (dirichlet() latent sampling
+# is not yet supported -- see the note above); means and scales estimated
+w_fixed <- c(0.4, 0.6)
 mu1 <- normal(-5, 5); mu2 <- normal(5, 5)  # component means
 sigma1 <- half_cauchy(2); sigma2 <- half_cauchy(2)
 
@@ -592,12 +618,12 @@ mix <- mixture(
     normal(mu1, sigma1),
     normal(mu2, sigma2)
   ),
-  weights = w
+  weights = w_fixed
 )
 
 y <- as_data(y_obs)
 distribution(y) <- mix
-m <- model(w, mu1, mu2, sigma1, sigma2)
+m <- model(mu1, mu2, sigma1, sigma2)
 
 # MAP for quick check
 fit <- opt(m)
@@ -633,8 +659,15 @@ fit <- opt(m, verbose = FALSE)
 
 ## 15. Stan Backend
 
-Use Stan’s compiled C++ sampler for 30-150x faster inference on standard
-models.
+`backend = "stan"` routes sampling through Stan’s compiled C++ engine
+instead of gretaR’s own torch-based NUTS. **This is an experimental path
+with known gaps, not a drop-in faster replacement**: the Stan code
+emitter currently supports only the normal, bernoulli, poisson, gamma,
+student-t and beta families, and a likelihood or prior outside that list
+is not translated to Stan – see `NEWS.md` for the current status before
+relying on it for any model whose distributions are not all in that
+list. No timing claim is made here; benchmark your own model on both
+backends before choosing one for production.
 
 ``` r
 
@@ -655,7 +688,7 @@ fit_torch <- mcmc(m, n_samples = 500, warmup = 500,
 fit_stan <- mcmc(m, n_samples = 500, warmup = 500,
                   chains = 2, backend = "stan")
 
-# Same output structure — same API
+# Same output structure -- same API
 coef(fit_torch)
 coef(fit_stan)
 
@@ -671,11 +704,11 @@ coef(fit_stan_map)
 
 | Scenario | Backend | Why |
 |----|----|----|
-| Production inference | `"stan"` | 30-150x faster for standard models |
+| Model uses only normal/bernoulli/poisson/gamma/student-t/beta throughout | `"stan"` | Within the emitter’s current supported set |
+| Any other distribution, or you are unsure | `"torch"` | The default backend; every distribution gretaR exposes is supported |
 | Custom distributions | `"torch"` | Stan can’t express arbitrary torch log_prob |
 | Very large models (future) | `"torch"` | GPU/MPS is on the torch roadmap; Stan has no GPU path |
 | Quick prototyping | `"torch"` + [`opt()`](https://max578.github.io/gretaR/reference/opt.md) | No compilation wait |
-| Hierarchical models | `"stan"` | Massive speedup (100x+) |
 
 ## 16. The Unified Output Object
 
@@ -699,10 +732,11 @@ fit$par           # point estimates (all methods)
 print(fit)        # concise summary
 summary(fit)      # full posterior table
 coef(fit)         # named point estimates
-plot(fit, "trace")    # trace plots (requires bayesplot)
-plot(fit, "density")  # density overlays
-plot(fit, "rhat")     # R-hat diagnostic
-plot(fit, "neff")     # ESS ratio plot
+
+# plot(fit, "trace")    # trace plots -- see Section 17 for a captioned example
+# plot(fit, "density")  # density overlays -- see Section 17
+# plot(fit, "rhat")     # R-hat diagnostic -- see Section 17
+# plot(fit, "neff")     # ESS ratio plot (not otherwise demonstrated in this guide)
 ```
 
 ## 17. Diagnostics and Plotting
@@ -713,21 +747,56 @@ plot(fit, "neff")     # ESS ratio plot
 fit$convergence$max_rhat       # < 1.05 is good
 fit$convergence$min_ess        # > 400 is adequate
 fit$convergence$n_divergences  # 0 is ideal
+```
 
-# Visual diagnostics (requires bayesplot)
+``` r
+
 library(bayesplot)
-plot(fit, type = "trace")     # should show mixing chains
-plot(fit, type = "density")   # posterior density overlays
-plot(fit, type = "pairs")     # bivariate posterior
-plot(fit, type = "rhat")      # R-hat bar chart
+plot(fit, type = "trace")
+```
+
+The two chains overlap for the full length of the chain with no visible
+trend, the signature of a well-mixed run.
+
+``` r
+
+plot(fit, type = "density")
+```
+
+Each parameter’s per-chain density curves sit on top of one another,
+giving the same convergence signal as the trace plot from a different
+angle.
+
+``` r
+
+plot(fit, type = "pairs")
+```
+
+A single elliptical scatter with no funnel or secondary mode confirms
+the two parameters are jointly identified by this likelihood.
+
+``` r
+
+plot(fit, type = "rhat")
+```
+
+Both bars clear the 1.05 threshold quoted above, agreeing numerically
+with what the trace and density plots show visually.
+
+``` r
 
 # Use posterior package directly
 library(posterior)
 summary(fit)  # delegates to summarise_draws()
+```
 
-# Use loo for model comparison
+``` r
+
+# loo for model comparison: loo::loo() takes a pointwise log-likelihood
+# matrix, which gretaR does not compute internally -- it must be built by
+# the caller from the fitted model's likelihood terms. There is no
+# gretaR-native LOO-CV verb.
 library(loo)
-# (future: loo integration coming in next release)
 ```
 
 ## 18. Performance Tips
@@ -736,39 +805,42 @@ library(loo)
 
 ``` r
 
-# Fastest to slowest:
-# 1. MAP: opt(m)                    ~seconds
-# 2. Laplace: laplace(m)            ~seconds
-# 3. ADVI: variational(m)           ~seconds to minutes
-# 4. MCMC (Stan): mcmc(m, backend="stan")  ~seconds to minutes
-# 5. MCMC (torch): mcmc(m, backend="torch") ~minutes to hours
+# Roughly fastest to slowest, on a small model:
+# 1. MAP: opt(m)                             ~seconds
+# 2. Laplace: laplace(m)                     ~seconds
+# 3. ADVI: variational(m)                    ~seconds
+# 4. MCMC (torch, the default backend):
+#      mcmc(m, backend = "torch")            ~seconds to minutes
+# 5. MCMC (Stan, experimental -- see Section 15 for its current
+#    distribution-support limits before using it):
+#      mcmc(m, backend = "stan")
 
 # Recommended workflow:
 # 1. Start with MAP to verify the model compiles and estimates are sensible
-# 2. Try ADVI for approximate posteriors
-# 3. Run MCMC (Stan) for final inference
+# 2. Try ADVI for a quick approximate posterior
+# 3. Run MCMC (torch) for final inference
 ```
 
-### Non-centred parameterisation for hierarchical models
+### Partially-centred parameterisation for hierarchical models
+
+[`random_effect()`](https://max578.github.io/gretaR/reference/random_effect.md)
+(see the *Hierarchical Models* vignette) builds the same group-level
+prior on a continuum between the non-centred and centred forms via its
+`centring` argument, and is the recommended way to write a group-level
+term – hand-rolling either endpoint below is equivalent to
+`centring = 0` or `centring = 1` but loses the ability to move between
+them.
 
 ``` r
 
-# BAD: centred parameterisation (funnel geometry)
-# alpha <- normal(mu, tau, dim = c(J, 1))
+# Non-centred by hand (funnel-resistant when groups are data-poor):
+# z_raw <- normal(0, 1, dim = c(J, 1))
+# alpha <- mu + tau * z_raw
 
-# GOOD: non-centred (better HMC geometry)
-z_raw <- normal(0, 1, dim = c(J, 1))
-alpha <- mu + tau * z_raw
-```
-
-### Use Stan backend for hierarchical models
-
-``` r
-
-# The Stan backend is 30-150x faster for standard models.
-# Always prefer backend = "stan" for production runs on
-# models that use standard distributions.
-fit <- mcmc(m, backend = "stan", n_samples = 2000, warmup = 1000)
+# Equivalent, via random_effect() (also gives the centred end and every
+# partial weight in between):
+# re <- random_effect(group_id, J, sd = tau, centring = 0, mean = mu)
+# alpha <- re$effect  # and pass re$latent, not alpha, to model()
 ```
 
 ### Reset the environment between models

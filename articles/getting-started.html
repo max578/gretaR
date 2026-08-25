@@ -79,7 +79,7 @@ compiled to differentiable torch computations and sampled using
 Hamiltonian Monte Carlo (HMC) or the No-U-Turn Sampler (NUTS).</p>
 <p><strong>Key features:</strong></p>
 <ul>
-<li>Pure R — no Python or reticulate dependency</li>
+<li>Pure R – no Python or reticulate dependency</li>
 <li>Native torch (libtorch) backend – CPU today, GPU/MPS on the
 roadmap</li>
 <li>Familiar R syntax: standard operators, functions, and
@@ -94,7 +94,7 @@ assignment</li>
 </h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Install from GitHub (development version)</span></span>
-<span><span class="co"># remotes::install_github("maxmoldovan/gretaR")</span></span>
+<span><span class="co"># remotes::install_github("max578/gretaR")</span></span>
 <span></span>
 <span><span class="co"># Ensure torch is installed</span></span>
 <span><span class="fu">torch</span><span class="fu">::</span><span class="fu"><a href="https://torch.mlverse.org/docs/reference/install_torch.html" class="external-link">install_torch</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
@@ -126,15 +126,22 @@ estimate the mean and standard deviation.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Draw posterior samples</span></span>
-<span><span class="va">draws</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mcmc.html">mcmc</a></span><span class="op">(</span><span class="va">m</span>, n_samples <span class="op">=</span> <span class="fl">1000</span>, warmup <span class="op">=</span> <span class="fl">1000</span>, chains <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span>
+<span><span class="va">fit1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mcmc.html">mcmc</a></span><span class="op">(</span><span class="va">m</span>, n_samples <span class="op">=</span> <span class="fl">500</span>, warmup <span class="op">=</span> <span class="fl">500</span>, chains <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Summarise</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">draws</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit1</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit1</span>, type <span class="op">=</span> <span class="st">"trace"</span><span class="op">)</span></span></code></pre></div>
+<p>The two chains mix over the same range of <code>mu</code> and
+<code>sigma</code> from the first sampled draw, with no visible trend or
+one chain sitting apart from the other – consistent with the R-hat close
+to 1 and the effective sample size reported by
+<code>summary(fit1)</code>.</p>
 </div>
 <div class="section level2">
 <h2 id="example-2-bayesian-linear-regression">Example 2: Bayesian Linear Regression<a class="anchor" aria-label="anchor" href="#example-2-bayesian-linear-regression"></a>
 </h2>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Simulate data</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
 <span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">100</span></span>
@@ -162,13 +169,17 @@ estimate the mean and standard deviation.</p>
 <span><span class="co"># Compile</span></span>
 <span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/model.html">model</a></span><span class="op">(</span><span class="va">alpha</span>, <span class="va">beta</span>, <span class="va">sigma</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Sample</span></span>
-<span><span class="va">draws</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mcmc.html">mcmc</a></span><span class="op">(</span><span class="va">m</span>, n_samples <span class="op">=</span> <span class="fl">1000</span>, warmup <span class="op">=</span> <span class="fl">1000</span>, chains <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">draws</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Visualise traces (requires bayesplot)</span></span>
-<span><span class="co"># plot(draws, type = "trace")</span></span></code></pre></div>
+<span><span class="va">fit2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mcmc.html">mcmc</a></span><span class="op">(</span><span class="va">m</span>, n_samples <span class="op">=</span> <span class="fl">500</span>, warmup <span class="op">=</span> <span class="fl">500</span>, chains <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit2</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit2</span>, type <span class="op">=</span> <span class="st">"density"</span><span class="op">)</span></span></code></pre></div>
+<p>The three densities are unimodal, chain-to-chain agreement is close,
+and the posterior mass for <code>alpha</code>, <code>beta</code> and
+<code>sigma</code> brackets the values used to simulate
+<code>y_obs</code>, confirming the model recovers the generating
+parameters on this synthetic dataset.</p>
 </div>
 <div class="section level2">
 <h2 id="workflow-summary">Workflow Summary<a class="anchor" aria-label="anchor" href="#workflow-summary"></a>
@@ -288,7 +299,7 @@ steps needed. Recommended for most models.</li>
 <strong>HMC</strong>: Fixed number of leapfrog steps. Useful for
 debugging or when NUTS tree depth is a concern.</li>
 </ul>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># NUTS (default)</span></span>
 <span><span class="va">draws</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mcmc.html">mcmc</a></span><span class="op">(</span><span class="va">m</span>, sampler <span class="op">=</span> <span class="st">"nuts"</span><span class="op">)</span></span>
 <span></span>
@@ -299,7 +310,9 @@ debugging or when NUTS tree depth is a concern.</li>
 <h2 id="next-steps">Next Steps<a class="anchor" aria-label="anchor" href="#next-steps"></a>
 </h2>
 <ul>
-<li>Explore hierarchical models (coming in v0.2)</li>
+<li>Explore hierarchical models in
+<code><a href="../articles/hierarchical-models.html">vignette("hierarchical-models", package = "gretaR")</a></code>
+</li>
 <li>Use <code><a href="https://mc-stan.org/bayesplot/reference/MCMC-traces.html" class="external-link">bayesplot::mcmc_trace()</a></code> and
 <code><a href="https://mc-stan.org/bayesplot/reference/MCMC-distributions.html" class="external-link">bayesplot::mcmc_dens_overlay()</a></code> for diagnostics</li>
 <li>Compare models with <code><a href="https://mc-stan.org/loo/reference/loo.html" class="external-link">loo::loo()</a></code> on the posterior
@@ -317,7 +330,7 @@ draws</li>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>

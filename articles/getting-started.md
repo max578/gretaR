@@ -10,7 +10,7 @@ the No-U-Turn Sampler (NUTS).
 
 **Key features:**
 
-- Pure R — no Python or reticulate dependency
+- Pure R – no Python or reticulate dependency
 - Native torch (libtorch) backend – CPU today, GPU/MPS on the roadmap
 - Familiar R syntax: standard operators, functions, and assignment
 - Output compatible with `posterior`, `bayesplot`, and `loo`
@@ -20,7 +20,7 @@ the No-U-Turn Sampler (NUTS).
 ``` r
 
 # Install from GitHub (development version)
-# remotes::install_github("maxmoldovan/gretaR")
+# remotes::install_github("max578/gretaR")
 
 # Ensure torch is installed
 torch::install_torch()
@@ -57,11 +57,21 @@ print(m)
 ``` r
 
 # Draw posterior samples
-draws <- mcmc(m, n_samples = 1000, warmup = 1000, chains = 4)
+fit1 <- mcmc(m, n_samples = 500, warmup = 500, chains = 2)
 
 # Summarise
-summary(draws)
+summary(fit1)
 ```
+
+``` r
+
+plot(fit1, type = "trace")
+```
+
+The two chains mix over the same range of `mu` and `sigma` from the
+first sampled draw, with no visible trend or one chain sitting apart
+from the other – consistent with the R-hat close to 1 and the effective
+sample size reported by `summary(fit1)`.
 
 ## Example 2: Bayesian Linear Regression
 
@@ -99,12 +109,19 @@ print(m)
 ``` r
 
 # Sample
-draws <- mcmc(m, n_samples = 1000, warmup = 1000, chains = 4)
-summary(draws)
-
-# Visualise traces (requires bayesplot)
-# plot(draws, type = "trace")
+fit2 <- mcmc(m, n_samples = 500, warmup = 500, chains = 2)
+summary(fit2)
 ```
+
+``` r
+
+plot(fit2, type = "density")
+```
+
+The three densities are unimodal, chain-to-chain agreement is close, and
+the posterior mass for `alpha`, `beta` and `sigma` brackets the values
+used to simulate `y_obs`, confirming the model recovers the generating
+parameters on this synthetic dataset.
 
 ## Workflow Summary
 
@@ -158,7 +175,8 @@ draws <- mcmc(m, sampler = "hmc", n_leapfrog = 25)
 
 ## Next Steps
 
-- Explore hierarchical models (coming in v0.2)
+- Explore hierarchical models in
+  [`vignette("hierarchical-models", package = "gretaR")`](https://max578.github.io/gretaR/articles/hierarchical-models.md)
 - Use
   [`bayesplot::mcmc_trace()`](https://mc-stan.org/bayesplot/reference/MCMC-traces.html)
   and

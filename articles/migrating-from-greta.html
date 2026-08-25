@@ -74,9 +74,15 @@
 </h2>
 <p><strong>gretaR</strong> is a ground-up reimplementation of the <a href="https://github.com/greta-dev/greta" class="external-link">greta</a> probabilistic
 programming interface for R. It preserves the elegant, intuitive API
-that made greta popular while removing its most significant pain point —
-the Python/TensorFlow dependency — and adding modern inference
+that made greta popular while removing its most significant pain point –
+the Python/TensorFlow dependency – and adding modern inference
 capabilities.</p>
+<p>The comparisons below describe greta’s API and dependencies as of
+gretaR’s own development; they are not re-verified against greta’s
+current release on every gretaR update and should be treated as
+<code>[unverified]</code> for any greta version you have not checked
+directly against <a href="https://github.com/greta-dev/greta" class="external-link">the greta
+repository</a>.</p>
 <p>Three reasons to migrate:</p>
 <ol style="list-style-type: decimal">
 <li><p><strong>No Python dependency.</strong> gretaR uses <a href="https://torch.mlverse.org/" class="external-link">torch for R</a> as its computation
@@ -240,22 +246,22 @@ changes at all.</p>
 available in greta:</p>
 <ul>
 <li>
-<code>half_normal(sd)</code> — half-normal distribution on the
+<code>half_normal(sd)</code> – half-normal distribution on the
 positive reals</li>
 <li>
-<code>half_cauchy(scale)</code> — first-class constructor (no
+<code>half_cauchy(scale)</code> – first-class constructor (no
 truncation workaround)</li>
 <li>
-<code>negative_binomial(size, prob)</code> — negative binomial for
+<code>negative_binomial(size, prob)</code> – negative binomial for
 overdispersed counts</li>
 <li>
-<code>lognormal(meanlog, sdlog)</code> — log-normal
+<code>lognormal(meanlog, sdlog)</code> – log-normal
 distribution</li>
 <li>
-<code>cauchy(location, scale)</code> — full (two-sided) Cauchy
+<code>cauchy(location, scale)</code> – full (two-sided) Cauchy
 distribution</li>
 <li>
-<code>wishart(df, scale_matrix)</code> — Wishart distribution for
+<code>wishart(df, scale_matrix)</code> – Wishart distribution for
 covariance matrices</li>
 </ul>
 </div>
@@ -271,11 +277,11 @@ TensorFlow Probability. This is the single most common source of
 installation failures. gretaR replaces the entire Python stack with <a href="https://torch.mlverse.org/" class="external-link">torch for R</a>, which is a native R
 package with pre-built binaries for macOS, Linux, and Windows.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># greta — requires Python + TensorFlow</span></span>
+<code class="sourceCode R"><span><span class="co"># greta -- requires Python + TensorFlow</span></span>
 <span><span class="co"># install.packages("greta")</span></span>
 <span><span class="co"># greta::install_greta_deps()  # can fail in many creative ways</span></span>
 <span></span>
-<span><span class="co"># gretaR — pure R + torch</span></span>
+<span><span class="co"># gretaR -- pure R + torch</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"gretaR"</span><span class="op">)</span></span>
 <span><span class="co"># That's it. No Python, no conda, no reticulate.</span></span></code></pre></div>
 </div>
@@ -286,7 +292,7 @@ package with pre-built binaries for macOS, Linux, and Windows.</p>
 tensors. The automatic differentiation engine is torch’s autograd, which
 provides exact gradients for HMC/NUTS without finite-difference
 approximations.</p>
-<p>For most users this is invisible — the user-facing API is the same.
+<p>For most users this is invisible – the user-facing API is the same.
 But if you wrote custom greta operations using <code>tensorflow</code>
 directly, those will need to be rewritten using <code>torch</code>.</p>
 </div>
@@ -298,23 +304,23 @@ more:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/model.html">model</a></span><span class="op">(</span><span class="va">mu</span>, <span class="va">sigma</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># MCMC (HMC or NUTS) — same as greta</span></span>
+<span><span class="co"># MCMC (HMC or NUTS) -- same as greta</span></span>
 <span><span class="va">draws</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mcmc.html">mcmc</a></span><span class="op">(</span><span class="va">m</span>, n_samples <span class="op">=</span> <span class="fl">1000</span>, warmup <span class="op">=</span> <span class="fl">1000</span>, chains <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Convenience wrappers</span></span>
 <span><span class="va">draws</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nuts.html">nuts</a></span><span class="op">(</span><span class="va">m</span>, n_samples <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></span>
 <span><span class="va">draws</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/hmc.html">hmc</a></span><span class="op">(</span><span class="va">m</span>, n_samples <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># MAP optimisation — find the posterior mode</span></span>
+<span><span class="co"># MAP optimisation -- find the posterior mode</span></span>
 <span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/opt.html">opt</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span></span>
 <span><span class="va">fit</span><span class="op">$</span><span class="va">par</span></span>
 <span></span>
-<span><span class="co"># Laplace approximation — Gaussian centred at MAP</span></span>
+<span><span class="co"># Laplace approximation -- Gaussian centred at MAP</span></span>
 <span><span class="va">la</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/laplace.html">laplace</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span></span>
 <span><span class="va">la</span><span class="op">$</span><span class="va">mean</span></span>
 <span><span class="va">la</span><span class="op">$</span><span class="va">sd</span></span>
 <span></span>
-<span><span class="co"># Variational inference (ADVI) — mean-field or full-rank Gaussian</span></span>
+<span><span class="co"># Variational inference (ADVI) -- mean-field or full-rank Gaussian</span></span>
 <span><span class="va">vi_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/variational.html">variational</a></span><span class="op">(</span><span class="va">m</span>, method <span class="op">=</span> <span class="st">"meanfield"</span><span class="op">)</span></span>
 <span><span class="va">vi_fit</span><span class="op">$</span><span class="va">mean</span></span>
 <span><span class="va">vi_fit</span><span class="op">$</span><span class="va">draws</span>  <span class="co"># samples from the variational posterior</span></span></code></pre></div>
@@ -344,7 +350,7 @@ formula syntax:</p>
 <span>  family <span class="op">=</span> <span class="st">"gaussian"</span>,</span>
 <span>  prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>beta <span class="op">=</span> <span class="fu"><a href="../reference/normal.html">normal</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>, sigma <span class="op">=</span> <span class="fu"><a href="../reference/half_cauchy.html">half_cauchy</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p>There is no equivalent in greta — all models must be built from the
+<p>There is no equivalent in greta – all models must be built from the
 DSL.</p>
 </div>
 <div class="section level3">
@@ -514,7 +520,7 @@ gretaR, side by side.</p>
 <h3 id="greta-version">greta version<a class="anchor" aria-label="anchor" href="#greta-version"></a>
 </h3>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">greta</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://greta-dev.github.io/greta/" class="external-link">greta</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Simulate data</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span></span>
@@ -571,7 +577,7 @@ gretaR, side by side.</p>
 <span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/model.html">model</a></span><span class="op">(</span><span class="va">alpha</span>, <span class="va">beta</span>, <span class="va">sigma</span><span class="op">)</span></span>
 <span><span class="va">draws</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mcmc.html">mcmc</a></span><span class="op">(</span><span class="va">m</span>, n_samples <span class="op">=</span> <span class="fl">1000</span>, warmup <span class="op">=</span> <span class="fl">1000</span>, chains <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Summarise — uses posterior package</span></span>
+<span><span class="co"># Summarise -- uses posterior package</span></span>
 <span><span class="fu">posterior</span><span class="fu">::</span><span class="fu"><a href="https://mc-stan.org/posterior/reference/draws_summary.html" class="external-link">summarise_draws</a></span><span class="op">(</span><span class="va">draws</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Or use the formula interface for the same model in one call:</span></span>
@@ -585,22 +591,22 @@ gretaR, side by side.</p>
 <p>Only two lines differ:</p>
 <ol style="list-style-type: decimal">
 <li>
-<code><a href="https://rdrr.io/r/base/library.html" class="external-link">library(greta)</a></code> becomes
+<code><a href="https://greta-dev.github.io/greta/" class="external-link">library(greta)</a></code> becomes
 <code><a href="https://github.com/max578/gretaR" class="external-link">library(gretaR)</a></code>.</li>
 <li>
 <code>cauchy(0, 3, truncation = c(0, Inf))</code> becomes
 <code>half_cauchy(3)</code>.</li>
 </ol>
-<p>Everything else — <code><a href="../reference/as_data.html">as_data()</a></code>, <code><a href="../reference/normal.html">normal()</a></code>,
+<p>Everything else – <code><a href="../reference/as_data.html">as_data()</a></code>, <code><a href="../reference/normal.html">normal()</a></code>,
 <code><a href="../reference/variable.html">variable()</a></code>, <code>distribution&lt;-()</code>,
-<code><a href="../reference/model.html">model()</a></code>, <code><a href="../reference/mcmc.html">mcmc()</a></code> — works identically.</p>
+<code><a href="../reference/model.html">model()</a></code>, <code><a href="../reference/mcmc.html">mcmc()</a></code> – works identically.</p>
 </div>
 </div>
 <div class="section level2">
 <h2 id="quick-migration-checklist">Quick migration checklist<a class="anchor" aria-label="anchor" href="#quick-migration-checklist"></a>
 </h2>
 <ul class="task-list">
-<li><label><input type="checkbox">Replace <code><a href="https://rdrr.io/r/base/library.html" class="external-link">library(greta)</a></code>
+<li><label><input type="checkbox">Replace <code><a href="https://greta-dev.github.io/greta/" class="external-link">library(greta)</a></code>
 with <code><a href="https://github.com/max578/gretaR" class="external-link">library(gretaR)</a></code></label></li>
 <li><label><input type="checkbox">Replace <code>gamma(...)</code> with
 <code>gamma_dist(...)</code></label></li>
@@ -636,7 +642,7 @@ operations: rewrite using torch</label></li>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>

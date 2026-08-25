@@ -180,7 +180,7 @@ specification for standard models</li>
 <div class="section level2">
 <h2 id="inference-methods">Inference Methods<a class="anchor" aria-label="anchor" href="#inference-methods"></a>
 </h2>
-<p>gretaR offers four inference methods:</p>
+<p>gretaR offers five inference methods:</p>
 <table class="table">
 <colgroup>
 <col width="17%">
@@ -201,14 +201,14 @@ specification for standard models</li>
 <td><strong>NUTS</strong></td>
 <td><code>mcmc(sampler="nuts")</code></td>
 <td>Slow</td>
-<td>Exact</td>
+<td>Asymptotically exact</td>
 <td>Final analysis</td>
 </tr>
 <tr class="even">
 <td><strong>HMC</strong></td>
 <td><code>mcmc(sampler="hmc")</code></td>
 <td>Slow</td>
-<td>Exact</td>
+<td>Asymptotically exact</td>
 <td>Debugging</td>
 </tr>
 <tr class="odd">
@@ -225,26 +225,47 @@ specification for standard models</li>
 <td>Point estimate</td>
 <td>Model verification</td>
 </tr>
+<tr class="odd">
+<td><strong>Laplace</strong></td>
+<td><code><a href="../reference/laplace.html">laplace()</a></code></td>
+<td>Very fast</td>
+<td>Gaussian approximation</td>
+<td>Quick uncertainty around a mode</td>
+</tr>
 </tbody>
 </table>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># MAP (seconds)</span></span>
 <span><span class="va">map_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/opt.html">opt</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">map_fit</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Variational inference (seconds to minutes)</span></span>
+<span><span class="co"># Laplace approximation around the MAP (seconds)</span></span>
+<span><span class="va">laplace_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/laplace.html">laplace</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Variational inference (seconds)</span></span>
 <span><span class="va">vi_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/variational.html">variational</a></span><span class="op">(</span><span class="va">m</span>, method <span class="op">=</span> <span class="st">"meanfield"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># NUTS (minutes)</span></span>
-<span><span class="va">mcmc_draws</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mcmc.html">mcmc</a></span><span class="op">(</span><span class="va">m</span>, n_samples <span class="op">=</span> <span class="fl">1000</span>, warmup <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></span></code></pre></div>
+<span><span class="co"># NUTS (seconds on this small model)</span></span>
+<span><span class="va">mcmc_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mcmc.html">mcmc</a></span><span class="op">(</span><span class="va">m</span>, n_samples <span class="op">=</span> <span class="fl">500</span>, warmup <span class="op">=</span> <span class="fl">500</span>, chains <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mcmc_fit</span>, type <span class="op">=</span> <span class="st">"density"</span><span class="op">)</span></span></code></pre></div>
+<p>NUTS gives the reference posterior here: MAP and the Laplace
+approximation report a point estimate and a local Gaussian curvature
+around it, and ADVI reports a factorised approximate posterior, so the
+three faster methods are used to sanity-check a model quickly before
+committing to the full NUTS run.</p>
 </div>
 <div class="section level2">
 <h2 id="model-comparison-with-loo">Model Comparison with loo<a class="anchor" aria-label="anchor" href="#model-comparison-with-loo"></a>
 </h2>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Requires the loo package</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mc-stan.org/loo/" class="external-link">loo</a></span><span class="op">)</span></span>
-<span><span class="co"># Use posterior draws for LOO-CV</span></span>
-<span><span class="co"># (full implementation coming in Phase 3)</span></span></code></pre></div>
+<span></span>
+<span><span class="co"># loo::loo() takes a pointwise log-likelihood matrix, which gretaR does</span></span>
+<span><span class="co"># not currently compute internally -- it must be supplied by the caller</span></span>
+<span><span class="co"># from the fitted model's likelihood terms. There is no gretaR-native</span></span>
+<span><span class="co"># LOO-CV verb yet.</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
@@ -257,7 +278,7 @@ specification for standard models</li>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>

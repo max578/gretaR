@@ -6,7 +6,7 @@ required.**
 gretaR is a probabilistic programming package that lets you define
 Bayesian models interactively using native R syntax, then compile them
 to torch tensors and fit with HMC, NUTS, ADVI, MAP, and Laplace
-approximation — all on a native torch (libtorch) backend.
+approximation – all on a native torch (libtorch) backend.
 
 ## Installation
 
@@ -85,8 +85,10 @@ summary(draws)
   [`gretaR_glm()`](https://max578.github.io/gretaR/reference/gretaR_glm.md)
   for specifying GLMs with standard R formula syntax (Gaussian,
   Binomial, Poisson families)
-- **Hierarchical models** – nested and crossed random effects via the
-  core DSL
+- **Hierarchical models** – single-grouping-factor random effects via
+  [`random_effect()`](https://max578.github.io/gretaR/reference/random_effect.md),
+  with a continuous centring weight that interpolates between the
+  non-centred and centred parameterisations
 - **Sparse matrix support** – efficient large design matrices via
   `as_data_sparse()` and `sparse_matmul()`
 - **Native R torch backend** – automatic differentiation and zero Python
