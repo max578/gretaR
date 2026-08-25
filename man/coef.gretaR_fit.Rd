@@ -18,3 +18,13 @@ A named numeric vector of point estimates.
 Extract posterior means (for MCMC/VI) or MAP estimates as a
 named numeric vector.
 }
+\examples{
+\dontrun{
+mu <- normal(0, 10)
+y <- as_data(rnorm(50, 3, 1))
+distribution(y) <- normal(mu, 1)
+m <- model(mu)
+fit <- opt(m)
+coef(fit)
+}
+}

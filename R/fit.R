@@ -177,6 +177,15 @@ print.gretaR_fit <- function(x, ...) {
 #' @return A data frame of posterior summaries (from `posterior::summarise_draws()`),
 #'   or a list for MAP/Laplace fits.
 #' @export
+#' @examples
+#' \dontrun{
+#' mu <- normal(0, 10)
+#' y <- as_data(rnorm(50, 3, 1))
+#' distribution(y) <- normal(mu, 1)
+#' m <- model(mu)
+#' fit <- mcmc(m, n_samples = 200, warmup = 200, chains = 2)
+#' summary(fit)
+#' }
 summary.gretaR_fit <- function(object, ...) {
   if (!is.null(object$draws)) {
     posterior::summarise_draws(object$draws, ...)
@@ -202,6 +211,15 @@ summary.gretaR_fit <- function(object, ...) {
 #' @param ... Ignored.
 #' @return A named numeric vector of point estimates.
 #' @export
+#' @examples
+#' \dontrun{
+#' mu <- normal(0, 10)
+#' y <- as_data(rnorm(50, 3, 1))
+#' distribution(y) <- normal(mu, 1)
+#' m <- model(mu)
+#' fit <- opt(m)
+#' coef(fit)
+#' }
 coef.gretaR_fit <- function(object, ...) {
   if (!is.null(object$par)) {
     return(object$par)
@@ -228,6 +246,15 @@ coef.gretaR_fit <- function(object, ...) {
 #' @param ... Additional arguments passed to the bayesplot function.
 #' @return A ggplot object.
 #' @export
+#' @examples
+#' \dontrun{
+#' mu <- normal(0, 10)
+#' y <- as_data(rnorm(50, 3, 1))
+#' distribution(y) <- normal(mu, 1)
+#' m <- model(mu)
+#' fit <- mcmc(m, n_samples = 200, warmup = 200, chains = 2)
+#' plot(fit, type = "trace")
+#' }
 plot.gretaR_fit <- function(x, type = c("trace", "density", "pairs",
                                          "rhat", "neff"), ...) {
   type <- rlang::arg_match(type)

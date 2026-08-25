@@ -21,3 +21,13 @@ A ggplot object.
 Generate diagnostic plots for MCMC or VI posterior draws.
 Requires the \code{bayesplot} package.
 }
+\examples{
+\dontrun{
+mu <- normal(0, 10)
+y <- as_data(rnorm(50, 3, 1))
+distribution(y) <- normal(mu, 1)
+m <- model(mu)
+fit <- mcmc(m, n_samples = 200, warmup = 200, chains = 2)
+plot(fit, type = "trace")
+}
+}

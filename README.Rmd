@@ -98,7 +98,9 @@ summary(draws)
   Laplace approximation
 - **Formula interface** -- `gretaR_glm()` for specifying GLMs with standard R
   formula syntax (Gaussian, Binomial, Poisson families)
-- **Hierarchical models** -- nested and crossed random effects via the core DSL
+- **Hierarchical models** -- single-grouping-factor random effects via
+  `random_effect()`, with a continuous centring weight that interpolates
+  between the non-centred and centred parameterisations
 - **Sparse matrix support** -- efficient large design matrices via
   `as_data_sparse()` and `sparse_matmul()`
 - **Native R torch backend** -- automatic differentiation, GPU acceleration,
