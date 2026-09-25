@@ -88,7 +88,10 @@ model <- function(..., precision = c("float32", "float64")) {
     }
     node <- get_node(arr)
     if (node$node_type != "variable") {
-      gretaR_abort("Argument {target_names[i]} is not a variable node (it is '{node$node_type}').", reason_code = "invalid_input")
+      gretaR_abort(
+        "Argument {target_names[i]} is not a variable node (it is '{node$node_type}').",
+        reason_code = "invalid_input"
+      )
     }
     node$node_name <- target_names[i]
     free_vars[[node$id]] <- node

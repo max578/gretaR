@@ -279,10 +279,16 @@ distribution <- function(x) {
   dist_node <- get_node(value)
 
   if (is.null(data_node)) {
-    gretaR_abort("Left-hand side of {.code distribution(x) <- ...} must be a gretaR_array.", reason_code = "invalid_input")
+    gretaR_abort(
+      "Left-hand side of {.code distribution(x) <- ...} must be a gretaR_array.",
+      reason_code = "invalid_input"
+    )
   }
   if (is.null(dist_node) || is.null(dist_node$distribution)) {
-    gretaR_abort("Right-hand side must be a distribution (e.g., {.code normal(mu, sigma)}).", reason_code = "invalid_input")
+    gretaR_abort(
+      "Right-hand side must be a distribution (e.g., {.code normal(mu, sigma)}).",
+      reason_code = "invalid_input"
+    )
   }
 
   # Register this as a likelihood term:
@@ -347,7 +353,10 @@ distribution <- function(x) {
     )
     idx_node <- idx_r6
   } else {
-    gretaR_abort("Index for {.cls gretaR_array} must be integer, logical, or a gretaR_array.", reason_code = "invalid_input")
+    gretaR_abort(
+      "Index for {.cls gretaR_array} must be integer, logical, or a gretaR_array.",
+      reason_code = "invalid_input"
+    )
   }
 
   # --- Infer output dimensions ---
@@ -641,7 +650,10 @@ broadcast_dims <- function(dim1, dim2) {
     } else if (d2[i] == 1L) {
       out[i] <- d1[i]
     } else {
-      gretaR_abort("Incompatible dimensions for broadcasting: {dim1} vs {dim2}", reason_code = "untransformable_constraint")
+      gretaR_abort(
+        "Incompatible dimensions for broadcasting: {dim1} vs {dim2}",
+        reason_code = "untransformable_constraint"
+      )
     }
   }
   rev(out)

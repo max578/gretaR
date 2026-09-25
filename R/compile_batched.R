@@ -105,7 +105,10 @@
   } else if (is.numeric(param)) {
     torch_tensor(param, dtype = torch_float32())$reshape(c(1L, -1L, 1L))$to(device = dev)
   } else {
-    gretaR_abort("Cannot batch-resolve a parameter of class {.cls {class(param)}}.", reason_code = "untransformable_constraint")
+    gretaR_abort(
+      "Cannot batch-resolve a parameter of class {.cls {class(param)}}.",
+      reason_code = "untransformable_constraint"
+    )
   }
 }
 
@@ -165,7 +168,10 @@ compile_log_prob_batched <- function(model) {
         },
         variable = cache[[nid]],
         operation = .batched_op(node, bcompute, C),
-        gretaR_abort("Batched eval: unsupported node type {.val {node$node_type}}.", reason_code = "unsupported_distribution")
+        gretaR_abort(
+          "Batched eval: unsupported node type {.val {node$node_type}}.",
+          reason_code = "unsupported_distribution"
+        )
       )
       cache[[nid]] <- val
       val

@@ -428,7 +428,10 @@ stan_sample <- function(model, n_samples = 1000L, warmup = 1000L,
                         chains = 4L, verbose = TRUE, ...) {
 
   if (!requireNamespace("cmdstanr", quietly = TRUE)) {
-    gretaR_abort("Package {.pkg cmdstanr} is required for the Stan backend. Install from https://mc-stan.org/cmdstanr/", reason_code = "backend_unavailable")
+    gretaR_abort(
+      "Package {.pkg cmdstanr} is required for the Stan backend. Install from https://mc-stan.org/cmdstanr/",
+      reason_code = "backend_unavailable"
+    )
   }
 
   # Generate Stan code

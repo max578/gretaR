@@ -29,3 +29,6 @@
 ^PROJECT_LOG_ARCHIVE\.md$
 ^CITATION\.cff$
 ^CONSTELLATION_MEMBER\.md$
+^\.claude$
+^\.positai$
+^\.cursor$

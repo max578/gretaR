@@ -358,7 +358,10 @@ plot.gretaR_draws <- function(x, type = c("trace", "density", "pairs"), ...) {
   type <- rlang::arg_match(type)
 
   if (!requireNamespace("bayesplot", quietly = TRUE)) {
-    gretaR_abort("Package {.pkg bayesplot} is required for plotting. Install with {.code install.packages('bayesplot')}.", reason_code = "backend_unavailable")
+    gretaR_abort(
+      "Package {.pkg bayesplot} is required for plotting. Install with {.code install.packages('bayesplot')}.",
+      reason_code = "backend_unavailable"
+    )
   }
 
   switch(type,
