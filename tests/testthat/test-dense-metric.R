@@ -96,8 +96,12 @@ test_that("dense metric recovers a correlated posterior and out-mixes diagonal",
   expect_lt(abs(b2e$mean - 0.5), 0.2)
   expect_lt(max(se$rhat, na.rm = TRUE), 1.1)
 
-  # Payoff: dense mixes the correlated posterior better than diagonal.
-  expect_gt(min(se$ess_bulk, na.rm = TRUE), min(sd_$ess_bulk, na.rm = TRUE))
+  # Payoff: dense mixes the correlated pair better than diagonal. The noise
+  # scale s is left out: neither metric targets it, and its ESS varies by
+  # platform enough to flip a comparison that includes it.
+  pair <- c("b1", "b2")
+  expect_gt(min(se$ess_bulk[se$variable %in% pair]),
+            min(sd_$ess_bulk[sd_$variable %in% pair]))
 })
 
 test_that("mcmc rejects an unknown metric", {
