@@ -1,6 +1,6 @@
 # Changelog
 
-## gretaR (development version)
+## gretaR 0.5.2
 
 ### Documentation
 
@@ -292,9 +292,9 @@ Both samplers are now verified against closed-form analytic posteriors.
 
 ### Documentation
 
-- The GPU-acceleration claim is scoped honestly: gretaR is a native-R
-  `torch` (libtorch) backend; the measured performance win is CPU
-  multi-chain batching. Constrained-transform support for
+- The GPU-acceleration claim is narrowed: gretaR is a native-R `torch`
+  (libtorch) backend; the measured performance win is CPU multi-chain
+  batching. Constrained-transform support for
   [`dirichlet()`](https://max578.github.io/gretaR/reference/dirichlet.md)
   /
   [`lkj_correlation()`](https://max578.github.io/gretaR/reference/lkj_correlation.md)
@@ -348,7 +348,7 @@ first externally-released version.
 ### Diagnostics & timing
 
 - `mcmc()$run_time` is now the actual elapsed sampler wall-time
-  (seconds), not a placeholder copy of `n_samples`.
+  (seconds), not a copy of `n_samples`.
 - [`mcmc()`](https://max578.github.io/gretaR/reference/mcmc.md)
   divergence diagnostics now use the **post-warmup** window
   consistently. The `n_divergences` field in `fit$convergence` and the
@@ -380,7 +380,7 @@ first externally-released version.
 ### Documentation
 
 - [`gretaR_glm()`](https://max578.github.io/gretaR/reference/gretaR_glm.md)
-  docs honestly describe random-effect support: `(1|group)` and
+  docs describe random-effect support accurately: `(1|group)` and
   `(0 + x | group)` work; correlated intercept + slope `(x | group)`
   raises an informative error pointing to the
   `(1|group) + (0 + x|group)` workaround until LKJ-Cholesky lands in

@@ -10,9 +10,9 @@ Python/TensorFlow dependency – and adding modern inference capabilities.
 
 The comparisons below describe greta’s API and dependencies as of
 gretaR’s own development; they are not re-verified against greta’s
-current release on every gretaR update and should be treated as
-`[unverified]` for any greta version you have not checked directly
-against [the greta repository](https://github.com/greta-dev/greta).
+current release on every gretaR update, so check them for your greta
+version against [the greta
+repository](https://github.com/greta-dev/greta).
 
 Three reasons to migrate:
 
