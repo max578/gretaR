@@ -1,4 +1,4 @@
-# gretaR (development version)
+# gretaR 0.5.2
 
 ## Documentation
 
@@ -224,7 +224,7 @@ samplers are now verified against closed-form analytic posteriors.
 
 ## Documentation
 
-* The GPU-acceleration claim is scoped honestly: gretaR is a native-R `torch`
+* The GPU-acceleration claim is narrowed: gretaR is a native-R `torch`
   (libtorch) backend; the measured performance win is CPU multi-chain batching.
   Constrained-transform support for `dirichlet()` / `lkj_correlation()` /
   `wishart()` as samplable latents remains scheduled for a later release.
@@ -263,7 +263,7 @@ externally-released version.
 ## Diagnostics & timing
 
 * `mcmc()$run_time` is now the actual elapsed sampler wall-time (seconds),
-  not a placeholder copy of `n_samples`.
+  not a copy of `n_samples`.
 * `mcmc()` divergence diagnostics now use the **post-warmup** window
   consistently. The `n_divergences` field in `fit$convergence` and the
   user-visible warning count exclude warmup-phase divergences. Both windows
@@ -284,7 +284,7 @@ externally-released version.
 
 ## Documentation
 
-* `gretaR_glm()` docs honestly describe random-effect support: `(1|group)`
+* `gretaR_glm()` docs describe random-effect support accurately: `(1|group)`
   and `(0 + x | group)` work; correlated intercept + slope `(x | group)`
   raises an informative error pointing to the
   `(1|group) + (0 + x|group)` workaround until LKJ-Cholesky lands in v0.3.
