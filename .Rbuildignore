@@ -32,3 +32,4 @@
 ^\.claude$
 ^\.positai$
 ^\.cursor$
+^rpkg_quality\.yml$
