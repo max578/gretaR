@@ -117,6 +117,20 @@ summary(draws)
 | **Formula interface** | `gretaR_glm()` | No | `brm()` | No |
 | **Maintenance status** | Active | Maintenance-only | Active | Active |
 
+## Related packages
+
+- [greta](https://CRAN.R-project.org/package=greta) lets you write
+  statistical models in R and fit them by MCMC and optimisation on CPUs and GPUs,
+  using TensorFlow.
+- [brms](https://CRAN.R-project.org/package=brms) fits Bayesian
+  generalised (non-)linear multivariate multilevel models using Stan.
+- [rstanarm](https://CRAN.R-project.org/package=rstanarm) fits
+  precompiled Bayesian regression models through rstan, specified with
+  an R formula and a data frame.
+- [nimble](https://CRAN.R-project.org/package=nimble) lets you write
+  hierarchical models in a language close to BUGS and JAGS, and compiles
+  them to C++ for MCMC and other algorithms.
+
 ## Inference Methods
 
 | Method | Function | Use Case |
