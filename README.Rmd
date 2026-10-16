@@ -13,7 +13,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# gretaR
+# gretaR <img src="man/figures/logo.png" align="right" height="139" alt="gretaR logo" />
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/max578/gretaR/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/max578/gretaR/actions/workflows/R-CMD-check.yaml)
