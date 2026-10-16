@@ -25,15 +25,11 @@ approximation -- all on a native torch (libtorch) backend.
 ## Installation
 
 gretaR will be available from CRAN after acceptance. In the meantime,
-install binaries from R-Universe (built within ~1 hour of every commit
-to `main`):
+install it from GitHub:
 
 ``` r
-options(repos = c(
-  max578 = "https://max578.r-universe.dev",
-  CRAN   = "https://cloud.r-project.org"
-))
-install.packages("gretaR")
+# install.packages("pak")
+pak::pak("max578/gretaR")
 ```
 
 Or build from source with vignettes:
