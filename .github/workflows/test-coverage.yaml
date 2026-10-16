@@ -45,7 +45,7 @@ jobs:
           # Flip to true once CODECOV_TOKEN is configured as a repo secret.
           fail_ci_if_error: false
           files: ./cobertura.xml
-          plugin: noop
+          plugins: noop
           disable_search: true
           token: ${{ secrets.CODECOV_TOKEN }}
 
