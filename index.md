@@ -11,16 +11,12 @@ approximation – all on a native torch (libtorch) backend.
 ## Installation
 
 gretaR will be available from CRAN after acceptance. In the meantime,
-install binaries from R-Universe (built within ~1 hour of every commit
-to `main`):
+install it from GitHub:
 
 ``` r
 
-options(repos = c(
-  max578 = "https://max578.r-universe.dev",
-  CRAN   = "https://cloud.r-project.org"
-))
-install.packages("gretaR")
+# install.packages("pak")
+pak::pak("max578/gretaR")
 ```
 
 Or build from source with vignettes:
@@ -116,6 +112,20 @@ summary(draws)
 | **Variational inference** | ADVI (MF + FR) | No | No | Yes |
 | **Formula interface** | [`gretaR_glm()`](https://max578.github.io/gretaR/reference/gretaR_glm.md) | No | `brm()` | No |
 | **Maintenance status** | Active | Maintenance-only | Active | Active |
+
+## Related packages
+
+- [greta](https://CRAN.R-project.org/package=greta) lets you write
+  statistical models in R and fit them by MCMC and optimisation on CPUs
+  and GPUs, using TensorFlow.
+- [brms](https://CRAN.R-project.org/package=brms) fits Bayesian
+  generalised (non-)linear multivariate multilevel models using Stan.
+- [rstanarm](https://CRAN.R-project.org/package=rstanarm) fits
+  precompiled Bayesian regression models through rstan, specified with
+  an R formula and a data frame.
+- [nimble](https://CRAN.R-project.org/package=nimble) lets you write
+  hierarchical models in a language close to BUGS and JAGS, and compiles
+  them to C++ for MCMC and other algorithms.
 
 ## Inference Methods
 

@@ -13,6 +13,7 @@
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Bayesian Statistical Modelling with Torch">
 <meta name="description" content="A probabilistic programming package for Bayesian statistical modelling in R using native R syntax. Models are defined interactively with gretaR_array objects, then compiled to torch tensors for Hamiltonian Monte Carlo and No-U-Turn Sampler inference. Runs on a native torch (libtorch) backend with no Python dependency required.">
 <meta property="og:description" content="A probabilistic programming package for Bayesian statistical modelling in R using native R syntax. Models are defined interactively with gretaR_array objects, then compiled to torch tensors for Hamiltonian Monte Carlo and No-U-Turn Sampler inference. Runs on a native torch (libtorch) backend with no Python dependency required.">
+<meta property="og:image" content="https://max578.github.io/gretaR/logo.png">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -57,8 +58,10 @@
 </nav><div class="container template-home">
 <div class="row">
   <main id="main" class="col-md-9"><div class="section level1">
-<div class="page-header"><h1 id="gretar">gretaR<a class="anchor" aria-label="anchor" href="#gretar"></a>
-</h1></div>
+<div class="page-header">
+<img src="logo.png" class="logo" alt=""><h1 id="gretar-">gretaR <a class="anchor" aria-label="anchor" href="#gretar-"></a>
+</h1>
+</div>
 <!-- badges: start -->
 
 <p><strong>Bayesian statistical modelling in R, powered by torch – no Python required.</strong></p>
@@ -66,13 +69,10 @@
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>gretaR will be available from CRAN after acceptance. In the meantime, install binaries from R-Universe (built within ~1 hour of every commit to <code>main</code>):</p>
+<p>gretaR will be available from CRAN after acceptance. In the meantime, install it from GitHub:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>  max578 <span class="op">=</span> <span class="st">"https://max578.r-universe.dev"</span>,</span>
-<span>  CRAN   <span class="op">=</span> <span class="st">"https://cloud.r-project.org"</span></span>
-<span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"gretaR"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># install.packages("pak")</span></span>
+<span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"max578/gretaR"</span><span class="op">)</span></span></code></pre></div>
 <p>Or build from source with vignettes:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("remotes")</span></span>
@@ -223,6 +223,20 @@
 </tr>
 </tbody>
 </table>
+</div>
+<div class="section level2">
+<h2 id="related-packages">Related packages<a class="anchor" aria-label="anchor" href="#related-packages"></a>
+</h2>
+<ul>
+<li>
+<a href="https://CRAN.R-project.org/package=greta" class="external-link">greta</a> lets you write statistical models in R and fit them by MCMC and optimisation on CPUs and GPUs, using TensorFlow.</li>
+<li>
+<a href="https://CRAN.R-project.org/package=brms" class="external-link">brms</a> fits Bayesian generalised (non-)linear multivariate multilevel models using Stan.</li>
+<li>
+<a href="https://CRAN.R-project.org/package=rstanarm" class="external-link">rstanarm</a> fits precompiled Bayesian regression models through rstan, specified with an R formula and a data frame.</li>
+<li>
+<a href="https://CRAN.R-project.org/package=nimble" class="external-link">nimble</a> lets you write hierarchical models in a language close to BUGS and JAGS, and compiles them to C++ for MCMC and other algorithms.</li>
+</ul>
 </div>
 <div class="section level2">
 <h2 id="inference-methods">Inference Methods<a class="anchor" aria-label="anchor" href="#inference-methods"></a>
